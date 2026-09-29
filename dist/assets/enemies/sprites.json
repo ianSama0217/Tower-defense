@@ -1,0 +1,77 @@
+{
+  "layout": "horizontal",
+  "columns": 20,
+  "rows": 1,
+  "spacing": 0,
+  "margin": 0,
+  "animations": {
+    "idle": {
+      "start": 0,
+      "count": 4,
+      "fps": 5,
+      "loop": true
+    },
+    "walk": {
+      "start": 4,
+      "count": 4,
+      "fps": 8,
+      "loop": true
+    },
+    "attack": {
+      "start": 8,
+      "count": 4,
+      "fps": 10,
+      "loop": false
+    },
+    "hurt": {
+      "start": 12,
+      "count": 2,
+      "fps": 10,
+      "loop": false
+    },
+    "death": {
+      "start": 14,
+      "count": 6,
+      "fps": 8,
+      "loop": false
+    }
+  },
+  "enemies": {
+    "1": {
+      "file": "enemy_lv1_goblin.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "width": 480,
+      "height": 24,
+      "anchor": {
+        "x": 12,
+        "y": 21
+      },
+      "facing": "right"
+    },
+    "2": {
+      "file": "enemy_lv2_orc.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "width": 640,
+      "height": 32,
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "facing": "right"
+    },
+    "3": {
+      "file": "enemy_lv3_cyclops.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "width": 960,
+      "height": 48,
+      "anchor": {
+        "x": 24,
+        "y": 45
+      },
+      "facing": "right"
+    }
+  }
+}

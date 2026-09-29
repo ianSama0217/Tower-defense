@@ -1,0 +1,85 @@
+{
+  "layout": "horizontal",
+  "spacing": 0,
+  "margin": 0,
+  "enemies": {
+    "4": {
+      "file": "enemy_bomber_goblin.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "width": 768,
+      "height": 32,
+      "frames": 24,
+      "anchor": {
+        "x": 16,
+        "y": 29
+      },
+      "animations": {
+        "idle": {
+          "start": 0,
+          "count": 6,
+          "fps": 6,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 10,
+          "loop": true
+        },
+        "hurt": {
+          "start": 12,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "death": {
+          "start": 18,
+          "count": 6,
+          "fps": 8,
+          "loop": false
+        }
+      },
+      "facing": "right"
+    },
+    "5": {
+      "file": "enemy_slime.png",
+      "frameWidth": 24,
+      "frameHeight": 24,
+      "width": 576,
+      "height": 24,
+      "frames": 24,
+      "anchor": {
+        "x": 12,
+        "y": 21
+      },
+      "animations": {
+        "idle": {
+          "start": 0,
+          "count": 6,
+          "fps": 6,
+          "loop": true
+        },
+        "walk": {
+          "start": 6,
+          "count": 6,
+          "fps": 10,
+          "loop": true
+        },
+        "hurt": {
+          "start": 12,
+          "count": 6,
+          "fps": 20,
+          "loop": false
+        },
+        "death": {
+          "start": 18,
+          "count": 6,
+          "fps": 8,
+          "loop": false
+        }
+      },
+      "facing": "right"
+    }
+  }
+}

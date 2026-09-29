@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="theme-color" content="#eeeae0"><meta name="description" content="點選地形建造箭塔，守住蛇形道路與左中右隨機分流的兩道防線。">
+  <title>幾何防線 · 森林守衛</title>
+  <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='4' fill='%233b6b60'/%3E%3Cpath d='M16 9v14' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
+  <link rel="stylesheet" href="style.css">
+  <link rel="stylesheet" href="start-screen.css">
+  <link rel="stylesheet" href="level-select.css">
+</head>
+<body>
+  <section id="start-screen" aria-labelledby="menu-title">
+    <canvas id="forest-scene" aria-hidden="true"></canvas>
+    <div class="forest-light" aria-hidden="true"></div>
+    <div class="menu-brand"><span class="brand-emblem" aria-hidden="true"></span>幾何防線<span class="brand-divider">/</span><span>森林守衛</span></div>
+    <div class="menu-content">
+      <p class="menu-eyebrow"><span aria-hidden="true">✦</span> 林間的冒險，即將開始 <span aria-hidden="true">✦</span></p>
+      <h1 id="menu-title">幾何防線</h1>
+      <p class="menu-subtitle">築起箭塔，守護這片森林。</p>
+      <nav class="wood-sign" aria-label="主選單">
+        <span class="sign-rope rope-left" aria-hidden="true"></span><span class="sign-rope rope-right" aria-hidden="true"></span>
+        <span class="sign-post" aria-hidden="true"></span>
+        <button id="start" class="wood-button" disabled><span class="menu-pointer" aria-hidden="true"></span><span id="start-label">開始遊戲</span><span class="menu-spark" aria-hidden="true">✦</span></button>
+        <button id="settings-open" class="wood-button wood-secondary" aria-haspopup="dialog"><span class="menu-pointer" aria-hidden="true"></span><span>設定</span><span class="menu-spark" aria-hidden="true">✦</span></button>
+        <img class="sign-fern" src="assets/environment/fern.png" alt=""><img class="sign-flowers" src="assets/environment/whiteFlowers.png" alt="">
+      </nav>
+      <p id="menu-status" class="menu-status" role="status">正在準備森林素材…</p>
+    </div>
+    <div class="menu-footer"><span class="footer-leaf" aria-hidden="true">◆</span> 每一座箭塔，都是森林的防線 <span class="footer-leaf" aria-hidden="true">◆</span></div>
+  </section>
+  <section id="level-screen" aria-labelledby="world-title" hidden>
+    <div class="world-topbar"><button id="world-back" class="world-back"><span aria-hidden="true">←</span> 返回首頁</button><span class="world-brand">幾何防線 <span>/</span> 森林守衛</span><span class="world-chapter">WORLD 01</span></div>
+    <div class="world-heading"><p>第一章 · FOREST TRAIL</p><h1 id="world-title">翡翠森林</h1><span>沿著林間小徑，走向森林深處。</span></div>
+    <div class="world-map" id="world-map">
+      <canvas id="world-scenery" aria-hidden="true"></canvas>
+      <nav id="world-levels" aria-label="森林關卡地圖">
+        <button class="level-node" data-stage="1" aria-label="第 1 關，林間入口" aria-pressed="true"><span class="node-art"><img class="node-pad" src="assets/environment/buildPad.png" alt=""><img class="node-tower" src="assets/towers/tower_lv1.png" alt=""></span><span class="node-number">1</span><span class="node-name">林間入口</span><span class="node-marker" aria-hidden="true">▼</span></button>
+        <button class="level-node" data-stage="2" aria-label="第 2 關，花徑哨站" aria-pressed="false"><span class="node-art"><img class="node-pad" src="assets/environment/buildPad.png" alt=""><img class="node-tower" src="assets/towers/tower_lv1.png" alt=""></span><span class="node-number">2</span><span class="node-name">花徑哨站</span><span class="node-marker" aria-hidden="true">▼</span></button>
+        <button class="level-node" data-stage="3" aria-label="第 3 關，古木岔路" aria-pressed="false"><span class="node-art"><img class="node-pad" src="assets/environment/buildPad.png" alt=""><img class="node-tower" src="assets/towers/tower_lv1.png" alt=""></span><span class="node-number">3</span><span class="node-name">古木岔路</span><span class="node-marker" aria-hidden="true">▼</span></button>
+        <button class="level-node" data-stage="4" aria-label="第 4 關，暮色防線" aria-pressed="false"><span class="node-art"><img class="node-pad" src="assets/environment/buildPad.png" alt=""><img class="node-tower" src="assets/towers/tower_lv2.png" alt=""></span><span class="node-number">4</span><span class="node-name">暮色防線</span><span class="node-marker" aria-hidden="true">▼</span></button>
+        <button class="level-node boss-node" data-stage="5" aria-label="第 5 關，BOSS，荊棘王座" aria-pressed="false"><span class="boss-banner">BOSS</span><span class="node-art"><img class="boss-fort" src="assets/ui/boss-fort.svg" alt=""></span><span class="node-number">5</span><span class="node-name">荊棘王座</span><span class="node-marker" aria-hidden="true">▼</span></button>
+      </nav>
+      <div class="map-compass" aria-hidden="true"><span>N</span><b>✦</b><small>翡翠林地</small></div>
+    </div>
+    <div class="world-bottom"><div class="stage-details" aria-live="polite" aria-atomic="true"><span id="stage-index">01</span><div><p id="stage-kind">森林旅程 · 第 1 關</p><h2 id="stage-title">林間入口</h2><p id="stage-description">陽光灑落的小徑，森林旅程的起點。</p></div><span id="stage-availability">關卡準備中</span></div><p class="world-help">點選關卡查看路標 <span>·</span> 五段旅程，一片需要守護的森林</p></div>
+  </section>
+  <dialog id="settings-dialog" aria-labelledby="settings-title">
+    <form method="dialog" class="settings-panel">
+      <p class="settings-eyebrow">FOREST DEFENSE</p>
+      <h2 id="settings-title">遊戲設定</h2>
+      <div class="setting-row"><label for="default-speed">初始遊戲速度<small>進入關卡後仍可隨時切換</small></label><select id="default-speed"><option value="1">正常 · 1×</option><option value="2">快速 · 2×</option></select></div>
+      <div class="setting-row"><label for="ambient-motion">森林動態<small>首頁的螢火與浮動光點</small></label><input id="ambient-motion" type="checkbox" role="switch" checked></div>
+      <p id="settings-note">設定會自動保存在此瀏覽器。</p>
+      <button class="wood-button settings-done" autofocus>返回木牌</button>
+    </form>
+  </dialog>
+  <main id="game" hidden>
+    <header>
+      <div id="lives" class="life-counter" role="img" aria-label="剩餘生命 3 / 3"><span class="heart" aria-hidden="true">♥</span><span class="heart" aria-hidden="true">♥</span><span class="heart" aria-hidden="true">♥</span></div>
+      <div class="stats"><div><span>金幣</span><strong id="money">240</strong></div><div><span>波次</span><strong id="wave">0 <small>/ 6</small></strong></div></div>
+      <div class="controls"><button id="speed" aria-label="切換遊戲速度">1×</button><button id="pause" aria-label="暫停遊戲">Ⅱ</button></div>
+    </header>
+    <section class="play-layout">
+      <div class="board-wrap"><div class="board-caption"><span class="status-dot"></span><span id="status" role="status">部署箭塔</span><nav class="level-tabs" aria-label="選擇關卡"><button id="level-1" aria-pressed="true" title="重新開始第一關">第一關</button><button id="level-2" aria-pressed="false" title="開始第二關，重新部署">第二關</button></nav></div><canvas id="board" tabindex="0" aria-label="點選方形底座建造箭塔；方向鍵選擇底座，Enter 確認"></canvas></div>
+      <aside>
+        <div class="tower-summary"><h2 id="tower-title">點選地形</h2><p id="tower-health" class="tower-health" hidden>生命 100 / 100 HP</p><p id="tower-copy">點選方形底座，查看可建造的建築。</p><p id="tower-work" class="tower-work" hidden></p><canvas id="tower-progress" width="48" height="48" hidden role="progressbar" aria-label="箭塔作業進度" aria-valuemin="0" aria-valuemax="100" aria-valuenow="0"></canvas></div>
+        <div id="building-options" class="building-options" hidden><button id="build" class="building-card" aria-label="建造箭塔，60 金幣"><span class="building-icon" aria-hidden="true">1</span><span>箭塔</span><small>60 金幣</small></button></div>
+        <div id="tower-stats" class="tower-stats" hidden><div><span>傷害</span><b id="damage">12</b></div><div><span>射程</span><b id="range">155</b></div><div><span>等級</span><b id="level">1 / 3</b></div></div>
+        <div id="tower-actions" class="tower-actions" hidden><button id="upgrade" class="primary">升級</button><button id="repair" class="primary" hidden>修復 · 50 金幣 · 3 秒</button><button id="demolish" class="secondary">拆除</button></div><p id="feedback" role="status" class="feedback"></p>
+      </aside>
+    </section>
+  </main>
+  <div id="result" class="modal" hidden><div class="result-card"><span id="result-level" class="section-label">第一關</span><h2 id="result-title"></h2><p id="result-copy"></p><button id="next-level" class="primary" hidden>進入第二關 ↗</button><button id="restart" class="secondary">重玩本關</button></div></div>
+  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="tower-work.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="start-screen.js"></script><script src="level-select.js"></script><script src="game.js"></script>
+</body>
+</html>

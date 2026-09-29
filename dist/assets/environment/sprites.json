@@ -1,0 +1,182 @@
+{
+  "oak": {
+    "file": "oak.png",
+    "width": 54,
+    "height": 64
+  },
+  "roundTree": {
+    "file": "roundTree.png",
+    "width": 44,
+    "height": 56
+  },
+  "birch": {
+    "file": "birch.png",
+    "width": 33,
+    "height": 52
+  },
+  "pine": {
+    "file": "pine.png",
+    "width": 41,
+    "height": 60
+  },
+  "limeTree": {
+    "file": "limeTree.png",
+    "width": 39,
+    "height": 52
+  },
+  "oldOak": {
+    "file": "oldOak.png",
+    "width": 77,
+    "height": 80
+  },
+  "goldTree": {
+    "file": "goldTree.png",
+    "width": 48,
+    "height": 60
+  },
+  "sapling": {
+    "file": "sapling.png",
+    "width": 36,
+    "height": 34
+  },
+  "youngTree": {
+    "file": "youngTree.png",
+    "width": 36,
+    "height": 36
+  },
+  "smallTree": {
+    "file": "smallTree.png",
+    "width": 40,
+    "height": 34
+  },
+  "smallOak": {
+    "file": "smallOak.png",
+    "width": 36,
+    "height": 35
+  },
+  "bush": {
+    "file": "bush.png",
+    "width": 28,
+    "height": 23
+  },
+  "flowers": {
+    "file": "flowers.png",
+    "width": 32,
+    "height": 22
+  },
+  "orangeBush": {
+    "file": "orangeBush.png",
+    "width": 32,
+    "height": 19
+  },
+  "berryBush": {
+    "file": "berryBush.png",
+    "width": 28,
+    "height": 22
+  },
+  "log": {
+    "file": "log.png",
+    "width": 36,
+    "height": 23
+  },
+  "boulders": {
+    "file": "boulders.png",
+    "width": 48,
+    "height": 30
+  },
+  "standingRock": {
+    "file": "standingRock.png",
+    "width": 36,
+    "height": 31
+  },
+  "rockCluster": {
+    "file": "rockCluster.png",
+    "width": 48,
+    "height": 25
+  },
+  "mossRock": {
+    "file": "mossRock.png",
+    "width": 34,
+    "height": 30
+  },
+  "rock": {
+    "file": "rock.png",
+    "width": 28,
+    "height": 22
+  },
+  "pebble": {
+    "file": "pebble.png",
+    "width": 20,
+    "height": 19
+  },
+  "lowRock": {
+    "file": "lowRock.png",
+    "width": 24,
+    "height": 20
+  },
+  "stump": {
+    "file": "stump.png",
+    "width": 28,
+    "height": 24
+  },
+  "fallenLog": {
+    "file": "fallenLog.png",
+    "width": 36,
+    "height": 23
+  },
+  "grass": {
+    "file": "grass.png",
+    "width": 48,
+    "height": 48
+  },
+  "grassDirt": {
+    "file": "grassDirt.png",
+    "width": 47,
+    "height": 48
+  },
+  "dirt": {
+    "file": "dirt.png",
+    "width": 46,
+    "height": 48
+  },
+  "meadow": {
+    "file": "meadow.png",
+    "width": 46,
+    "height": 48
+  },
+  "flowerGrass": {
+    "file": "flowerGrass.png",
+    "width": 48,
+    "height": 48
+  },
+  "fern": {
+    "file": "fern.png",
+    "width": 20,
+    "height": 18
+  },
+  "tuft": {
+    "file": "tuft.png",
+    "width": 18,
+    "height": 18
+  },
+  "reeds": {
+    "file": "reeds.png",
+    "width": 24,
+    "height": 18
+  },
+  "whiteFlowers": {
+    "file": "whiteFlowers.png",
+    "width": 16,
+    "height": 15
+  },
+  "pinkFlowers": {
+    "file": "pinkFlowers.png",
+    "width": 16,
+    "height": 16
+  },
+  "buildPad": {
+    "file": "buildPad.png",
+    "width": 40,
+    "height": 32
+  }
+}

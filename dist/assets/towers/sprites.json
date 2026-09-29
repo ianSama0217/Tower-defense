@@ -1,0 +1,51 @@
+{
+  "view": "three-quarter-slightly-elevated",
+  "footprintTiles": {
+    "width": 2,
+    "height": 2
+  },
+  "towers": {
+    "1": {
+      "file": "tower_lv1.png",
+      "width": 64,
+      "height": 64,
+      "anchor": {
+        "x": 32,
+        "y": 61
+      },
+      "archers": 1,
+      "footprintTiles": {
+        "width": 2,
+        "height": 2
+      }
+    },
+    "2": {
+      "file": "tower_lv2.png",
+      "width": 80,
+      "height": 80,
+      "anchor": {
+        "x": 40,
+        "y": 77
+      },
+      "archers": 2,
+      "footprintTiles": {
+        "width": 2,
+        "height": 2
+      }
+    },
+    "3": {
+      "file": "tower_lv3.png",
+      "width": 96,
+      "height": 96,
+      "anchor": {
+        "x": 48,
+        "y": 93
+      },
+      "archers": 3,
+      "footprintTiles": {
+        "width": 2,
+        "height": 2
+      }
+    }
+  }
+}
