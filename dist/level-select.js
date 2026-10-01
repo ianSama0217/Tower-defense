@@ -6,7 +6,7 @@
   const ctx = canvas.getContext('2d');
   const nodes = [...document.querySelectorAll('.level-node')];
   const stages = [
-    { name: '林間入口', description: '陽光灑落的小徑，森林旅程的起點。' },
+    { name: '林間入口', description: '四波入門教學：建造箭塔、升級防線，認識會攻塔的哥布林。' },
     { name: '花徑哨站', description: '穿過盛開的花叢，抵達林間的寧靜哨站。' },
     { name: '古木岔路', description: '古老橡樹盤根交錯，小徑在此分岔。' },
     { name: '暮色防線', description: '暮色籠罩最後的哨塔，前方就是森林禁地。' },
@@ -20,6 +20,10 @@
     document.getElementById('stage-kind').textContent = index === 4 ? 'BOSS · 第 5 關' : `森林旅程 · 第 ${index + 1} 關`;
     document.getElementById('stage-title').textContent = stages[index].name;
     document.getElementById('stage-description').textContent = stages[index].description;
+    document.getElementById('stage-enter').hidden=index!==0;
+    document.getElementById('stage-availability').hidden=index===0;
+    let completed=false;try{completed=localStorage.getItem('td-tutorial-complete')==='true';}catch{}
+    document.getElementById('stage-enter').textContent=completed?'已通關 · 重玩教學 →':'開始教學 →';
     document.querySelector('.world-bottom').classList.toggle('is-boss', index === 4);
     if (focus) nodes[index].focus({ preventScroll: true });
   }

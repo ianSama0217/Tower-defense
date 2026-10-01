@@ -1,10 +1,11 @@
+const {combatScenario}=require('./fixtures.cjs');
 const {test}=require('node:test');
 const assert=require('node:assert/strict');
 const fs=require('node:fs');
 const path=require('node:path');
 const zlib=require('node:zlib');
 const sprites=require('../dist/enemy-sprites.js');
-const {Game,ENEMIES,position,WAVES}=require('../dist/engine.js');
+const {Game,ENEMIES,position}=require('../dist/engine.js');
 const manifest=require('../dist/assets/enemies/sprites.json');
 
 // Decode the delivered 8-bit RGBA PNGs with Node built-ins so tests need no packages.
@@ -87,18 +88,18 @@ test('new monster frames have exact dimensions, fixed anchors, transparent edges
 });
 function enemy(g,level=1,distance=16){const s=ENEMIES[level],route=g.level.routes[0];const e={id:1,level,hp:s.hp,maxHp:s.hp,distance,remaining:route.length-distance,routeIndex:0,...position(distance,route)};g.enemies.push(e);return e;}
 test('hit, attack, movement and death events drive animation without changing rewards or routes',()=>{
-  const g=new Game();g.start();g.countdown=999;g.build(25);g.slots[25].cooldown=999;
+  const g=new Game(Math.random,combatScenario());g.start();g.countdown=999;g.build(1);g.slots[1].cooldown=999;Object.assign(g.slots[1],{x:1248,y:380});
   const e=enemy(g);g.update(.01);assert.equal(e.facing,-1);assert.equal(e.attackAt,g.time);
   g.bullets.push({x:e.x,y:e.y,target:e,damage:1});g.update(.01);assert.equal(sprites.sample(e,g.time).state,'hurt');
   const money=g.money;g.bullets.push({x:e.x,y:e.y,target:e,damage:999},{x:e.x,y:e.y,target:e,damage:999});g.update(.01);
   assert.equal(g.enemies.length,0);assert.equal(g.corpses.length,1);assert.equal(g.money,money+ENEMIES[1].reward);assert.equal(g.kills,1);
-  const corpse=g.corpses[0],x=corpse.x,y=corpse.y,hp=g.slots[25].hp;
-  g.update(.63);assert.equal(sprites.sample(corpse,g.time).index,19);assert.equal(corpse.x,x);assert.equal(corpse.y,y);assert.equal(g.slots[25].hp,hp);
+  const corpse=g.corpses[0],x=corpse.x,y=corpse.y,hp=g.slots[1].hp;
+  g.update(.63);assert.equal(sprites.sample(corpse,g.time).index,19);assert.equal(corpse.x,x);assert.equal(corpse.y,y);assert.equal(g.slots[1].hp,hp);
   g.update(.13);assert.equal(g.corpses.length,0);
 });
 test('victory waits for death playback, resets clear corpses and escapes create no corpse',()=>{
-  const g=new Game();g.start();g.countdown=0;g.wave=WAVES.length;const e=enemy(g);g.bullets.push({x:e.x,y:e.y,target:e,damage:999});g.update(.01);
+  const g=new Game(Math.random,combatScenario());g.start();g.countdown=0;g.wave=g.waves.length;const e=enemy(g);g.bullets.push({x:e.x,y:e.y,target:e,damage:999});g.update(.01);
   assert.equal(g.phase,'playing');g.update(.76);assert.equal(g.phase,'won');
   g.start();g.countdown=999;enemy(g,1,g.level.routes[0].length-.1);g.update(.01);assert.equal(g.corpses.length,0);assert.equal(g.lives,2);
-  g.corpses.push({level:1,deathAt:g.time});g.start(1);assert.equal(g.corpses.length,0);
+  g.corpses.push({level:1,deathAt:g.time});g.start();assert.equal(g.corpses.length,0);
 });

@@ -1,13 +1,12 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
-const {Game,ENEMIES,ENEMY_TYPES,WAVES,position}=require('../dist/engine.js');
+const {Game,ENEMIES,ENEMY_TYPES,position}=require('../dist/engine.js');
 const {bomber,slime}=ENEMY_TYPES;
 function arena(){const g=new Game();g.start();g.worldScale=1;g.countdown=999;g.slots=[];g.level={...g.level,routes:[]};return g;}
 function enemy(g,level,x=100,y=100){const routeIndex=g.level.routes.length;g.level.routes.push({path:[{x:0,y},{x:1000,y}],segments:[1000],length:1000});const spec=ENEMIES[level],e={id:g.nextId++,level,x,y,hp:spec.hp,maxHp:spec.hp,distance:x,remaining:1000-x,routeIndex};g.enemies.push(e);return e;}
 function tower(g,x,y){const s={id:g.slots.length,x,y,level:1,hp:100,maxHp:100,cooldown:Infinity,action:null,destroyedAt:null};g.slots.push(s);return s;}
 
-test('the first wave introduces only normal-speed passive slimes',()=>{
-  assert.ok(WAVES[0].every(level=>level===slime));assert.equal(ENEMIES[slime].speed,ENEMIES[2].speed);
-  const live=new Game();live.start();live.countdown=.001;live.update(.01);assert.equal(live.enemies[0].level,slime);
+test('slimes move at normal speed without attacking',()=>{
+  assert.equal(ENEMIES[slime].speed,ENEMIES[2].speed);
   const g=arena(),e=enemy(g,slime),s=tower(g,110,100);g.update(.5);
   assert.equal(e.x,100+ENEMIES[slime].speed*.5);assert.equal(e.y,100);assert.equal(s.hp,100);assert.equal(e.attackAt,undefined);assert.equal(g.effects.length,0);
   e.distance=999.9;Object.assign(e,position(e.distance,g.level.routes[0]));g.update(.01);assert.equal(g.lives,2);assert.equal(g.corpses.length,0);
@@ -46,6 +45,6 @@ test('large movement steps cannot tunnel past a tower and explosion range respec
   const scaled=arena();scaled.worldScale=2;const bomb=enemy(scaled,bomber),inside=enemy(scaled,slime,225),outside=enemy(scaled,slime,235);scaled.damageEnemy(bomb,999);assert.equal(inside.hp,0);assert.equal(outside.hp,32);
 });
 test('victory waits for the explosion and reset clears all new monster state',()=>{
-  const g=arena(),e=enemy(g,bomber);g.countdown=0;g.wave=WAVES.length;g.damageEnemy(e,999);g.update(.01);assert.equal(g.phase,'playing');g.update(.75);assert.equal(g.phase,'won');
+  const g=arena(),e=enemy(g,bomber);g.countdown=0;g.wave=g.waves.length;g.damageEnemy(e,999);g.update(.01);assert.equal(g.phase,'playing');g.update(.75);assert.equal(g.phase,'won');
   g.start();assert.equal(g.corpses.length,0);assert.equal(g.effects.length,0);assert.equal(g.enemies.length,0);
 });

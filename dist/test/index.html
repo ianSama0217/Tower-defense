@@ -22,9 +22,10 @@
       <button id="bomber-demo" disabled>載入爆炸範例</button>
       <span id="simulation-status" role="status">放置塔與怪物後，可測試追塔、自爆與範圍傷害。</span>
     </div>
-    <section class="stage-area" aria-label="素材測試區">
-      <div class="stage-caption"><span><i aria-hidden="true"></i>自由測試區 <small>960 × 540</small></span><span id="object-count">0 個物件</span></div>
-      <div id="stage-wrap"><canvas id="test-stage" width="960" height="540" tabindex="0" aria-label="素材測試畫布。點選放置素材；方向鍵調整游標，Enter 放置；選取模式下可拖曳物件，Delete 移除選取。"></canvas></div>
+    <section id="test-scene" class="stage-area" aria-label="素材測試區">
+      <div class="stage-caption"><span><i aria-hidden="true"></i>自由測試區 <small id="stage-size">1280 × 768</small></span><div class="stage-view-controls"><label><input id="show-enemy-ranges" type="checkbox" checked> 怪物攻擊範圍</label><span id="object-count">0 個物件</span><button id="toggle-fullscreen" type="button" aria-controls="test-scene" aria-pressed="false">全螢幕</button></div></div>
+      <div class="range-legend"><span class="range-detection">藍虛線：判定半徑</span><span class="range-attack">實線：攻擊半徑</span><span class="range-trigger">黃虛線：引爆距離</span><span class="range-blast">紅虛線：爆炸半徑</span><span>選取怪物查看數值 · 腳底為圓心 · 範圍與素材倍率無關</span></div>
+      <div id="stage-wrap"><canvas id="test-stage" width="1280" height="768" tabindex="0" aria-label="素材測試畫布。點選放置素材；方向鍵調整游標，Enter 放置；選取模式下可拖曳物件，Delete 移除選取。"></canvas></div>
       <div id="empty-hint" aria-hidden="true"><b>從下方選一個素材</b><span>點一下草地，開始佈置你的測試場景。</span></div>
       <div class="stage-footer"><span id="lab-status" role="status">正在載入素材…</span><span class="stage-note">行為測試結束後會還原素材擺放</span></div>
     </section>

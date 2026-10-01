@@ -1,8 +1,9 @@
 const {test}=require('node:test'),assert=require('node:assert/strict');
-const {LEVELS}=require('../dist/engine.js'),environment=require('../dist/environment.js'),specs=require('../dist/assets/environment/sprites.json');
+const {createScenario}=require('../dist/engine.js'),environment=require('../dist/environment.js'),specs=require('../dist/assets/environment/sprites.json');
 const images=Object.fromEntries(Object.entries(specs).map(([name,s])=>[name,{naturalWidth:s.width,naturalHeight:s.height}]));
-test('first level hides the debug grid and scenery leaves roads and every build pad clear',()=>{
-  const level=LEVELS[0],items=environment.placements(level,images,2);assert.equal(level.mapConfig.debugGrid,false);assert.equal(level.slots.length,27);assert.ok(items.length>=20);
+const scene=createScenario({paths:[[[0,384],[1280,384]]],slots:[[640,160]]});
+test('scenery leaves supplied roads and build pads clear',()=>{
+  const level=scene,items=environment.placements(level,images,2);assert.equal(level.mapConfig.debugGrid,false);assert.ok(items.length>=20);
   for(const item of items){
     assert.ok(item.x>=0&&item.y>=0&&item.x+item.w<=1280&&item.y+item.h<=768);
     for(const s of level.slots)assert.ok(item.x+item.w<=s.x-32||item.x>=s.x+32||item.y+item.h<=s.y-32||item.y>=s.y+32,'Scenery overlaps a build pad');
@@ -14,7 +15,7 @@ test('first level hides the debug grid and scenery leaves roads and every build 
   assert.ok(items.some(p=>environment.names.indexOf(p.name)<11));assert.ok(items.some(p=>p.name==='flowers'));assert.ok(items.some(p=>p.name==='fallenLog'));
 });
 test('scenery remains stable across restarts and only the first build-pad variant is shipped',()=>{
-  assert.deepEqual(environment.placements(LEVELS[0],images,2),environment.placements(LEVELS[0],images,2));
+  assert.deepEqual(environment.placements(scene,images,2),environment.placements(scene,images,2));
   assert.deepEqual(environment.names.filter(n=>/pad/i.test(n)),['buildPad']);
   assert.deepEqual(Object.keys(specs).sort(),[...environment.names].sort());
 });

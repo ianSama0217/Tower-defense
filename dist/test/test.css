@@ -5,3 +5,14 @@
 .simulation-toolbar{display:flex;align-items:center;flex-wrap:wrap;gap:8px 14px;padding:8px 24px;background:#233a2a;border-bottom:1px solid #516545;flex-shrink:0}.simulation-toolbar span{font-size:11px;color:#d5ce9a}.enemy-description{font-size:11px;color:#b8c99f;margin:0 0 6px;min-height:16px;line-height:1.5}.simulation-toolbar button{font-size:11px;padding:6px 10px}
 @media(min-width:1500px){.asset-tray{min-height:265px}.asset-card{flex-basis:134px;height:115px}.asset-card canvas{height:68px;width:75px}}
 @media(max-width:700px){body{min-height:780px}.lab-header{height:57px;padding:0 16px}.lab-header h1{font-size:16px}.lab-tag{display:none}.lab-toolbar{padding:10px 14px;gap:10px 14px}.history-tools{margin-left:0}.lab-toolbar button{padding:7px 9px}.stage-area{min-height:275px}#stage-wrap{margin:0 10px}.stage-caption,.stage-footer{padding:10px 14px}.stage-note{display:none}.asset-tray{padding:0 12px;flex-basis:267px}.tray-heading{gap:10px}.tray-heading h2{font-size:11px}.category-tabs{gap:0}.category-tabs button{font-size:11px;padding:12px 8px}.category-tabs span{display:none}#asset-count{font-size:9px}.animation-tools{flex-wrap:wrap;gap:7px}.animation-tools label{font-size:10px}.animation-tools button{font-size:10px;padding:6px 8px}#selection-label{flex-basis:100%;margin:0;font-size:10px}.tray-help{font-size:9px;line-height:1.7}.tray-help span{padding:0 4px}.asset-card{flex-basis:105px}#empty-hint{padding:18px 16px}#empty-hint b{font-size:13px}#empty-hint span{font-size:10px}}
+/* Only the scene expands; both modes keep the game's 1280:768 aspect ratio. */
+.stage-area{min-height:clamp(320px,55vh,840px)}
+.stage-view-controls{display:flex;align-items:center;gap:14px;flex-wrap:wrap}
+.range-legend{display:flex;gap:8px 16px;flex-wrap:wrap;padding:0 25px 10px;font-size:10px;color:#9aac91}
+.range-detection{color:#79d9ef}.range-attack{color:#ffcb70}.range-trigger{color:#f9eea6}.range-blast{color:#ff9999}
+#toggle-fullscreen{white-space:nowrap;font-size:11px;padding:7px 12px}
+.stage-area:fullscreen,.stage-area.stage-expanded{width:100vw;height:100vh;height:100dvh;min-height:0;max-height:none;flex:none;background:#182d23}
+.stage-area.stage-expanded{position:fixed;inset:0;z-index:100}
+body.scene-expanded{overflow:hidden}
+.stage-area:fullscreen #stage-wrap,.stage-area.stage-expanded #stage-wrap{min-height:0}
+@media(max-width:520px){.stage-view-controls{gap:8px}.stage-caption{gap:8px;flex-wrap:wrap}.stage-caption>span:first-child{gap:6px}#toggle-fullscreen{padding:7px 9px}.stage-view-controls #object-count{font-size:10px}}

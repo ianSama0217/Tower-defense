@@ -1,0 +1,10 @@
+:root { font-family: 'Segoe UI', 'Microsoft JhengHei', sans-serif; color: #293c36; background: #eeeae0; font-synthesis: none; --green: #3b6b60; --muted: #7d857c; --line: #cdd2c2; }
+* { box-sizing: border-box; }
+html, body { width: 100%; height: 100%; margin: 0; overflow: hidden; overscroll-behavior: none; }
+button { font: inherit; }
+button { cursor: pointer; }
+button:focus-visible, canvas:focus-visible { outline: 3px solid #d99455; outline-offset: 2px; }
+button:disabled { cursor: default; opacity: .42; }
+[hidden] { display: none !important; }
+#start-screen { width:100%; height:100vh; height:100dvh; overflow:hidden; display:grid; place-items:center; }
+#forest-scene { position:absolute; display:block; }
