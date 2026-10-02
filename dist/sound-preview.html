@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>音效試聽 · 幾何防線</title>
+  <style>
+    :root{font-family:'Microsoft JhengHei',sans-serif;color:#e8e5cf;background:#172b22;color-scheme:dark}*{box-sizing:border-box}body{margin:0;padding:32px 20px}main{max-width:760px;margin:auto}a{color:#e5c885}h1{margin-top:32px}p{line-height:1.8;color:#b8c8b0}.controls{display:flex;flex-wrap:wrap;align-items:center;gap:24px;margin:24px 0;padding:20px;background:#233c2b;border-radius:8px}label{display:flex;align-items:center;gap:12px}.sounds{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px}button{font:inherit;min-height:100px;padding:18px;text-align:left;background:#2a4532;border:1px solid #71845b;border-radius:8px;color:#f0dfad;cursor:pointer}button:hover{background:#405c3b}button:focus-visible,input:focus-visible,a:focus-visible{outline:3px solid #ffdc8a;outline-offset:3px}small{display:block;color:#bdc7ac;margin-top:8px}#status{min-height:30px}
+  </style>
+</head>
+<body><main>
+  <a href="index.html">← 返回首頁</a>
+  <h1>森林防線 · 音效試聽</h1>
+  <p>點選試聽。箭塔等級越高，弓弦聲越低沉。</p>
+  <div class="controls"><label>音效音量 <input data-sound-volume type="range" min="0" max="100" value="50"></label><label><input data-sound-muted type="checkbox"> 靜音</label></div>
+  <div class="sounds">
+    <button data-sound="playArrow" data-level="1">Lv.1 射箭<small>1000 Hz · 輕快弓弦</small></button>
+    <button data-sound="playArrow" data-level="2">Lv.2 射箭<small>900 Hz · 厚實弓弦</small></button>
+    <button data-sound="playArrow" data-level="3">Lv.3 射箭<small>800 Hz · 低沉弓弦</small></button>
+    <button data-sound="playHit">弓箭命中<small>短促撞擊</small></button>
+    <button data-sound="playCoin">取得金幣<small>清脆雙音</small></button>
+    <button data-sound="playBuild">建造完成<small>三次木槌敲擊</small></button>
+    <button data-sound="playUpgrade">升級完成<small>上行四音</small></button>
+    <button data-sound="playExplosion">爆炸<small>低頻衝擊與碎裂聲</small></button>
+    <button data-sound="playEnemyDeath">敵人死亡<small>下滑短音</small></button>
+    <button data-sound="playWaveStart">波次開始<small>上行號角</small></button>
+  </div>
+  <p id="status" role="status">音量與靜音設定會套用至遊戲。</p>
+</main>
+<script src="sound-manager.js"></script><script src="sound-settings.js"></script>
+<script>
+  document.querySelectorAll('[data-sound]').forEach(button=>button.addEventListener('click',async()=>{
+    const ready=await gameSound.unlock();gameSound.stopAll();
+    const played=ready&&gameSound[button.dataset.sound](Number(button.dataset.level)||1);
+    document.getElementById('status').textContent=played?`正在試聽：${button.firstChild.textContent}`:gameSound.muted||gameSound.volume===0?'請取消靜音或提高音量。':'瀏覽器尚未啟用音訊，請再次點選試聽。';
+  }));
+</script>
+</body></html>

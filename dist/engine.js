@@ -13,7 +13,7 @@
   };
   const TOWERS = [null, {damage:12,range:155,interval:.68,cost:60}, {damage:27,range:180,interval:.53,cost:80}, {damage:48,range:205,interval:.4,cost:125}];
   const TOWER_MAX_HP = 100;
-  const TOWER_ACTIONS = {upgrade:{duration:5},repair:{duration:3,cost:50},demolish:{duration:3}};
+  const TOWER_ACTIONS = {build:{duration:5},upgrade:{duration:5},repair:{duration:3,cost:50},demolish:{duration:3}};
   const ENEMY_TYPES = {goblin:1,orc:2,cyclops:3,bomber:4,slime:5};
   const ENEMIES = [null,
     {name:'哥布林',behavior:'attacker',detectionRange:64,hp:44,speed:57,reward:11,attackDamage:6,attackRange:32,attackInterval:1.2},
@@ -61,6 +61,7 @@
     startNextWave() {
       if(this.phase!=='playing'||!this.awaitingWave||this.wave>=this.waves.length)return false;
       this.awaitingWave=false;this.countdown=0;this.spawnQueue=[...this.waves[this.wave++]];this.spawnTimer=0;
+      this.sound?.playWaveStart();
       return true;
     }
     build(id) {
@@ -77,7 +78,8 @@
         return{ok:true,message:`升級開始，5 秒後升至 ${s.level+1} 級並回滿 100 HP；期間停止攻擊。`};
       }
       s.level=1;s.cooldown=0;s.hp=s.maxHp=TOWER_MAX_HP;s.destroyedAt=null;
-      return{ok:true,message:'箭塔已建造。'};
+      s.action={kind:'build',elapsed:0,duration:TOWER_ACTIONS.build.duration,cost};
+      return{ok:true,message:'建造開始，5 秒後完成並開始攻擊。'};
     }
     repair(id) {
       if(this.phase!=='playing')return{ok:false,message:'目前無法修復。'};
@@ -107,11 +109,14 @@
         if(action.elapsed+1e-9<action.duration)continue;
         if(action.kind==='demolish'){
           this.money+=action.refund;
+          if(action.refund>0)this.sound?.playCoin();
           this.effects.push({kind:'demolition',x:s.x,y:s.y,level:s.level,material:s.level===1?'wood':'stone',life:.85,duration:.85});
           s.level=0;s.hp=0;s.destroyedAt=null;
         }else{
           if(action.kind==='upgrade')s.level=action.targetLevel;
-          s.hp=s.maxHp=TOWER_MAX_HP;
+          if(action.kind!=='build')s.hp=s.maxHp=TOWER_MAX_HP;
+          if(action.kind==='upgrade')this.sound?.playUpgrade();
+          else this.sound?.playBuild();
         }
         s.cooldown=0;s.action=null;
       }
@@ -137,11 +142,13 @@
         if(e.deathAt!=null||e.escaped)continue;
         e.hp=0;e.deathAt=this.time;e.moving=false;e.targetId=null;
         this.corpses.push({...e});
+        this.sound?.playEnemyDeath();
         const spec=ENEMIES[e.level];
-        if(grant){this.money+=spec.reward;this.kills++;}
+        if(grant){this.money+=spec.reward;this.kills++;this.sound?.playCoin();}
         if(spec.behavior!=='bomber')continue;
         const radius=enemyRanges(e.level,this.worldScale).blast;
         this.effects.push({kind:'bomb-explosion',x:e.x,y:e.y,radius,life:sprites.deathDuration});
+        this.sound?.playExplosion();
         for(const s of this.slots)if(Math.hypot(s.x-e.x,s.y-e.y)<=radius)this.damageTower(s,spec.blastDamage);
         for(const other of this.enemies){
           if(other.hp<=0||other.deathAt!=null||other.escaped||Math.hypot(other.x-e.x,other.y-e.y)>radius)continue;
@@ -275,18 +282,19 @@
       }
       this.time+=dt;this.effects=this.effects.filter(e=>(e.life-=dt)>0);
       this.corpses=this.corpses.filter(e=>this.time-e.deathAt<sprites.deathDuration);
-      if(this.countdown>0){this.countdown=Math.max(0,this.countdown-dt);if(this.countdown===0){this.spawnQueue=[...this.waves[this.wave]];this.wave++;this.spawnTimer=0;}}
+      if(this.countdown>0){this.countdown=Math.max(0,this.countdown-dt);if(this.countdown===0){this.spawnQueue=[...this.waves[this.wave]];this.wave++;this.spawnTimer=0;this.sound?.playWaveStart();}}
       if(this.spawnQueue.length){this.spawnTimer-=dt;if(this.spawnTimer<=0){const level=this.spawnQueue.shift(),s=ENEMIES[level],routeIndex=Math.floor(this.random()*this.level.routes.length),route=this.level.routes[routeIndex];this.enemies.push({id:this.nextId++,level,hp:s.hp,maxHp:s.hp,distance:0,routeIndex,remaining:route.length,...position(0,route)});this.spawnTimer=this.level.spawnInterval??1.35;}}
       for(const e of this.enemies)if(e.hp>0)this.moveEnemy(e,dt);
       if(this.lives===0){this.phase='lost';return;}
-      for(const s of this.slots){if(!s.level||s.action)continue;s.cooldown-=dt;if(s.cooldown>0)continue;const spec=TOWERS[s.level];let target=null;for(const e of this.enemies)if(e.hp>0&&Math.hypot(e.x-s.x,e.y-s.y)<=spec.range*this.worldScale&&(!target||e.remaining<target.remaining))target=e;if(target){this.bullets.push({x:s.x,y:s.y,target,damage:spec.damage});s.cooldown=spec.interval;}}
-      this.bullets=this.bullets.filter(b=>{const e=b.target;if(e.hp<=0)return false;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<640*this.worldScale*dt){this.damageEnemy(e,b.damage);return false;}b.x+=(e.x-b.x)/d*640*this.worldScale*dt;b.y+=(e.y-b.y)/d*640*this.worldScale*dt;return true;});
+      for(const s of this.slots){if(!s.level||s.action)continue;s.cooldown-=dt;if(s.cooldown>0)continue;const spec=TOWERS[s.level];let target=null;for(const e of this.enemies)if(e.hp>0&&Math.hypot(e.x-s.x,e.y-s.y)<=spec.range*this.worldScale&&(!target||e.remaining<target.remaining))target=e;if(target){this.bullets.push({x:s.x,y:s.y,target,damage:spec.damage});this.sound?.playArrow(s.level);s.cooldown=spec.interval;}}
+      this.bullets=this.bullets.filter(b=>{const e=b.target;if(e.hp<=0)return false;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<640*this.worldScale*dt){this.sound?.playHit();this.damageEnemy(e,b.damage);return false;}b.x+=(e.x-b.x)/d*640*this.worldScale*dt;b.y+=(e.y-b.y)/d*640*this.worldScale*dt;return true;});
       this.enemies=this.enemies.filter(e=>e.hp>0);
       // Resolve only surviving enemies, keeping their target locked while approaching or attacking.
       this.attackTowers(dt);
       this.updateTowerActions(dt);
       if(this.countdown===0&&!this.spawnQueue.length&&!this.enemies.length){if(this.wave===this.waves.length){if(!this.corpses.length)this.phase='won';}else if(!this.level.manualWaves||!this.corpses.length){
         this.money+=this.level.waveRewards?.[this.wave-1]??30;
+        if((this.level.waveRewards?.[this.wave-1]??30)>0)this.sound?.playCoin();
         this.awaitingWave=!!this.level.manualWaves;this.countdown=this.awaitingWave?Infinity:8;
       }}
     }

@@ -51,10 +51,10 @@
       <h2 id="settings-title">遊戲設定</h2>
       <div class="setting-row"><label for="default-speed">初始遊戲速度<small>進入關卡後仍可隨時切換</small></label><select id="default-speed"><option value="1">正常 · 1×</option><option value="2">快速 · 2×</option></select></div>
       <div class="setting-row"><label for="ambient-motion">森林動態<small>首頁的螢火與浮動光點</small></label><input id="ambient-motion" type="checkbox" role="switch" checked></div>
-      <p id="settings-note">設定會自動保存在此瀏覽器。</p>
+      <div class="setting-row"><label for="sound-volume">音效音量</label><input id="sound-volume" data-sound-volume type="range" min="0" max="100" value="50"></div><div class="setting-row"><label for="sound-muted">靜音</label><input id="sound-muted" data-sound-muted type="checkbox"></div><a href="sound-preview.html">試聽音效 →</a><p id="settings-note">設定會自動保存在此瀏覽器。</p>
       <button class="wood-button settings-done" autofocus>返回木牌</button>
     </form>
   </dialog>
-  <script src="environment.js"></script><script src="start-screen.js"></script><script src="level-select.js"></script><script src="menu.js"></script>
+  <script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="start-screen.js"></script><script src="level-select.js"></script><script src="menu.js"></script>
 </body>
 </html>

@@ -139,11 +139,13 @@
   $('object-scale').addEventListener('change',()=>{const item=current();if(item){record();item.scale=Number($('object-scale').value);status(`已調整${item.asset.name}為 ${item.scale} 倍。`);update();}});
   $('enemy-animation').addEventListener('change',()=>{const item=current();if(item?.asset.category==='enemy'){record();item.animation=$('enemy-animation').value;item.started=time;update();}status('已切換怪物動作；攻擊、受傷與死亡動作播放一次。');});
   $('flip-object').addEventListener('click',()=>{const item=current();if(item){record();item.facing*=-1;}else facing*=-1;update();status(item?'已翻轉選取物件。':'已翻轉接下來放置素材的方向。');});
-  $('play-animation').addEventListener('click',()=>{paused=!paused;$('play-animation').textContent=paused?'播放動畫':'暫停動畫';$('play-animation').setAttribute('aria-pressed',String(paused));});
+  $('play-animation').addEventListener('click',()=>{paused=!paused;if(paused)window.gameSound.stopAll();$('play-animation').textContent=paused?'播放動畫':'暫停動畫';$('play-animation').setAttribute('aria-pressed',String(paused));});
   $('simulate').addEventListener('click',()=>{
+    window.gameSound.stopAll();
     if(simulation){simulation=null;objects.forEach(o=>o.started=time);status('已結束測試並還原原始擺放。');$('simulation-status').textContent='放置塔與怪物後，可測試追塔、自爆與範圍傷害。';update();return;}
     if(!objects.some(o=>o.asset.category==='enemy'))return;
     const sim=new TD.Game();sim.start();sim.lives=150;sim.time=time;
+    sim.sound=window.gameSound;
     sim.slots=objects.filter(o=>o.asset.category==='tower').map((o,id)=>({id,objectId:o.id,x:o.x,y:o.y,level:o.asset.level,hp:100,maxHp:100,cooldown:0,action:null,destroyedAt:null}));
     sim.enemies=objects.filter(o=>o.asset.category==='enemy').map(o=>{
       const spec=TD.ENEMIES[o.asset.level],routeIndex=sim.level.routes.length;

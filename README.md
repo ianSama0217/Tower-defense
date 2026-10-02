@@ -2,6 +2,38 @@
 
 純 HTML、CSS、Canvas 與 JavaScript，無套件相依。執行 `node server.cjs` 後開啟 http://127.0.0.1:4173，或直接開啟 `dist/index.html`。
 
+## JavaScript 音效
+
+`dist/sound-manager.js` 使用 Web Audio API 即時合成八種音效，不需下載音訊檔。開啟 `sound-preview.html` 可逐一試聽，包含 Lv.1／2／3 射箭的 1000／900／800 Hz 起始音高；音高向下滑落並疊加短促風聲。
+
+| 方法 | 遊戲觸發時機 |
+| --- | --- |
+| `playArrow(level = 1)` | 箭塔實際發射，傳入當前等級 |
+| `playHit()` | 箭矢命中存活敵人 |
+| `playCoin()` | 擊殺獎勵、波次獎勵或拆除退款入帳 |
+| `playBuild()` | 建造或修復完成 |
+| `playUpgrade()` | 升級完成 |
+| `playExplosion()` | 炸彈哥布林自爆或死亡爆炸 |
+| `playEnemyDeath()` | 敵人死亡（漏怪不播放） |
+| `playWaveStart()` | 手動或自動開始新波次 |
+
+教學與行為測試場透過 `game.sound = window.gameSound` 共用音效；引擎沒有音效物件時仍可獨立執行。首頁設定、關卡暫停設定及試聽頁提供音量／靜音，測試場也有靜音開關；設定保存於 `td-sound-settings`。`sound-settings.js` 在玩家點擊或按鍵後啟用音訊，未啟用或瀏覽器不支援時安靜略過，不累積待播事件。
+
+獨立使用方式（`unlock()` 必須由使用者操作觸發）：
+
+```js
+const sound = new SoundManager({ volume: 0.5 });
+button.addEventListener('click', async () => {
+  await sound.unlock();
+  sound.playArrow(3); // Lv.3：800 Hz
+});
+// sound.setVolume(0.5); sound.setMuted(true); sound.stopAll();
+```
+
+同時最多 24 組音效，重複音效有短暫節流，並使用音量包絡與壓縮器控制疊音。2× 遊戲速度只加快事件頻率，不改變音高。暫停、重新開始及隱藏頁面會停止現有音效。`tests/sound.test.cjs` 驗證音高、生命週期、播放限制及戰鬥事件整合。
+
+預設音量為 50%，主音量增益為 `volume × 2`：50% 對應增益 1（原本的 100%），100% 對應增益 2。既有音量偏好仍會載入，密集疊音由壓縮器控制峰值。
+
 首頁保留森林木牌選單、設定與 1～5 關的選關外觀；第五關為 BOSS「荊棘王座」。第一關可進入森林教學，其餘關卡為「準備中」。舊第 1、2 關已移除。`menu.js` 獨立載入首頁素材，`base.css` 提供共用基本樣式。
 
 ## 第一關教學

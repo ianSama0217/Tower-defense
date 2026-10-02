@@ -26,6 +26,7 @@ test('escaping enemies each cost one life and zero lives ends combat',()=>{
 test('arrow tower upgrade, demolition refund and rebuilding cannot generate free coins',()=>{
   const g=new Game(Math.random,combatScenario());g.start();g.countdown=999;
   assert.equal(g.build(0).ok,true);assert.equal(g.money,120);
+  g.update(5);
   assert.equal(g.build(0).ok,true);assert.equal(g.money,40);
   assert.equal(g.slots[0].level,1);g.update(5);
   assert.equal(g.build(0).ok,false);
@@ -34,6 +35,7 @@ test('arrow tower upgrade, demolition refund and rebuilding cannot generate free
   assert.equal(g.money,110);assert.equal(g.slots[0].level,0);
   assert.equal(g.demolish(0).ok,false);assert.equal(g.money,110);
   assert.equal(g.build(0).ok,true);assert.equal(g.money,50);
+  g.update(5);
   assert.equal(g.build(-1).ok,false);assert.equal(g.demolish(500).ok,false);
   g.money=500;g.build(0);g.update(5);g.build(0);g.update(5);
   assert.equal(g.slots[0].level,3);assert.equal(g.build(0).ok,false);

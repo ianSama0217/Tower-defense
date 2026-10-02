@@ -4,7 +4,7 @@ const assert=require('node:assert/strict');
 const {Game,ENEMIES,position,TOWER_MAX_HP,createScenario,enemyRanges}=require('../dist/engine.js');
 
 function setup(){const g=new Game(Math.random,combatScenario());g.start();g.countdown=999;return g;}
-function tower(g,id){assert.equal(g.build(id).ok,true);g.slots[id].cooldown=999;return g.slots[id];}
+function tower(g,id){assert.equal(g.build(id).ok,true);g.updateTowerActions(5);g.slots[id].cooldown=999;return g.slots[id];}
 function enemy(g,distance=16,routeIndex=0,level=1){
   distance*=g.worldScale;
   const route=g.level.routes[routeIndex],spec=ENEMIES[level];
@@ -56,7 +56,7 @@ test('destroyed towers stop being targets, give no refund, and can be rebuilt at
   assert.equal(near.hp,0);assert.equal(near.level,0);assert.equal(near.cooldown,0);assert.notEqual(near.destroyedAt,null);
   assert.equal(second.targetId,far.id);assert.equal(far.hp,94);assert.equal(g.money,money);
   assert.equal(g.demolish(1).ok,false);
-  assert.equal(g.build(1).ok,true);assert.equal(near.hp,100);assert.equal(near.level,1);assert.equal(near.destroyedAt,null);
+  assert.equal(g.build(1).ok,true);assert.equal(near.hp,100);assert.equal(near.level,1);assert.equal(near.destroyedAt,null);g.updateTowerActions(5);
   assert.equal(g.demolish(1).ok,true);assert.equal(near.hp,100);g.update(3);assert.equal(near.hp,0);
 });
 

@@ -1,9 +1,27 @@
 const {combatScenario}=require('./fixtures.cjs');
 const {test}=require('node:test'),assert=require('node:assert/strict');
 const {Game,TOWER_ACTIONS,ENEMIES,position,refundFor}=require('../dist/engine.js');
-function setup(level=1){const g=new Game(Math.random,combatScenario());g.start();g.countdown=999;g.money=1000;g.build(1);const s=g.slots[1];Object.assign(s,{x:1248,y:380});s.level=level;return {g,s};}
+function setup(level=1){const g=new Game(Math.random,combatScenario());g.start();g.countdown=999;g.money=1000;g.build(1);g.updateTowerActions(5);const s=g.slots[1];Object.assign(s,{x:1248,y:380});s.level=level;return {g,s};}
 function threat(g){const r=g.level.routes[0],distance=32;const e={id:g.nextId++,level:1,hp:10000,maxHp:10000,distance,routeIndex:0,remaining:r.length-distance,...position(distance,r)};g.enemies.push(e);return e;}
 function advance(g,time){for(let t=0;t<time-1e-9;t+=.01)g.update(Math.min(.01,time-t));}
+
+test('new construction charges once and blocks attacks and other work until five seconds',()=>{
+  const g=new Game(Math.random,combatScenario());g.start();g.countdown=999;
+  const before=g.money;assert.equal(g.build(1).ok,true);const s=g.slots[1];
+  Object.assign(s,{x:1248,y:380});const enemy=threat(g);
+  assert.equal(s.action.kind,'build');assert.equal(s.action.duration,5);assert.equal(g.money,before-60);
+  assert.equal(g.build(1).ok,false);assert.equal(g.demolish(1).ok,false);assert.equal(g.money,before-60);
+  advance(g,4.99);assert.ok(s.action);assert.equal(g.bullets.length,0);assert.equal(enemy.hp,enemy.maxHp);
+  g.update(.01);assert.equal(s.action,null);assert.equal(s.level,1);
+  g.update(.01);assert.ok(g.bullets.length>0);assert.equal(g.money,before-60);
+});
+
+test('destroyed construction does not complete or refund; reset clears pending construction',()=>{
+  const g=new Game(Math.random,combatScenario());g.start();g.countdown=999;g.build(1);
+  const money=g.money;g.damageTower(g.slots[1],100);g.update(6);
+  assert.equal(g.slots[1].level,0);assert.equal(g.slots[1].action,null);assert.equal(g.money,money);
+  g.build(1);g.start();assert.ok(g.slots.every(s=>!s.action&&!s.level));
+});
 test('upgrade charges once, preserves level and HP until exactly five seconds, then heals',()=>{
   const {g,s}=setup();s.hp=34;const before=g.money;
   assert.equal(g.build(1).ok,true);assert.equal(g.money,before-80);assert.equal(s.level,1);assert.equal(s.hp,34);

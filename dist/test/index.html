@@ -16,7 +16,7 @@
       <div class="tool-group history-tools"><button id="undo" disabled>復原</button><button id="remove" disabled>移除選取</button><button id="clear" disabled>清空</button></div>
     </div>
     <div class="simulation-toolbar" aria-label="怪物行為測試">
-      <button id="simulate" disabled aria-pressed="false">開始行為測試</button>
+      <label><input data-sound-muted type="checkbox"> 靜音</label><a href="sound-preview.html">試聽音效</a><button id="simulate" disabled aria-pressed="false">開始行為測試</button>
       <label><input id="tower-fire" type="checkbox"> 塔可射擊</label>
       <button id="kill-enemy" disabled>擊殺選取怪物</button>
       <button id="bomber-demo" disabled>載入爆炸範例</button>
@@ -37,6 +37,6 @@
       <p class="tray-help">選素材 → 點畫布放置 <span>·</span> 選取／移動可拖曳調整 <span>·</span> Delete 移除 <span>·</span> Ctrl / ⌘ + Z 復原</p>
     </section>
   </main>
-  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="test/test.js"></script>
+  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="test/test.js"></script>
 </body>
 </html>

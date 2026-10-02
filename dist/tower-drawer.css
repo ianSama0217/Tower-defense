@@ -1,0 +1,23 @@
+.game-window{--drawer-height:158px;--card-width:104px;--card-height:140px}
+.game-layout{grid-template-rows:minmax(0,1fr)}
+.tower-drawer{position:absolute;z-index:5;left:0;right:0;bottom:0;height:var(--drawer-height);display:flex;align-items:center;gap:16px;padding:7px 24px;background:#c99b6c url('assets/ui/wood-texture.png') center/100% 360px;border-top:3px solid #362015;border-radius:8px 8px 0 0;box-shadow:inset 0 3px #f4d6a0,0 -5px 18px #21120b55;color:#382013;transform:translateY(105%);visibility:hidden;transition:transform .23s ease-out,visibility .23s;pointer-events:none}
+.tower-drawer.is-open{transform:translateY(0);visibility:visible;pointer-events:auto}
+.tower-details{display:none}
+.tower-card,.action-card{width:var(--card-width);height:var(--card-height);flex:none}
+.tower-actions{margin-left:auto;display:flex;gap:14px}
+.tower-card button,.action-card button{position:relative;width:100%;height:100%;padding:7px 4px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;background-color:#efd1a0;background-image:linear-gradient(#fff0cec4,#f8dfb4b8),url('assets/ui/wood-texture.png');background-size:auto,230px 230px;background-position:center;border:3px solid #24180e;border-radius:8px;box-shadow:inset 0 3px #dfae62,inset 3px 0 #bc854c,inset -3px -3px #60331d,0 2px #342114;cursor:pointer}
+.tower-card button::before,.action-card button::before{content:'';position:absolute;inset:5px;pointer-events:none;background:radial-gradient(circle at 4px 4px,#e0e5e5 0 1px,#858f98 1px 3px,#1b2025 3px 4px,transparent 4px),radial-gradient(circle at calc(100% - 4px) 4px,#e0e5e5 0 1px,#858f98 1px 3px,#1b2025 3px 4px,transparent 4px),radial-gradient(circle at 4px calc(100% - 4px),#e0e5e5 0 1px,#858f98 1px 3px,#1b2025 3px 4px,transparent 4px),radial-gradient(circle at calc(100% - 4px) calc(100% - 4px),#e0e5e5 0 1px,#858f98 1px 3px,#1b2025 3px 4px,transparent 4px)}
+.tower-card button:hover:not(:disabled),.action-card button:hover:not(:disabled){background-color:#ffe5b5;border-color:#ffe17a;box-shadow:inset 0 3px #f7d08a,inset 0 -3px #7a4e24,0 0 10px #ffcc5b99}
+.tower-card button:disabled,.action-card button:disabled{opacity:1;cursor:default}
+.action-card button:disabled .action-icon,.tower-card button[data-unavailable='true'] #tower-preview{filter:grayscale(.65) brightness(.65)}
+#tower-preview,.action-icon{display:block;flex:none;width:68px;height:68px;object-fit:contain;image-rendering:pixelated}
+.action-icon{background-image:url('assets/ui/engineering-icons.png');background-repeat:no-repeat;background-size:200% 200%;image-rendering:pixelated}
+.upgrade-icon{background-position:0 0}.repair-icon{background-position:100% 0}.demolish-icon{background-position:0 100%}
+.price-tag,.time-tag{display:flex;flex:none;align-items:center;justify-content:center;width:100%;height:26px;gap:3px;white-space:nowrap;background:none;border:0;box-shadow:none;font:26px/1 'Pixel Operator',monospace;text-shadow:0 1px #fff4d4}
+.price-tag .amount{color:#ad201b;font-weight:700}.price-tag.income .amount{color:#24620e}
+.time-tag{font-size:21px;color:#3d2b18}.duration{font-family:'Pixel Operator','Microsoft JhengHei',sans-serif}
+.card-coin{display:block;width:24px;height:24px;background:url('assets/ui/hud-icons.png') no-repeat 0 0/200% 200%;image-rendering:pixelated}
+.build-time-icon{display:block;flex:none;width:24px;height:24px;background:url('assets/ui/build-time-clock-green.png') center/contain no-repeat;image-rendering:pixelated}
+@media(max-width:900px){.tower-drawer{gap:10px}.tower-actions{gap:8px}}
+@media(max-width:600px){.game-window{--drawer-height:146px;--card-width:clamp(60px,20vw,80px);--card-height:130px}.tower-drawer{padding:5px 8px;gap:6px}.tower-actions{gap:6px}.tower-card button,.action-card button{padding:6px 2px}#tower-preview,.action-icon{width:60px;height:60px}.price-tag{font-size:24px}.time-tag{font-size:19px}.card-coin,.build-time-icon{width:23px;height:23px}}
+@media(prefers-reduced-motion:reduce){.tower-drawer{transition:none}}

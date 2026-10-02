@@ -54,10 +54,11 @@
 .setting-row label { font-size: 14px; }
 .setting-row small { display: block; color: #abb99a; font-size: 10px; margin-top: 8px; line-height: 1.6; }
 .setting-row select { border: 2px solid #a69c67; border-radius: 0; padding: 10px 8px; background: #1e3126; color: #eee4bc; font: inherit; font-size: 12px; }
-.setting-row input { appearance: none; flex: 0 0 42px; height: 26px; border: 2px solid #a69c67; background: #1e3126; cursor: pointer; margin: 0; }
-.setting-row input::before { content: ''; display: block; width: 14px; height: 14px; margin: 4px; background: #b1b295; }
+.setting-row input[type=checkbox] { appearance: none; flex: 0 0 42px; height: 26px; border: 2px solid #a69c67; background: #1e3126; cursor: pointer; margin: 0; }
+.setting-row input[type=checkbox]::before { content: ''; display: block; width: 14px; height: 14px; margin: 4px; background: #b1b295; }
 .setting-row input:checked { background: #688149; }
-.setting-row input:checked::before { transform: translateX(16px); background: #f0dea1; }
+.setting-row input[type=checkbox]:checked::before { transform: translateX(16px); background: #f0dea1; }
+.setting-row input[type=range] { width: 50%; min-width: 90px; accent-color: #d8bf7b; cursor: pointer; }
 .setting-row :focus-visible { outline: 3px solid #ffdb7a; outline-offset: 4px; }
 #settings-note { color: #abb99a; font-size: 10px; line-height: 1.6; margin: 10px 0 22px; }
 .settings-done { min-height: 60px; font-size: 17px; }

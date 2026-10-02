@@ -1,0 +1,35 @@
+:root{--wood-texture:url('assets/ui/wood-texture.png');--wood-edge:#26170f;--wood-ink:#382013;color:#382013;background:#39271c}
+body{background-color:#39271c;background-image:linear-gradient(#23150cc9,#23150cc9),var(--wood-texture);background-size:auto,480px 480px}
+.game-window{border-color:var(--wood-edge);background:#bb895e;box-shadow:0 20px 60px #170d09aa,0 0 0 2px #8f6344}
+.game-header #hearts,.hud-stat,.game-header button,#wave-control{background-color:#cda473;background-image:var(--wood-texture);background-size:240px 240px;background-position:center 12%;border:2px solid var(--wood-edge);border-radius:6px;box-shadow:inset 0 2px #f2d5a4,inset 0 -2px #93603f,2px 2px #1b110ea6}
+.hud-stat b,.game-header button{color:#352016;text-shadow:1px 1px #ecd0a0}
+.game-header button:hover:not(:disabled),#wave-control:hover:not(:disabled){background-color:#dbb383;background-image:linear-gradient(#fff0c52b,#fff0c52b),var(--wood-texture)}
+.game-header #pause[aria-expanded='true']{border-color:#ffe1a2;background-color:#ab754d}
+.game-layout>.guide-panel{background-color:#c99b6c;background-image:var(--wood-texture);background-size:100% 100%;background-attachment:local;border-color:var(--wood-edge);box-shadow:inset 0 3px #eed1a0,inset 0 -4px #87563c;scrollbar-color:#734c33 #c99b6c;color:var(--wood-ink)}
+/* Theme only: retain the existing information panel's content and layout. */
+.guide-panel h2,.guide-panel h3,.guide-panel p,.guide-panel .guide-badge,.guide-panel #step-label,.guide-panel #lesson-copy,.guide-panel #lesson-goal,.guide-panel #wave-status,.guide-panel #tower-info,.guide-panel #feedback{color:var(--wood-ink)}
+.guide-panel .lesson-goal{border-color:#785038}.guide-panel .tower-panel{border-color:#9a6646}
+.guide-panel .wave-track span{background:#795237;border-color:#50331f;color:#f5dfb3}.guide-panel .wave-track .current{background:#a97745;border-color:#422c19;color:#fff0c7}.guide-panel .wave-track .done{background:#91643e;border-color:#cfb077;color:#fff0c7}
+.guide-panel button,.settings-content button{background:#8c5b39;color:#fff0c9;border-color:#412619;border-radius:0;box-shadow:inset 0 2px #c69766,0 2px #513423}
+.guide-panel button:hover:not(:disabled),.settings-content button:hover:not(:disabled){background:#a67448}
+.guide-panel .gold-button,.settings-content .gold-button,.result-content .gold-button{background:#dbb77e;color:#382013;border-color:#624126;box-shadow:inset 0 2px #ffe3ae,0 3px #42291b}
+#game-settings,#result{background-color:#c99b6c;background-image:var(--wood-texture);background-size:100% 100%;color:var(--wood-ink);border:4px solid var(--wood-edge);box-shadow:inset 0 3px #f4d6a0,inset 0 -4px #84523a,4px 4px #130c08}
+#game-settings::backdrop,#result::backdrop{background:#21150db5}
+.settings-heading h2,.settings-content>p,.settings-content>a,.result-content h2,.result-content p,.result-content a,.result-content #save-note{color:var(--wood-ink)}
+.speed-options [aria-pressed='true']{background:#e4c38b;border-color:#402819;color:#382013;box-shadow:inset 0 0 0 2px #ffe3a9,0 2px #513423}
+#pause-shade{background:#25180fa6;color:#fff0d0;text-shadow:2px 2px #392115}
+button:focus-visible,a:focus-visible{outline-color:#fff0b7}
+
+/* Two iron chains connect each sign to the top edge of the game window. */
+.game-header,#wave-control{--hang:15px;--chain-width:12px;--chain-inset:10px;padding-top:var(--hang)}
+.game-header #hearts,.game-header .hud-stat,.game-header button{position:relative;}
+.game-header #hearts,.game-header .hud-stat,.game-header button,#wave-control{image-rendering:pixelated;box-shadow:inset 0 2px #f2d5a4,inset 2px 0 #d7b383,inset 0 -3px #875237,2px 4px #24150da6}
+.game-header #hearts::before,.game-header #hearts::after,
+.game-header .hud-stat::before,.game-header .hud-stat::after,
+.game-header button::before,.game-header button::after,#wave-control::before,#wave-control::after{content:'';position:absolute;top:calc(-1 * var(--hang) - 2px);width:var(--chain-width);height:calc(var(--hang) + 4px);background:url('assets/ui/iron-chain.svg') center/100% 100% no-repeat;image-rendering:pixelated;pointer-events:none;filter:drop-shadow(1px 1px #231a1399)}
+.game-header #hearts::before,.game-header .hud-stat::before,.game-header button::before,#wave-control::before{left:var(--chain-inset)}
+.game-header #hearts::after,.game-header .hud-stat::after,.game-header button::after,#wave-control::after{right:var(--chain-inset)}
+.game-header #pause,.game-header #speed{--chain-inset:6px}
+@media(max-width:900px){.game-header,#wave-control{--hang:12px;--chain-width:10px;--chain-inset:8px}}
+@media(max-width:600px){.game-header,#wave-control{--hang:9px;--chain-width:8px;--chain-inset:5px}.game-header #pause,.game-header #speed{--chain-inset:3px}}
+@media(max-height:440px) and (orientation:landscape){.game-header,#wave-control{--hang:9px;--chain-width:8px;--chain-inset:6px}.game-header #pause,.game-header #speed{--chain-inset:3px}}

@@ -1,0 +1,12 @@
+#wave-control{position:absolute;z-index:4;top:15px;left:50%;transform:translateX(-50%);width:68px;height:68px;padding:0;display:grid;place-items:center;image-rendering:pixelated}
+#wave-control[data-state='ready']{cursor:pointer}
+#wave-control[data-state='ready']:hover{border-color:#fff2a1}
+#wave-control:disabled{opacity:1;cursor:default}
+#wave-control img,#wave-control canvas{display:block;width:64px;height:64px;image-rendering:pixelated}
+
+.tower-drawer{padding-left:24px;padding-right:24px}
+.tower-drawer .tower-details{display:none}
+@media(max-width:900px){#wave-control{width:56px;height:56px;top:12px}#wave-control img,#wave-control canvas{width:52px;height:52px}}
+@media(max-width:760px){#wave-control{top:62px}}
+@media(max-width:600px){#wave-control{top:48px;width:44px;height:44px}#wave-control img,#wave-control canvas{width:40px;height:40px}.game-window{--drawer-height:146px}.tower-drawer{padding:5px 8px}}
+@media(max-height:440px) and (orientation:landscape){#wave-control{top:8px;width:42px;height:42px}#wave-control img,#wave-control canvas{width:38px;height:38px}}

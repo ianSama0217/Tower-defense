@@ -1,6 +1,6 @@
 (function(root){
   'use strict';
-  const labels={upgrade:'升級',repair:'修復',demolish:'拆除'};
+  const labels={build:'建造',upgrade:'升級',repair:'修復',demolish:'拆除'};
   function drawProgress(ctx,x,y,progress,size=48){
     // Twelve clockwise steps, with an open center so the artwork remains visible.
     const amount=Math.floor(Math.max(0,Math.min(1,progress))*12)/12;
