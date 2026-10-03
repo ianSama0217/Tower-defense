@@ -1,0 +1,15 @@
+/* Fusion Pixel Font 12px proportional, Traditional Chinese (OFL-1.1). */
+@font-face {
+  font-family: 'Fusion Pixel';
+  src: url('assets/fonts/fusion-pixel-12px-proportional-zh_hant.woff2') format('woff2');
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+}
+
+:root {
+  --font-ui: 'Fusion Pixel', 'Microsoft JhengHei', sans-serif;
+  font-synthesis: none;
+}
+
+button, input, select, textarea { font-family: inherit; }

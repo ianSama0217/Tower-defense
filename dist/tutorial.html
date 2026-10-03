@@ -1,6 +1,8 @@
 <!doctype html>
 <html lang="zh-Hant">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>第一關 · 森林入門</title><link rel="stylesheet" href="tutorial.css"><link rel="stylesheet" href="game-hud.css"><link rel="stylesheet" href="wood-theme.css"><link rel="stylesheet" href="tower-drawer.css"><link rel="stylesheet" href="wave-clock.css"><link rel="preload" href="assets/fonts/PixelOperator.ttf" as="font" type="font/ttf" crossorigin></head>
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preload" href="assets/fonts/fusion-pixel-12px-proportional-zh_hant.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+<title>第一關 · 森林入門</title><link rel="stylesheet" href="tutorial.css"><link rel="stylesheet" href="game-hud.css"><link rel="stylesheet" href="wood-theme.css"><link rel="stylesheet" href="tower-drawer.css"><link rel="stylesheet" href="wave-clock.css"><link rel="preload" href="assets/fonts/PixelOperator.ttf" as="font" type="font/ttf" crossorigin></head>
 <body>
   <div class="game-window">
   <main class="game-layout">
@@ -23,5 +25,5 @@
   </div>
   <dialog id="game-settings" aria-labelledby="settings-title"><div class="settings-content"><div class="settings-heading"><h2 id="settings-title">遊戲已暫停</h2><button id="close-settings" aria-label="關閉設定">×</button></div><p>遊戲速度</p><div class="speed-options" role="group" aria-label="遊戲速度"><button data-speed="1" aria-pressed="true">1×</button><button data-speed="2" aria-pressed="false">2×</button></div><p><label for="sound-volume">音效音量</label> <input id="sound-volume" data-sound-volume type="range" min="0" max="100" value="50"></p><p><label><input data-sound-muted type="checkbox"> 靜音</label></p><button id="resume" class="gold-button">繼續遊戲</button><a href="index.html#levels">返回選關地圖</a></div></dialog>
   <dialog id="result" aria-labelledby="result-title"><div class="result-content"><p class="guide-badge">森林守衛 · 第一關</p><h2 id="result-title"></h2><p id="result-copy"></p><p id="save-note"></p><button id="restart" class="gold-button">再玩一次</button><a href="index.html#levels">返回選關地圖 →</a></div></dialog>
-  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="tower-work.js"></script><script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="tutorial-level.js"></script><script src="game-hud.js"></script><script src="tower-menu.js"></script><script src="wave-clock.js"></script><script src="tutorial.js"></script>
+  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="tower-work.js"></script><script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="tutorial-level.js"></script><script src="game-hud.js"></script><script src="tower-menu.js"></script><script src="wave-clock.js"></script><script src="level-progress.js"></script><script src="tutorial.js"></script>
 </body></html>

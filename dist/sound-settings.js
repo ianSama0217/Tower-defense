@@ -10,12 +10,18 @@
   document.addEventListener('visibilitychange',()=>{if(document.hidden)sound.stopAll();});
   window.addEventListener('pagehide',()=>sound.stopAll());
   function save(){try{localStorage.setItem('td-sound-settings',JSON.stringify({volume:sound.volume,muted:sound.muted}));}catch{}}
-  document.querySelectorAll('[data-sound-volume]').forEach(input=>{
+  const volumeInputs=[...document.querySelectorAll('[data-sound-volume]')];
+  const muteInputs=[...document.querySelectorAll('[data-sound-muted]')];
+  function syncControls(){
+    volumeInputs.forEach(input=>{input.value=String(Math.round(sound.volume*100));});
+    muteInputs.forEach(input=>{input.checked=sound.muted;});
+  }
+  volumeInputs.forEach(input=>{
     input.value=String(Math.round(sound.volume*100));
-    input.addEventListener('input',()=>{sound.setVolume(Number(input.value)/100);save();});
+    input.addEventListener('input',()=>{sound.setVolume(Number(input.value)/100);syncControls();save();});
   });
-  document.querySelectorAll('[data-sound-muted]').forEach(input=>{
+  muteInputs.forEach(input=>{
     input.checked=sound.muted;
-    input.addEventListener('change',()=>{sound.setMuted(input.checked);save();});
+    input.addEventListener('change',()=>{sound.setMuted(input.checked);syncControls();save();});
   });
 })();

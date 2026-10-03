@@ -1,0 +1,95 @@
+{
+  "source": "art/level-select/markers-source.png",
+  "sprites": {
+    "banner-1": {
+      "width": 152,
+      "height": 180,
+      "crop": {
+        "left": 64,
+        "top": 59,
+        "width": 314,
+        "height": 374
+      }
+    },
+    "banner-2": {
+      "width": 152,
+      "height": 180,
+      "crop": {
+        "left": 470,
+        "top": 59,
+        "width": 315,
+        "height": 374
+      }
+    },
+    "banner-3": {
+      "width": 152,
+      "height": 180,
+      "crop": {
+        "left": 875,
+        "top": 59,
+        "width": 315,
+        "height": 374
+      }
+    },
+    "banner-4": {
+      "width": 152,
+      "height": 180,
+      "crop": {
+        "left": 64,
+        "top": 467,
+        "width": 314,
+        "height": 372
+      }
+    },
+    "banner-5": {
+      "width": 152,
+      "height": 180,
+      "crop": {
+        "left": 470,
+        "top": 466,
+        "width": 314,
+        "height": 373
+      }
+    },
+    "pedestal": {
+      "width": 184,
+      "height": 104,
+      "crop": {
+        "left": 836,
+        "top": 538,
+        "width": 387,
+        "height": 266
+      }
+    },
+    "star-gold": {
+      "width": 64,
+      "height": 64,
+      "crop": {
+        "left": 71,
+        "top": 878,
+        "width": 302,
+        "height": 293
+      }
+    },
+    "star-empty": {
+      "width": 64,
+      "height": 64,
+      "crop": {
+        "left": 474,
+        "top": 877,
+        "width": 307,
+        "height": 294
+      }
+    },
+    "lock-chains": {
+      "width": 200,
+      "height": 156,
+      "crop": {
+        "left": 835,
+        "top": 853,
+        "width": 394,
+        "height": 340
+      }
+    }
+  }
+}

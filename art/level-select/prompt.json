@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "output": "dist/assets/ui/forest-world-map.png",
+  "prompt": "Use case: precise-object-edit. Asset type: production background for a tower defense level selection map. Input image is the edit target. Preserve the entire wide 2:1 pixel-art forest landscape, composition, winding dirt road, waterfalls, bridge, camp at lower left, lookout tower and skull cave at upper right exactly. Remove ALL five numbered level banners, their circular stone pedestals, all stars, locks and chains belonging to these markers and yellow marker glow. Fill these five areas with continuous empty dirt road matching the surroundings. Keep the scenery flags at the cave and tower. No UI, no numbers, no text, no stars, no buttons. Keep the empty road stops at normalized positions (0.126,0.68), (0.191,0.36), (0.478,0.54), (0.667,0.63), (0.905,0.44) so interactive markers can be overlaid later. Crisp detailed pixel art, original colors and wide 2:1 framing."
+}

@@ -87,7 +87,14 @@
     if(['won','lost'].includes(g.phase)&&!resultShown&&!hud.isBreaking()){
       resultShown=true;$('result-title').textContent=g.phase==='won'?'第一關通過！':'防線失守';
       $('result-copy').textContent=g.phase==='won'?`完成 4 波教學，擊敗 ${g.kills} 隻怪物，剩餘 ${g.lives} 顆生命。你已學會建造、升級與應對哥布林。`:'怪物突破了防線。再試一次，優先建好右側箭塔並完成升級。';
-      $('save-note').textContent='';if(g.phase==='won'){try{localStorage.setItem('td-tutorial-complete','true');$('save-note').textContent='通關紀錄已儲存在此瀏覽器。';}catch{$('save-note').textContent='本次已通關，但瀏覽器無法保存紀錄。';}}
+      $('save-note').textContent='';
+      if(g.phase==='won'){
+        const earned=LevelProgress.starsForResult(g.phase,g.lives);
+        let storage=null;try{storage=localStorage;}catch{}
+        const result=LevelProgress.record(storage,0,earned);
+        try{storage.setItem('td-tutorial-complete','true');}catch{}
+        $('save-note').textContent=`本次獲得 ${earned} 顆星（${'★'.repeat(earned)}${'☆'.repeat(3-earned)}）。`+(result.saved?'最佳星等已儲存，第 2 關已解鎖。':'瀏覽器無法保存紀錄，返回選關後將無法保留本次星等。');
+      }
       $('result').showModal();
     }
   }

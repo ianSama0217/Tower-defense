@@ -1,6 +1,6 @@
 #start-screen {
   position: relative; isolation: isolate; color: #fff1be;
-  background: #314a30; font-family: 'Microsoft JhengHei', monospace;
+  background: #314a30; font-family:var(--font-ui);
 }
 #forest-scene { inset: 0; transform: none; width: 100%; height: 100%; image-rendering: pixelated; pointer-events: none; }
 .forest-light { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 37%, transparent 22%, #122b2333 70%, #0d211fa6 100%); }

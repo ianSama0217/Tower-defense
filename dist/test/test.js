@@ -87,7 +87,7 @@
     }
     if(labels){
       const label=r.attack?`判定 ${r.detection} / 攻擊 ${r.attack} px`:r.blast?`引爆 ${r.trigger} / 爆炸 R ${r.blast} px`:'不攻擊 · R 0 px';
-      ctx.setLineDash([]);ctx.font='bold 16px "Microsoft JhengHei", sans-serif';ctx.textAlign='center';
+      ctx.setLineDash([]);ctx.font='16px "Fusion Pixel", "Microsoft JhengHei", sans-serif';ctx.textAlign='center';
       const width=ctx.measureText(label).width+16,x=Math.max(width/2+2,Math.min(W-width/2-2,o.x)),y=Math.min(H-24,o.y+12);
       ctx.fillStyle='#14241eee';ctx.fillRect(x-width/2,y,width,24);ctx.fillStyle=r.blast?'#ffaaaa':'#ffe0a0';ctx.fillText(label,x,y+18);
     }
