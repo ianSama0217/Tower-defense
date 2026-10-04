@@ -1,0 +1,15 @@
+{
+  "checks": [
+    "no wall UI in first two levels",
+    "first two levels reject wall purchases after unlocking",
+    "80px and 96px road-centered geometry",
+    "six pixel HP gap",
+    "90 degree pixel rotation",
+    "mobile layout",
+    "second-level wall reward",
+    "reward persistence and replay",
+    "test lab wall bounds and simulation"
+  ],
+  "rotationChannelDifference": 0,
+  "errors": []
+}

@@ -11,15 +11,18 @@
     return rects;
   }
   function placements(level,images,displayScale=1){
-    const random=rng(48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
+    const dense=level.environment==='deep-forest';
+    const random=rng(dense?20406:48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
     // Reserve the full tower silhouette above every build pad as well as its click area.
     const reserved=level.slots.map(s=>({x:s.x-24*displayScale,y:s.y-56*displayScale,w:48*displayScale,h:78*displayScale}));
-    const groups=[{count:19,names:names.slice(0,11),scale:.85},{count:15,names:['boulders','standingRock','rockCluster','mossRock','rock','lowRock','stump','fallenLog','log'],scale:.8},{count:28,names:['bush','flowers','orangeBush','berryBush'],scale:.75},{count:45,names:['fern','tuft','reeds','whiteFlowers','pinkFlowers','pebble'],scale:.75}];
-    for(const group of groups){let count=0;for(let attempt=0;attempt<1600&&count<group.count;attempt++){
+    const groups=dense?[{count:78,names:names.slice(0,7),scale:.9},{count:35,names:['boulders','mossRock','rock','lowRock','stump','fallenLog','log'],scale:.65},{count:85,names:['bush','flowers','orangeBush','berryBush'],scale:.65},{count:220,names:['fern','tuft','whiteFlowers','pinkFlowers','pebble'],scale:.6}]:[{count:19,names:names.slice(0,11),scale:.85},{count:15,names:['boulders','standingRock','rockCluster','mossRock','rock','lowRock','stump','fallenLog','log'],scale:.8},{count:28,names:['bush','flowers','orangeBush','berryBush'],scale:.75},{count:45,names:['fern','tuft','reeds','whiteFlowers','pinkFlowers','pebble'],scale:.75}];
+    for(const group of groups){let count=0;for(let attempt=0;attempt<(dense?9000:1600)&&count<group.count;attempt++){
       const name=group.names[Math.floor(random()*group.names.length)],img=images[name],scale=group.scale*(.85+random()*.3),w=Math.round(img.naturalWidth*scale)*displayScale,h=Math.round(img.naturalHeight*scale)*displayScale;
       const box={x:Math.floor(3+random()*(map.width-w-6)),y:Math.floor(4+random()*(map.height-h-8)),w,h};
       if(roads.some(r=>overlaps(box,r))||reserved.some(r=>overlaps(box,r)))continue;
-      if(placed.some(p=>overlaps(box,{x:p.x+3,y:p.y+3,w:p.w-6,h:p.h-6})))continue;
+      const inset=dense?.23:0;
+      const occupied=dense?{x:box.x+box.w*inset,y:box.y+box.h*inset,w:box.w*(1-inset*2),h:box.h*(1-inset*2)}:box;
+      if(placed.some(p=>overlaps(occupied,{x:p.x+(dense?p.w*inset:3),y:p.y+(dense?p.h*inset:3),w:p.w-(dense?p.w*inset*2:6),h:p.h-(dense?p.h*inset*2:6)})))continue;
       placed.push({...box,name});count++;
     }}
     return placed.sort((a,b)=>a.y+a.h-b.y-b.h);

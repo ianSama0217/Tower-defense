@@ -1,0 +1,30 @@
+{
+  "file": "effects.png",
+  "cellSize": 96,
+  "columns": 4,
+  "rows": 4,
+  "animations": {
+    "hammer": [
+      0,
+      1,
+      2,
+      3
+    ],
+    "dust": [
+      4,
+      5,
+      6,
+      7
+    ],
+    "stone": [
+      8,
+      9,
+      10,
+      11
+    ]
+  },
+  "scaffold": 12,
+  "spark": 13,
+  "woodBurst": 14,
+  "woodRubble": 15
+}

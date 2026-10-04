@@ -53,13 +53,53 @@
       "file": "enemy_lv2_orc.png",
       "frameWidth": 32,
       "frameHeight": 32,
-      "width": 640,
+      "width": 768,
       "height": 32,
       "anchor": {
         "x": 16,
         "y": 29
       },
-      "facing": "right"
+      "facing": "right",
+      "frames": 24,
+      "columns": 24,
+      "animations": {
+        "idle": {
+          "start": 0,
+          "count": 4,
+          "fps": 5,
+          "loop": true
+        },
+        "walk": {
+          "start": 4,
+          "count": 4,
+          "fps": 8,
+          "loop": true
+        },
+        "attack": {
+          "start": 8,
+          "count": 4,
+          "fps": 10,
+          "loop": false
+        },
+        "hurt": {
+          "start": 12,
+          "count": 2,
+          "fps": 10,
+          "loop": false
+        },
+        "death": {
+          "start": 14,
+          "count": 6,
+          "fps": 8,
+          "loop": false
+        },
+        "charge": {
+          "start": 20,
+          "count": 4,
+          "fps": 12,
+          "loop": true
+        }
+      }
     },
     "3": {
       "file": "enemy_lv3_cyclops.png",

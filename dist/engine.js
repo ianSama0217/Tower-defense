@@ -11,16 +11,24 @@
     towerSlotSize: 64,
     debugGrid: false
   };
-  const TOWERS = [null, {damage:12,range:155,interval:.68,cost:60}, {damage:27,range:180,interval:.53,cost:80}, {damage:48,range:205,interval:.4,cost:125}];
+  const TOWERS = [null, {damage:12,range:95,interval:.65,cost:60}, {damage:18,range:95,interval:.55,cost:80}, {damage:24,range:115,interval:.5,cost:125}];
   const TOWER_MAX_HP = 100;
+  const WALL = {cost:100,limit:3,hp:300,length:36,thickness:16,detectionRange:64,attackDamage:6,attackRange:12,attackInterval:1.2};
+  function wallSize(orientation,scale=1,roadWidth=WALL.length*scale){const thickness=Math.min(roadWidth,WALL.thickness*scale);return orientation==='vertical'?{width:thickness,height:roadWidth}:{width:roadWidth,height:thickness};}
+  function targetPoint(target,from){
+    if(target.kind!=='wall')return target;
+    return {x:Math.max(target.x-target.width/2,Math.min(target.x+target.width/2,from.x)),y:Math.max(target.y-target.height/2,Math.min(target.y+target.height/2,from.y))};
+  }
+  function targetDistance(target,from){const p=targetPoint(target,from);return Math.hypot(p.x-from.x,p.y-from.y);}
   const TOWER_ACTIONS = {build:{duration:5},upgrade:{duration:5},repair:{duration:3,cost:50},demolish:{duration:3}};
-  const ENEMY_TYPES = {goblin:1,orc:2,cyclops:3,bomber:4,slime:5};
+  const ENEMY_TYPES = {goblin:1,orc:2,cyclops:3,bomber:4,slime:5,archer:6};
   const ENEMIES = [null,
     {name:'哥布林',behavior:'attacker',detectionRange:64,hp:44,speed:57,reward:11,attackDamage:6,attackRange:32,attackInterval:1.2},
-    {name:'獸人',behavior:'attacker',detectionRange:64,hp:112,speed:49,reward:18,attackDamage:10,attackRange:32,attackInterval:1},
+    {name:'獸人',behavior:'attacker',detectionRange:64,hp:112,speed:49,reward:18,attackDamage:10,attackRange:32,attackInterval:1,chargeDamage:120,chargeSpeedMultiplier:1.5},
     {name:'獨眼巨人',behavior:'attacker',detectionRange:128,hp:245,speed:42,reward:28,attackDamage:15,attackRange:32,attackInterval:0.9},
     {name:'炸彈哥布林',behavior:'bomber',detectionRange:Infinity,hp:60,speed:57,reward:14,attackDamage:0,attackRange:0,attackInterval:0,triggerRange:22,blastRadius:64,blastDamage:60},
-    {name:'史萊姆',behavior:'passive',detectionRange:0,hp:32,speed:49,reward:8,attackDamage:0,attackRange:0,attackInterval:0}
+    {name:'史萊姆',behavior:'passive',detectionRange:0,hp:32,speed:49,reward:8,attackDamage:0,attackRange:0,attackInterval:0},
+    {name:'哥布林弓箭手',behavior:'archer',detectionRange:90,hp:40,speed:49,reward:12,attackDamage:6,attackRange:112,attackInterval:1.4,attackWindup:.2,projectileSpeed:220}
   ];
   function makeRoute(points) {
     const path = points.map(([x,y]) => ({x,y}));
@@ -48,16 +56,79 @@
     constructor(random=Math.random,scenario=createScenario()){this.random=random;this.reset(scenario);}
     reset(scenario=this.level) {
       if(!scenario||!Array.isArray(scenario.routes)||!Array.isArray(scenario.slots)||!Array.isArray(scenario.waves))throw new TypeError('A scenario is required');
-      this.level=scenario;
+      // Later stages share one road width; the first two keep their legacy layouts.
+      this.level=Number.isInteger(scenario.stageIndex)&&scenario.stageIndex>=2?{...scenario,mapConfig:{...scenario.mapConfig,roadWidth:MAP_CONFIG.roadWidth}}:scenario;
       this.waves=this.level.waves;
       this.worldScale=this.level.worldScale;
-      this.money=this.level.initialMoney??180;this.lives=3;this.wave=0;this.kills=0;this.time=0;this.phase='ready';
+      this.money=this.level.initialMoney??180;this.lives=3;this.wave=0;this.kills=0;this.towersBuilt=0;this.time=0;this.phase='ready';
       this.awaitingWave=!!this.level.manualWaves&&this.waves.length>0;
       this.countdown=this.waves.length&&!this.awaitingWave?15:Infinity;
-      this.enemies=[];this.corpses=[];this.bullets=[];this.effects=[];this.spawnQueue=[];this.spawnTimer=0;this.nextId=1;
-      this.slots=this.level.slots.map((s,id)=>({...s,id,level:0,cooldown:0,hp:0,maxHp:TOWER_MAX_HP,destroyedAt:null,action:null}));
+      this.enemies=[];this.corpses=[];this.bullets=[];this.enemyArrows=[];this.effects=[];this.spawnQueue=[];this.spawnTimer=0;this.nextId=1;
+      this.nextTowerId=1;
+      this.walls=[];this.wallsUsed=0;
+      this.wallsUnlocked=!!scenario.wallsUnlocked;
+      this.slots=this.level.slots.map((s,id)=>({...s,id,level:0,cooldown:0,hp:0,maxHp:TOWER_MAX_HP,destroyedAt:null,action:null,towerId:null,kills:0}));
     }
     start(scenario=this.level){this.reset(scenario);this.phase='playing';}
+    get wallsRemaining(){return WALL.limit-this.wallsUsed;}
+    wallAvailability(){
+      if(this.phase!=='playing')return {ok:false,message:'目前無法放置城牆。'};
+      if(Number.isInteger(this.level.stageIndex)){
+        if(this.level.stageIndex<2)return {ok:false,message:'城牆是第二關通關獎勵，從第三關開始使用。'};
+        if(!this.wallsUnlocked)return {ok:false,message:'通過第二關後解鎖城牆。'};
+      }
+      if(!this.wallsRemaining)return {ok:false,message:'本場 3 個城牆已用完，摧毀後不會補回。'};
+      if(this.money<WALL.cost)return {ok:false,message:'金幣不足，城牆需要 100 金幣。'};
+      return {ok:true};
+    }
+    canPlaceWall(x,y,orientation='horizontal'){
+      const available=this.wallAvailability();if(!available.ok)return available;
+      if(!Number.isFinite(x)||!Number.isFinite(y)||!['horizontal','vertical'].includes(orientation))return {ok:false,message:'請選擇有效的位置與方向。'};
+      const map=this.level.mapConfig,size=wallSize(orientation,this.worldScale,map.roadWidth);
+      // Snap to the nearest road segment and half-tile steps along its centerline.
+      // Keep the transverse span equal to the actual road width, including non-tile multiples.
+      let snapped=null,nearest=Infinity;
+      for(const route of this.level.routes)for(let i=0;i<route.segments.length;i++){
+        const length=route.segments[i];if(!length)continue;
+        const a=route.path[i],b=route.path[i+1],ux=(b.x-a.x)/length,uy=(b.y-a.y)/length;
+        const along=Math.max(0,Math.min(length,(x-a.x)*ux+(y-a.y)*uy));
+        const distance=Math.hypot(x-a.x-along*ux,y-a.y-along*uy);
+        if(distance<nearest){nearest=distance;const step=map.tileSize/2,grid=Math.max(0,Math.min(length,Math.round(along/step)*step));snapped={x:a.x+grid*ux,y:a.y+grid*uy};}
+      }
+      if(!snapped||nearest>map.roadWidth/2)return {ok:false,message:'城牆必須放在道路範圍內。'};
+      ({x,y}=snapped);
+      const onRoad=(px,py)=>this.level.routes.some(route=>route.segments.some((length,i)=>{
+        if(!length)return false;const a=route.path[i],b=route.path[i+1],t=Math.max(0,Math.min(1,((px-a.x)*(b.x-a.x)+(py-a.y)*(b.y-a.y))/(length*length)));
+        return Math.hypot(px-a.x-t*(b.x-a.x),py-a.y-t*(b.y-a.y))<=map.roadWidth/2;
+      }));
+      for(const dx of [-size.width/2,0,size.width/2])for(const dy of [-size.height/2,0,size.height/2]){
+        if(x+dx<0||x+dx>map.width||y+dy<0||y+dy>map.height||!onRoad(x+dx,y+dy))return {ok:false,message:'城牆必須完整放在道路範圍內。'};
+      }
+      if(this.walls.some(w=>w.hp>0&&Math.abs(w.x-x)<(w.width+size.width)/2+4&&Math.abs(w.y-y)<(w.height+size.height)/2+4)||this.slots.some(s=>Math.abs(s.x-x)<(map.towerSlotSize+size.width)/2&&Math.abs(s.y-y)<(map.towerSlotSize+size.height)/2))return {ok:false,message:'此處已有城牆或建造臺座。'};
+      if(this.enemies.some(e=>e.hp>0&&Math.abs(e.x-x)<size.width/2+8*this.worldScale&&Math.abs(e.y-y)<size.height/2+8*this.worldScale))return {ok:false,message:'此處有敵人，請選擇空的道路。'};
+      return {ok:true,placement:{x,y,orientation,...size}};
+    }
+    placeWall(x,y,orientation='horizontal'){
+      const result=this.canPlaceWall(x,y,orientation);if(!result.ok)return result;
+      this.money-=WALL.cost;this.wallsUsed++;
+      const wall={id:-this.wallsUsed,kind:'wall',...result.placement,level:1,hp:WALL.hp,maxHp:WALL.hp,towerId:this.nextTowerId++,destroyedAt:null};
+      this.walls.push(wall);this.sound?.playBuild();
+      return {ok:true,wall,message:`已放置城牆，剩餘 ${this.wallsRemaining} 個；無法修復。`};
+    }
+    wallTarget(e){
+      const range=Math.max(WALL.detectionRange,enemyRanges(e.level,this.worldScale).detection/this.worldScale)*this.worldScale;
+      const locked=this.walls.find(w=>w.id===e.targetId&&w.hp>0);
+      if(locked)return locked;
+      let target=null,nearest=Infinity;
+      for(const wall of this.walls){const distance=Math.hypot(wall.x-e.x,wall.y-e.y);if(wall.hp>0&&distance<=range+Math.hypot(wall.width,wall.height)/2+1e-7&&distance<nearest){target=wall;nearest=distance;}}
+      return target;
+    }
+    isCharging(e){return !!ENEMIES[e.level].chargeDamage&&!e.chargeConsumed;}
+    attackRange(e,target){
+      // Towers use their 32px footprint radius; walls use their nearest edge plus the orc's body radius.
+      if(this.isCharging(e))return (target?.kind==='wall'?8:32)*this.worldScale;
+      return target?.kind==='wall'&&!ENEMIES[e.level].attackDamage?WALL.attackRange*this.worldScale:enemyRanges(e.level,this.worldScale).attack;
+    }
     startNextWave() {
       if(this.phase!=='playing'||!this.awaitingWave||this.wave>=this.waves.length)return false;
       this.awaitingWave=false;this.countdown=0;this.spawnQueue=[...this.waves[this.wave++]];this.spawnTimer=0;
@@ -78,6 +149,7 @@
         return{ok:true,message:`升級開始，5 秒後升至 ${s.level+1} 級並回滿 100 HP；期間停止攻擊。`};
       }
       s.level=1;s.cooldown=0;s.hp=s.maxHp=TOWER_MAX_HP;s.destroyedAt=null;
+      s.towerId=this.nextTowerId++;s.kills=0;
       s.action={kind:'build',elapsed:0,duration:TOWER_ACTIONS.build.duration,cost};
       return{ok:true,message:'建造開始，5 秒後完成並開始攻擊。'};
     }
@@ -113,6 +185,7 @@
           this.effects.push({kind:'demolition',x:s.x,y:s.y,level:s.level,material:s.level===1?'wood':'stone',life:.85,duration:.85});
           s.level=0;s.hp=0;s.destroyedAt=null;
         }else{
+          if(action.kind==='build')this.towersBuilt++;
           if(action.kind==='upgrade')s.level=action.targetLevel;
           if(action.kind!=='build')s.hp=s.maxHp=TOWER_MAX_HP;
           if(action.kind==='upgrade')this.sound?.playUpgrade();
@@ -123,18 +196,20 @@
     }
     damageTower(target,damage) {
       if(!target.level||target.hp<=0)return;
+      this.effects.push({kind:'damage',x:target.x,y:target.y,amount:Math.min(target.hp,damage),life:.7});
       target.hp=Math.max(0,target.hp-damage);
       if(target.hp===0){
         target.level=0;target.cooldown=0;target.action=null;target.destroyedAt=this.time;
         this.effects.push({kind:'destroyed',x:target.x,y:target.y,life:.5});
       }
     }
-    damageEnemy(enemy,damage) {
+    damageEnemy(enemy,damage,sourceTowerId=null) {
       if(enemy.hp<=0||enemy.deathAt!=null||enemy.escaped)return;
+      this.effects.push({kind:'damage',x:enemy.x,y:enemy.y,amount:Math.min(enemy.hp,damage),life:.7});
       enemy.hp=Math.max(0,enemy.hp-damage);enemy.hurtAt=this.time;
-      if(enemy.hp===0)this.killEnemy(enemy);
+      if(enemy.hp===0)this.killEnemy(enemy,true,sourceTowerId);
     }
-    killEnemy(enemy,reward=true) {
+    killEnemy(enemy,reward=true,sourceTowerId=null) {
       // Queue chain reactions: each death, blast, reward and corpse is resolved exactly once.
       const pending=[{enemy,reward}];
       for(let i=0;i<pending.length;i++){
@@ -144,20 +219,27 @@
         this.corpses.push({...e});
         this.sound?.playEnemyDeath();
         const spec=ENEMIES[e.level];
-        if(grant){this.money+=spec.reward;this.kills++;this.sound?.playCoin();}
+        if(grant){
+          this.money+=spec.reward;this.kills++;this.sound?.playCoin();
+          // The projectile remembers the building instance, never just a reusable pad.
+          const tower=sourceTowerId==null?null:this.slots.find(s=>s.towerId===sourceTowerId&&s.level>0&&s.hp>0);
+          if(tower)tower.kills=(tower.kills||0)+1;
+        }
         if(spec.behavior!=='bomber')continue;
         const radius=enemyRanges(e.level,this.worldScale).blast;
         this.effects.push({kind:'bomb-explosion',x:e.x,y:e.y,radius,life:sprites.deathDuration});
         this.sound?.playExplosion();
-        for(const s of this.slots)if(Math.hypot(s.x-e.x,s.y-e.y)<=radius)this.damageTower(s,spec.blastDamage);
+        for(const s of [...this.slots,...this.walls])if(targetDistance(s,e)<=radius)this.damageTower(s,spec.blastDamage);
         for(const other of this.enemies){
           if(other.hp<=0||other.deathAt!=null||other.escaped||Math.hypot(other.x-e.x,other.y-e.y)>radius)continue;
+          this.effects.push({kind:'damage',x:other.x,y:other.y,amount:Math.min(other.hp,spec.blastDamage),life:.7});
           other.hp=Math.max(0,other.hp-spec.blastDamage);other.hurtAt=this.time;
           if(other.hp===0)pending.push({enemy:other,reward:true});
         }
       }
     }
     attackTarget(e) {
+      const wall=this.wallTarget(e);if(wall){e.targetId=wall.id;return wall;}
       if(!ENEMIES[e.level].attackDamage)return null;
       const range=enemyRanges(e.level,this.worldScale).detection;
       const valid=s=>s&&s.level>0&&s.hp>0;
@@ -189,10 +271,12 @@
         if(length>0&&offset+length>=e.distance&&offset<=stop){
           const from=Math.max(0,e.distance-offset),to=Math.min(length,stop-offset);
           const ux=(b.x-a.x)/length,uy=(b.y-a.y)/length;
-          for(const s of this.slots){
+          for(const s of [...this.slots,...this.walls]){
             if(!s.level||s.hp<=0)continue;
+            if(s.kind!=='wall'&&!ENEMIES[e.level].attackDamage)continue;
+            const detection=s.kind==='wall'?Math.max(range,WALL.detectionRange*this.worldScale)+Math.hypot(s.width,s.height)/2:range;
             const dx=s.x-a.x,dy=s.y-a.y,along=dx*ux+dy*uy;
-            const perpendicular=dx*uy-dy*ux,disc=range*range-perpendicular*perpendicular;
+            const perpendicular=dx*uy-dy*ux,disc=detection*detection-perpendicular*perpendicular;
             if(disc<0)continue;
             const half=Math.sqrt(disc),entry=Math.max(from,along-half);
             if(entry<=to&&entry<=along+half)stop=Math.min(stop,offset+entry);
@@ -203,7 +287,8 @@
       return stop;
     }
     moveEnemy(e,dt) {
-      const spec=ENEMIES[e.level],route=this.level.routes[e.routeIndex],speed=spec.speed*this.worldScale,oldX=e.x,oldY=e.y;
+      e.charging=this.isCharging(e);
+      const spec=ENEMIES[e.level],route=this.level.routes[e.routeIndex],speed=spec.speed*this.worldScale*(e.charging?spec.chargeSpeedMultiplier:1),oldX=e.x,oldY=e.y;
       let travel=speed*dt;
       const approach=(point,stop=0)=>{
         const dx=point.x-e.x,dy=point.y-e.y,distance=Math.hypot(dx,dy),step=Math.min(travel,Math.max(0,distance-stop));
@@ -213,7 +298,7 @@
       let chasing=false,attackTarget=null;
       const pursue=target=>{
         chasing=true;attackTarget=target;
-        approach(target,enemyRanges(e.level,this.worldScale).attack);
+        approach(targetPoint(target,e),this.attackRange(e,target));
         // Preserve forward progress when pursuit stays on the current route segment.
         let offset=0;
         for(let i=0;i<route.segments.length;i++){
@@ -229,19 +314,19 @@
         const anchor=position(e.distance,route);
         e.offRoute=Math.hypot(e.x-anchor.x,e.y-anchor.y)>1e-7;
       };
-      if(spec.attackDamage){
+      if(spec.behavior!=='bomber'){
         const target=this.attackTarget(e);
         if(target)pursue(target);
         else if(e.offRoute&&approach(position(e.distance,route))<=1e-9)e.offRoute=false;
       }
       if(spec.behavior==='bomber'){
-        let target=null,nearest=Infinity;
-        for(const s of this.slots){if(!s.level||s.hp<=0)continue;const distance=Math.hypot(s.x-e.x,s.y-e.y);if(distance<=enemyRanges(e.level,this.worldScale).detection&&distance<nearest){nearest=distance;target=s;}}
+        let target=this.wallTarget(e),nearest=Infinity;
+        if(!target)for(const s of this.slots){if(!s.level||s.hp<=0)continue;const distance=Math.hypot(s.x-e.x,s.y-e.y);if(distance<=enemyRanges(e.level,this.worldScale).detection&&distance<nearest){nearest=distance;target=s;}}
         e.targetId=target?.id??null;
         if(target){
           chasing=true;e.offRoute=true;
           const trigger=enemyRanges(e.level,this.worldScale).trigger;
-          if(approach(target,trigger)<=trigger+1e-9){this.killEnemy(e,false);return;}
+          if(approach(targetPoint(target,e),trigger)<=trigger+1e-9){this.killEnemy(e,false);return;}
         }else if(e.offRoute){
           // Return to the last route position continuously if every tower was removed.
           if(approach(position(e.distance,route))<=1e-9)e.offRoute=false;
@@ -249,32 +334,68 @@
       }
       if(!chasing&&!e.offRoute){
         const before=e.distance;
-        e.distance=spec.attackDamage?this.detectionStopDistance(e,travel):e.distance+travel;
+        e.distance=spec.attackDamage||this.walls.some(w=>w.hp>0)?this.detectionStopDistance(e,travel):e.distance+travel;
         travel=Math.max(0,travel-(e.distance-before));
         Object.assign(e,position(e.distance,route));
-        if(spec.attackDamage){const target=this.attackTarget(e);if(target)pursue(target);}
+        if(spec.behavior!=='bomber'){const target=this.attackTarget(e);if(target)pursue(target);}
         if(!chasing&&e.distance>=route.length){e.hp=0;e.escaped=true;this.lives=Math.max(0,this.lives-1);this.effects.push({x:e.x,y:e.y,life:.5,kind:'escape'});}
       }
       e.remaining=route.length-e.distance;e.moving=e.x!==oldX||e.y!==oldY;
       if(e.x!==oldX)e.facing=e.x>oldX?1:-1;else e.facing??=-1;
-      if(attackTarget&&Math.hypot(attackTarget.x-e.x,attackTarget.y-e.y)<=enemyRanges(e.level,this.worldScale).attack+1e-7)this.stopToAttack(e,attackTarget);
+      if(attackTarget&&targetDistance(attackTarget,e)<=this.attackRange(e,attackTarget)+1e-7)this.stopToAttack(e,attackTarget);
     }
     attackTowers(dt) {
       for(const e of this.enemies) {
         if(e.hp<=0)continue;
         const spec=ENEMIES[e.level];
-        if(!spec.attackDamage)continue;
+        if(spec.behavior==='bomber')continue;
         e.attackCooldown=Math.max(0,(e.attackCooldown??0)-dt);
+        if(e.pendingShot){
+          const shot=e.pendingShot;
+          if(this.time+1e-9<shot.releaseAt)continue;
+          e.pendingShot=null;
+          const target=shot.target;
+          if(target.level>0&&target.hp>0&&target.towerId===shot.towerId&&this.attackTarget(e)===target&&targetDistance(target,e)<=this.attackRange(e,target)+1e-7){
+            this.enemyArrows.push({x:e.x,y:e.y,target,targetTowerId:shot.towerId,damage:spec.attackDamage,speed:spec.projectileSpeed*this.worldScale});
+            this.sound?.playArrow(1);
+          }
+        }
         const target=this.attackTarget(e);
-        if(!target||Math.hypot(target.x-e.x,target.y-e.y)>enemyRanges(e.level,this.worldScale).attack+1e-7)continue;
+        if(!target||targetDistance(target,e)>this.attackRange(e,target)+1e-7)continue;
         this.stopToAttack(e,target);
+        if(this.isCharging(e)){
+          e.chargeConsumed=true;e.charging=false;e.chargeImpactAt=this.time;
+          e.attackCooldown=spec.attackInterval;e.attackAt=this.time;
+          this.damageTower(target,spec.chargeDamage);
+          this.effects.push({kind:'enemy-attack',x:e.x,y:e.y,toX:target.x,toY:target.y,life:.18});
+          continue;
+        }
         if(e.attackCooldown>0)continue;
-        e.attackCooldown=spec.attackInterval;
+        e.attackCooldown=spec.attackInterval||WALL.attackInterval;
         e.attackAt=this.time;
-        this.damageTower(target,spec.attackDamage);
+        if(spec.behavior==='archer'){
+          e.pendingShot={target,towerId:target.towerId,releaseAt:this.time+spec.attackWindup};
+          continue;
+        }
+        this.damageTower(target,spec.attackDamage||WALL.attackDamage);
         this.effects.push({kind:'enemy-attack',x:e.x,y:e.y,toX:target.x,toY:target.y,life:.18});
       }
     }
+    updateEnemyArrows(dt) {
+      this.enemyArrows=this.enemyArrows.filter(arrow=>{
+        const s=arrow.target;
+        // A removed tower's replacement must not inherit projectiles aimed at the old building.
+        if(!s.level||s.hp<=0||s.towerId!==arrow.targetTowerId)return false;
+        const dx=s.x-arrow.x,dy=s.y-arrow.y,distance=Math.hypot(dx,dy),step=arrow.speed*dt;
+        if(distance<=step){this.damageTower(s,arrow.damage);return false;}
+        if(distance>0){arrow.x+=dx/distance*step;arrow.y+=dy/distance*step;}
+        return true;
+      });
+    }
+    fireTowers(dt){
+      for(const s of this.slots){if(!s.level||s.action||s.kind==='bomb')continue;s.cooldown-=dt;if(s.cooldown>0)continue;const spec=TOWERS[s.level];let target=null;for(const e of this.enemies)if(e.hp>0&&Math.hypot(e.x-s.x,e.y-s.y)<=spec.range*this.worldScale&&(!target||e.remaining<target.remaining))target=e;if(target){this.bullets.push({x:s.x,y:s.y,target,damage:spec.damage,sourceTowerId:s.towerId});this.sound?.playArrow(s.level);s.cooldown=spec.interval;}}
+    }
+    hasFriendlyProjectiles(){return false;}
     update(dt) {
       if(this.phase!=='playing'){
         if(this.corpses.length){this.time+=dt;this.corpses=this.corpses.filter(e=>this.time-e.deathAt<sprites.deathDuration);}
@@ -283,22 +404,34 @@
       this.time+=dt;this.effects=this.effects.filter(e=>(e.life-=dt)>0);
       this.corpses=this.corpses.filter(e=>this.time-e.deathAt<sprites.deathDuration);
       if(this.countdown>0){this.countdown=Math.max(0,this.countdown-dt);if(this.countdown===0){this.spawnQueue=[...this.waves[this.wave]];this.wave++;this.spawnTimer=0;this.sound?.playWaveStart();}}
-      if(this.spawnQueue.length){this.spawnTimer-=dt;if(this.spawnTimer<=0){const level=this.spawnQueue.shift(),s=ENEMIES[level],routeIndex=Math.floor(this.random()*this.level.routes.length),route=this.level.routes[routeIndex];this.enemies.push({id:this.nextId++,level,hp:s.hp,maxHp:s.hp,distance:0,routeIndex,remaining:route.length,...position(0,route)});this.spawnTimer=this.level.spawnInterval??1.35;}}
+      if(this.spawnQueue.length){
+        this.spawnTimer-=dt;
+        while(this.spawnQueue.length&&this.spawnTimer<=1e-9){
+          // Numeric entries preserve the original random-route waves. Objects pin a lane
+          // and may set the delay before the next spawn, including simultaneous lanes.
+          const entry=this.spawnQueue.shift(),level=typeof entry==='number'?entry:entry.level;
+          const s=ENEMIES[level],routeIndex=entry.routeIndex??Math.floor(this.random()*this.level.routes.length),route=this.level.routes[routeIndex];
+          this.enemies.push({id:this.nextId++,level,hp:s.hp,maxHp:s.hp,charging:!!s.chargeDamage,chargeConsumed:false,distance:0,routeIndex,remaining:route.length,...position(0,route)});
+          this.onEnemySpawn?.(level);
+          this.spawnTimer+=this.spawnQueue[0]?.delay??this.level.spawnInterval??1.35;
+        }
+      }
       for(const e of this.enemies)if(e.hp>0)this.moveEnemy(e,dt);
       if(this.lives===0){this.phase='lost';return;}
-      for(const s of this.slots){if(!s.level||s.action)continue;s.cooldown-=dt;if(s.cooldown>0)continue;const spec=TOWERS[s.level];let target=null;for(const e of this.enemies)if(e.hp>0&&Math.hypot(e.x-s.x,e.y-s.y)<=spec.range*this.worldScale&&(!target||e.remaining<target.remaining))target=e;if(target){this.bullets.push({x:s.x,y:s.y,target,damage:spec.damage});this.sound?.playArrow(s.level);s.cooldown=spec.interval;}}
-      this.bullets=this.bullets.filter(b=>{const e=b.target;if(e.hp<=0)return false;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<640*this.worldScale*dt){this.sound?.playHit();this.damageEnemy(e,b.damage);return false;}b.x+=(e.x-b.x)/d*640*this.worldScale*dt;b.y+=(e.y-b.y)/d*640*this.worldScale*dt;return true;});
+      this.fireTowers(dt);
+      this.bullets=this.bullets.filter(b=>{const e=b.target;if(e.hp<=0)return false;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<640*this.worldScale*dt){this.sound?.playHit();this.damageEnemy(e,b.damage,b.sourceTowerId);return false;}b.x+=(e.x-b.x)/d*640*this.worldScale*dt;b.y+=(e.y-b.y)/d*640*this.worldScale*dt;return true;});
       this.enemies=this.enemies.filter(e=>e.hp>0);
+      this.updateEnemyArrows(dt);
       // Resolve only surviving enemies, keeping their target locked while approaching or attacking.
       this.attackTowers(dt);
       this.updateTowerActions(dt);
-      if(this.countdown===0&&!this.spawnQueue.length&&!this.enemies.length){if(this.wave===this.waves.length){if(!this.corpses.length)this.phase='won';}else if(!this.level.manualWaves||!this.corpses.length){
+      if(this.countdown===0&&!this.spawnQueue.length&&!this.enemies.length&&!this.enemyArrows.length&&!this.hasFriendlyProjectiles()){if(this.wave===this.waves.length){if(!this.corpses.length)this.phase='won';}else if(!this.level.manualWaves||!this.corpses.length){
         this.money+=this.level.waveRewards?.[this.wave-1]??30;
         if((this.level.waveRewards?.[this.wave-1]??30)>0)this.sound?.playCoin();
         this.awaitingWave=!!this.level.manualWaves;this.countdown=this.awaitingWave?Infinity:8;
       }}
     }
   }
-  const api={Game,MAP_CONFIG,createScenario,TOWERS,TOWER_MAX_HP,TOWER_ACTIONS,ENEMY_TYPES,ENEMIES,enemyRanges,position,refundFor};
+  const api={Game,MAP_CONFIG,createScenario,TOWERS,TOWER_MAX_HP,TOWER_ACTIONS,WALL,wallSize,targetPoint,targetDistance,ENEMY_TYPES,ENEMIES,enemyRanges,position,refundFor};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TD=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

@@ -1,0 +1,32 @@
+:is(#world-settings,#game-settings).forest-settings{box-sizing:border-box;width:min(680px,calc(100vw - 24px));max-width:none;max-height:none;padding:0;border:0;border-radius:0;overflow:hidden;background:transparent;color:#46230f;box-shadow:0 16px 60px #101409a6;font-family:var(--font-ui);image-rendering:pixelated}
+.forest-settings::backdrop{background:#081b13b8;backdrop-filter:blur(3px)}
+.forest-settings-panel{position:relative;padding:30px 48px 40px;background:url('assets/ui/settings-kit/parchment.png') center/100% 100% no-repeat}
+.forest-settings-panel::before{content:'';position:absolute;inset:0;pointer-events:none;border:20px solid transparent;border-image:url('assets/ui/settings-kit/frame.png') 24 stretch}
+.forest-settings-title{display:grid;place-items:center;width:82%;height:92px;margin:0 auto 24px;padding:0 12%;background:url('assets/ui/settings-kit/title.png') center/100% 100% no-repeat;color:#fff0cc;font:40px/1.2 var(--font-ui);text-shadow:3px 3px #412313,-2px -2px #412313,2px -2px #412313,-2px 2px #412313;white-space:nowrap}
+.forest-settings button.forest-settings-close{position:absolute;top:28px;right:29px;width:58px;height:62px;padding:0;border:0;border-radius:0;background:url('assets/ui/settings-kit/close.png') center/contain no-repeat;box-shadow:none;color:transparent;font-size:0}
+.forest-volume-row{display:grid;grid-template-columns:72px minmax(0,1fr) 86px;gap:16px;align-items:end;margin-top:18px}
+.forest-audio-icon{width:72px;height:72px;object-fit:contain;align-self:center;image-rendering:pixelated}
+.forest-volume-control{min-width:0}.forest-volume-control label{display:block;font-size:24px;line-height:1.3;margin-bottom:6px;font-weight:bold}
+.forest-volume-control input[type=range]{display:block;appearance:none;-webkit-appearance:none;width:100%;height:26px;margin:10px 0;padding:0;border:0;border-radius:0;box-shadow:none;background:url('assets/ui/settings-kit/fill.png') left center/var(--fill,50%) 100% no-repeat,url('assets/ui/settings-kit/track.png') center/100% 100% no-repeat;cursor:pointer}
+.forest-volume-control input::-webkit-slider-runnable-track{height:26px;background:transparent;border:0}
+.forest-volume-control input::-webkit-slider-thumb{appearance:none;-webkit-appearance:none;width:32px;height:46px;margin-top:-10px;border:0;border-radius:0;background:url('assets/ui/settings-kit/thumb.png') center/100% 100% no-repeat}
+.forest-volume-control input::-moz-range-track{height:26px;background:transparent;border:0}.forest-volume-control input::-moz-range-thumb{width:32px;height:46px;border:0;border-radius:0;background:url('assets/ui/settings-kit/thumb.png') center/100% 100% no-repeat}
+.forest-volume-row output{display:grid;place-items:center;min-width:0;height:42px;margin-bottom:2px;background:url('assets/ui/settings-kit/badge.png') center/100% 100% no-repeat;color:#fff2cf;font:24px/1 var(--font-ui)}
+.forest-settings-divider{height:22px;margin:24px 0 10px;background:url('assets/ui/settings-kit/divider.png') center/100% 100% no-repeat}
+.forest-display-options{display:flex;justify-content:space-between;gap:16px;margin:0 0 18px}
+.forest-display-options label{display:flex;align-items:center;gap:9px;font-size:22px;font-weight:bold;white-space:nowrap;cursor:pointer}
+.forest-display-options input{appearance:none;-webkit-appearance:none;flex-shrink:0;width:48px;height:48px;margin:0;border:0;background:url('assets/ui/settings-kit/unchecked.png') center/contain no-repeat;cursor:pointer}
+.forest-display-options input:checked{background-image:url('assets/ui/settings-kit/checked.png')}
+.forest-settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.forest-settings .forest-settings-actions :is(button,a){display:grid;place-items:center;min-width:0;min-height:78px;margin:0;padding:10px 15px;border:0;border-radius:0;box-shadow:none;background:url('assets/ui/settings-kit/button.png') center/100% 100% no-repeat;color:#fff0cb;text-decoration:none;text-align:center;font:30px/1.2 var(--font-ui);text-shadow:2px 2px #442613,-1px -1px #442613,1px -1px #442613,-1px 1px #442613;white-space:nowrap;cursor:pointer}
+.forest-settings button:hover,.forest-settings a:hover{filter:brightness(1.12)}
+.forest-settings :is(button,a,input):focus-visible{outline:3px solid #527327;outline-offset:3px}
+@media(max-width:600px){
+ .forest-settings-panel{padding:22px 24px 28px}.forest-settings-title{font-size:28px;width:88%;height:67px;margin-bottom:16px;padding:0 12%}
+ .forest-settings button.forest-settings-close{top:16px;right:14px;width:38px;height:42px}
+ .forest-volume-row{grid-template-columns:46px minmax(0,1fr) 58px;gap:8px;margin-top:18px}.forest-audio-icon{width:46px;height:56px}.forest-volume-control label{font-size:20px}.forest-volume-row output{font-size:19px;height:34px;margin-bottom:5px}
+ .forest-volume-control input[type=range],.forest-volume-control input::-webkit-slider-runnable-track{height:20px}.forest-volume-control input::-webkit-slider-thumb{width:25px;height:38px;margin-top:-9px}.forest-volume-control input::-moz-range-track{height:20px}.forest-volume-control input::-moz-range-thumb{width:25px;height:38px}
+ .forest-settings-divider{margin:18px 0 10px;height:17px}.forest-display-options{gap:8px}.forest-display-options label{font-size:16px;gap:5px}.forest-display-options input{width:34px;height:34px}
+ .forest-settings-actions{gap:8px}.forest-settings .forest-settings-actions :is(button,a){min-height:60px;font-size:20px;padding:8px}
+}
+@media(max-width:360px){.forest-settings-panel{padding:22px 18px}.forest-settings-title{font-size:24px}.forest-display-options label{font-size:14px}.forest-display-options input{width:29px;height:29px}.forest-settings .forest-settings-actions :is(button,a){font-size:17px}}

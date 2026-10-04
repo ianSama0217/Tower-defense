@@ -1,0 +1,149 @@
+{
+  "scale": 0.0859375,
+  "anchor": {
+    "x": 12,
+    "y": 21
+  },
+  "bounds": [
+    {
+      "frame": 0,
+      "left": 4,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 1,
+      "left": 5,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 2,
+      "left": 5,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 3,
+      "left": 5,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 4,
+      "left": 5,
+      "top": 5,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 5,
+      "left": 6,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 6,
+      "left": 5,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 7,
+      "left": 5,
+      "top": 5,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 8,
+      "left": 3,
+      "top": 5,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 9,
+      "left": 5,
+      "top": 5,
+      "right": 22,
+      "bottom": 20
+    },
+    {
+      "frame": 10,
+      "left": 4,
+      "top": 5,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 11,
+      "left": 4,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 12,
+      "left": 2,
+      "top": 6,
+      "right": 17,
+      "bottom": 20
+    },
+    {
+      "frame": 13,
+      "left": 6,
+      "top": 7,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 14,
+      "left": 4,
+      "top": 6,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 15,
+      "left": 4,
+      "top": 8,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 16,
+      "left": 3,
+      "top": 10,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 17,
+      "left": 4,
+      "top": 11,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 18,
+      "left": 3,
+      "top": 12,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 19,
+      "left": 3,
+      "top": 14,
+      "right": 20,
+      "bottom": 20
+    }
+  ]
+}

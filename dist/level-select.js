@@ -2,15 +2,16 @@
   'use strict';
   const $=id=>document.getElementById(id),screen=$('level-screen'),dialog=$('stage-dialog');
   const nodes=[...document.querySelectorAll('.level-node')],stages=LevelProgress.stages;
-  const enemyNames={1:'哥布林',2:'獸人',3:'獨眼巨人',4:'炸彈哥布林',5:'史萊姆'};
+  const enemyNames={1:'哥布林',2:'獸人',3:'獨眼巨人',4:'炸彈哥布林',5:'史萊姆',6:'哥布林弓箭手'};
   const settings=$('world-settings'),settingsButton=$('world-settings-open');
   let selected=0,stars=[];
   function fitDialog(modal){
     if(!modal.open)return;
+    if(modal===settings){ForestSettings.fit(modal);return;}
     const width=root.visualViewport?.width||root.innerWidth;
     const height=root.visualViewport?.height||root.innerHeight;
     modal.style.zoom='1';
-    modal.style.width=`${Math.min(modal===dialog?640:370,width-32)}px`;
+    modal.style.width=`${Math.min(modal===dialog?900:370,width-32)}px`;
     modal.style.zoom=String(Math.min(1,(height-32)/modal.offsetHeight));
   }
   function fitLayout(){
@@ -26,6 +27,7 @@
   function openSettings(){settingsButton.setAttribute('aria-expanded','true');settings.showModal();fitDialog(settings);}
   settingsButton.addEventListener('click',openSettings);
   $('world-settings-close').addEventListener('click',()=>settings.close());
+  $('world-resume').addEventListener('click',()=>settings.close());
   settings.addEventListener('close',()=>{settingsButton.setAttribute('aria-expanded','false');if(!screen.hidden)settingsButton.focus({preventScroll:true});});
   settings.addEventListener('click',event=>{if(event.target===settings){const rect=settings.getBoundingClientRect();if(event.clientX<rect.left||event.clientX>rect.right||event.clientY<rect.top||event.clientY>rect.bottom)settings.close();}});
   function storage(){try{return localStorage;}catch{return null;}}
@@ -48,16 +50,22 @@
     $('stage-name').textContent=stage.name;
     $('stage-preview').style.backgroundPosition=['0% 75%','10% 20%','50% 50%','75% 70%','100% 20%'][index];
     $('stage-preview').setAttribute('aria-label',`${stage.name}區域示意圖`);
+    const encountered=new Set(LevelProgress.readEncountered(storage()));
     $('stage-enemies').replaceChildren();
     stage.enemies.forEach(id=>{
       const spec=EnemySprites.specs[id],item=document.createElement('li'),sprite=document.createElement('span'),label=document.createElement('span');
+      const known=encountered.has(id);
+      item.className=known?'enemy-card':'enemy-card is-undiscovered';
       sprite.className='enemy-portrait';sprite.setAttribute('aria-hidden','true');
       sprite.style.backgroundImage=`url("assets/enemies/${spec.file}")`;
-      sprite.style.backgroundSize=`${(spec.frames||20)*64}px 64px`;
-      label.textContent=enemyNames[id];item.append(sprite,label);$('stage-enemies').append(item);
+      sprite.style.backgroundSize=`${(spec.frames||20)*112}px 112px`;
+      label.className='enemy-name';label.textContent=known?enemyNames[id]:'未遭遇';item.append(sprite,label);$('stage-enemies').append(item);
     });
     $('enemies-pending').hidden=stage.enemies.length>0;
-    $('stage-status').textContent=!open?`前一關（第 ${index} 關）取得至少一星後解鎖。`:stage.href?stars[index]?`最佳紀錄 ${'★'.repeat(stars[index])}${'☆'.repeat(3-stars[index])} · 可再次挑戰`:'守住四波進攻，開啟森林旅程。':'已解鎖，關卡內容準備中。';
+    $('stage-stars').setAttribute('aria-label',`最佳紀錄 ${stars[index]} / 3 顆星`);
+    $('stage-stars').querySelectorAll('span').forEach((star,i)=>star.classList.toggle('earned',i<stars[index]));
+    $('stage-clear-status').textContent=stars[index]?'已通關':!open?'尚未解鎖':'尚未通關';
+    $('stage-clear-status').classList.toggle('is-cleared',stars[index]>0);
     $('stage-enter').disabled=!open||!stage.href;
     $('stage-enter-label').textContent=!open?'尚未解鎖':!stage.href?'關卡準備中':'開始挑戰';
     if(!dialog.open)dialog.showModal();

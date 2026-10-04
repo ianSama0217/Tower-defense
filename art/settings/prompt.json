@@ -1,0 +1,6 @@
+{
+  "tool": "built-in image_gen",
+  "source": "art/settings/source.png",
+  "output": "dist/assets/ui/settings-kit/",
+  "prompt": "Use case: precise-object-edit. Edit the supplied pixel-art game settings UI sheet into a reusable transparent UI atlas. Preserve EXACT layout, positions, dimensions, wooden textures, gold parchment, leaves, icons, borders and pixel art style. Remove all text, Chinese lettering, numbers, percentages and filenames from the whole sheet, seamlessly filling their surfaces with the original texture. Keep the large composed window at upper left but remove its lettering only. Keep title board at upper right blank. Preserve all white X close icons, speaker and music note icons, checked green checkbox, empty checkbox, decorative divider, slider brown track, green fill, wooden slider thumb, and blank brown percentage badges. Remove text from the two bottom wooden buttons leaving blank wood. Keep bottom parchment panel and outer wooden frame. All checkerboard areas and white gutters, including the hollow center of the standalone outer wooden frame, must become actual alpha transparency, NOT a printed checkerboard. Keep every separated component in precisely the same location as reference. No new objects, no labels, no layout changes. Transparent PNG same 1536x1024 composition."
+}

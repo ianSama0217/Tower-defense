@@ -33,3 +33,11 @@ button:focus-visible,a:focus-visible{outline-color:#fff0b7}
 @media(max-width:900px){.game-header,#wave-control{--hang:12px;--chain-width:10px;--chain-inset:8px}}
 @media(max-width:600px){.game-header,#wave-control{--hang:9px;--chain-width:8px;--chain-inset:5px}.game-header #pause,.game-header #speed{--chain-inset:3px}}
 @media(max-height:440px) and (orientation:landscape){.game-header,#wave-control{--hang:9px;--chain-width:8px;--chain-inset:6px}.game-header #pause,.game-header #speed{--chain-inset:3px}}
+/* The speed sign cycles through 1x, 2x, 4x, then a paused play control. */
+.game-header #speed{display:grid;place-items:center}
+.game-header #speed-label{font:inherit;color:inherit}
+#speed-play{display:block;width:32px;height:32px;background:url('assets/ui/playback-play.svg') center/contain no-repeat;image-rendering:pixelated}
+#pause-shade{background:#17130960;z-index:3}
+#pause-shade img{display:block;width:min(72%,760px);height:auto;max-height:55%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 6px 0 #160c0855)}
+@media(max-width:900px){#speed-play{width:28px;height:28px}}
+@media(max-width:600px),(max-height:440px) and (orientation:landscape){#speed-play{width:22px;height:22px}}

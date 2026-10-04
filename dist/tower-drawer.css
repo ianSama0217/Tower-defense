@@ -13,11 +13,36 @@
 #tower-preview,.action-icon{display:block;flex:none;width:68px;height:68px;object-fit:contain;image-rendering:pixelated}
 .action-icon{background-image:url('assets/ui/engineering-icons.png');background-repeat:no-repeat;background-size:200% 200%;image-rendering:pixelated}
 .upgrade-icon{background-position:0 0}.repair-icon{background-position:100% 0}.demolish-icon{background-position:0 100%}
-.price-tag,.time-tag{display:flex;flex:none;align-items:center;justify-content:center;width:100%;height:26px;gap:3px;white-space:nowrap;background:none;border:0;box-shadow:none;font:26px/1 'Pixel Operator',monospace;text-shadow:0 1px #fff4d4}
+.price-tag,.time-tag{display:flex;flex:none;align-items:center;justify-content:center;width:100%;height:26px;gap:3px;white-space:nowrap;background:none;border:0;box-shadow:none;font:26px/1 var(--font-ui);text-shadow:0 1px #fff4d4}
 .price-tag .amount{color:#ad201b;font-weight:700}.price-tag.income .amount{color:#24620e}
-.time-tag{font-size:21px;color:#3d2b18}.duration{font-family:'Pixel Operator','Microsoft JhengHei',sans-serif}
+.time-tag{font-size:21px;color:#3d2b18}.duration{font-family:var(--font-ui)}
 .card-coin{display:block;width:24px;height:24px;background:url('assets/ui/hud-icons.png') no-repeat 0 0/200% 200%;image-rendering:pixelated}
 .build-time-icon{display:block;flex:none;width:24px;height:24px;background:url('assets/ui/build-time-clock-green.png') center/contain no-repeat;image-rendering:pixelated}
 @media(max-width:900px){.tower-drawer{gap:10px}.tower-actions{gap:8px}}
 @media(max-width:600px){.game-window{--drawer-height:146px;--card-width:clamp(60px,20vw,80px);--card-height:130px}.tower-drawer{padding:5px 8px;gap:6px}.tower-actions{gap:6px}.tower-card button,.action-card button{padding:6px 2px}#tower-preview,.action-icon{width:60px;height:60px}.price-tag{font-size:24px}.time-tag{font-size:19px}.card-coin,.build-time-icon{width:23px;height:23px}}
 @media(prefers-reduced-motion:reduce){.tower-drawer{transition:none}}
+/* Built towers become centered portraits with a two-column stat block beside them. */
+#build.is-built #tower-preview{width:82px;height:100px}
+.tower-stats{display:flex;align-self:center;gap:18px;flex:none;min-width:204px;height:126px;padding:3px 0}
+.stat-column{display:flex;flex-direction:column;gap:4px}
+.tower-stat{display:flex;align-items:center;gap:6px;height:36px;white-space:nowrap;color:#342312;text-shadow:0 1px #ffe5b5;cursor:help;border-radius:3px}
+.tower-stat b{font:22px/1 var(--font-ui);min-width:36px;font-variant-numeric:tabular-nums}
+.stat-icon{display:block;flex:none;width:36px;height:36px;background:url('assets/ui/tower-stat-icons.png') 0 50%/500% 166.6667% no-repeat;image-rendering:pixelated}
+.stat-rate{background-position-x:25%}.stat-range{background-position-x:50%}.stat-target{background-position-x:75%}.stat-kills{background-position-x:100%}
+.target-icons{display:flex;gap:2px}.target-icons img{display:block;width:22px;height:24px;image-rendering:pixelated}
+.tower-stat:focus-visible{outline:2px solid #ffe2a2;outline-offset:2px}
+@media(max-width:900px){.tower-drawer{padding-left:12px;padding-right:12px}.tower-stats{gap:8px;min-width:182px}.tower-stat{gap:4px}.tower-stat b{font-size:20px}}
+@media(max-width:720px){
+ .game-window.has-selection:has(.tower-drawer.has-tower){height:min(calc((100vw - 20px)*.6 + 238px),calc(100dvh - 16px));aspect-ratio:auto}
+ .game-window.has-selection:has(.tower-drawer.has-tower) .battlefield{margin-bottom:238px}
+ .tower-drawer.has-tower{height:238px;display:grid;grid-template-columns:82px 1fr;grid-template-rows:104px 112px;gap:6px 12px;padding:6px 10px}
+ .has-tower .tower-card{width:82px;height:104px}.has-tower #build.is-built #tower-preview{width:66px;height:84px}
+ .has-tower .tower-stats{height:104px;min-width:0;gap:12px;padding:0}.has-tower .tower-stat{height:32px;gap:4px}.has-tower .stat-column{gap:3px}.has-tower .stat-icon{width:32px;height:32px}.has-tower .tower-stat b{font-size:18px;min-width:30px}
+ .has-tower .tower-actions{grid-column:1/-1;width:100%;justify-content:flex-end;gap:8px;margin:0}.has-tower .action-card{width:82px;height:112px}.has-tower .action-icon{width:48px;height:48px}.has-tower .price-tag{font-size:22px;height:23px}.has-tower .time-tag{font-size:18px;height:22px}.has-tower .target-icons img{width:19px;height:22px}
+}
+/* Reference target sprites keep their aspect ratio and readable pixel detail. */
+.stat-icon.stat-health{background:url('assets/ui/heart-atlas.png') 0 0/400% 400% no-repeat}
+#stat-health b{font-size:18px}
+.target-icons img{width:28px;height:28px;object-fit:contain}
+@media(max-width:720px){.has-tower #stat-health b{font-size:14px}}
+@media(max-width:720px){.has-tower .target-icons img{width:24px;height:24px}}

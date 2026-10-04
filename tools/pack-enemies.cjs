@@ -84,6 +84,7 @@ async function main(){
   }
   fs.writeFileSync(path.join(out,'sprites.json'),JSON.stringify(manifest,null,2)+'\n');
   fs.writeFileSync(path.join(sources,'packing-report.json'),JSON.stringify(report,null,2)+'\n');
+  if(fs.existsSync(path.join(root,'art/orc-charge/source.png')))await require('./pack-orc-charge.cjs')();
   console.log(JSON.stringify(manifest,null,2));
 }
 main().catch(e=>{console.error(e);process.exitCode=1;});

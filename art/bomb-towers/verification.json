@@ -1,0 +1,16 @@
+{
+  "checks": [
+    "three tower assets and range description",
+    "one-click demo",
+    "live bomb flight",
+    "pause freezes travel and animation",
+    "explosion and damage",
+    "live self damage",
+    "live friendly wall damage",
+    "no arrow shots from bomb towers",
+    "restore original objects",
+    "390px layout and combat",
+    "no campaign asset loads"
+  ],
+  "errors": []
+}

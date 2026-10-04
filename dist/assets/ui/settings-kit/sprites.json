@@ -1,0 +1,89 @@
+{
+  "source": "art/settings/source.png",
+  "sprites": {
+    "title": {
+      "left": 779,
+      "top": 19,
+      "width": 529,
+      "height": 114
+    },
+    "close": {
+      "left": 1374,
+      "top": 31,
+      "width": 101,
+      "height": 102
+    },
+    "speaker": {
+      "left": 768,
+      "top": 221,
+      "width": 117,
+      "height": 104
+    },
+    "music": {
+      "left": 978,
+      "top": 218,
+      "width": 90,
+      "height": 102
+    },
+    "checked": {
+      "left": 1183,
+      "top": 227,
+      "width": 88,
+      "height": 88
+    },
+    "unchecked": {
+      "left": 1393,
+      "top": 227,
+      "width": 86,
+      "height": 88
+    },
+    "divider": {
+      "left": 766,
+      "top": 430,
+      "width": 322,
+      "height": 32
+    },
+    "track": {
+      "left": 46,
+      "top": 585,
+      "width": 389,
+      "height": 33
+    },
+    "fill": {
+      "left": 491,
+      "top": 587,
+      "width": 387,
+      "height": 31
+    },
+    "thumb": {
+      "left": 977,
+      "top": 590,
+      "width": 65,
+      "height": 86
+    },
+    "badge": {
+      "left": 1143,
+      "top": 596,
+      "width": 137,
+      "height": 59
+    },
+    "button": {
+      "left": 37,
+      "top": 869,
+      "width": 324,
+      "height": 96
+    },
+    "parchment": {
+      "left": 719,
+      "top": 746,
+      "width": 338,
+      "height": 212
+    },
+    "frame": {
+      "left": 1079,
+      "top": 743,
+      "width": 304,
+      "height": 216
+    }
+  }
+}

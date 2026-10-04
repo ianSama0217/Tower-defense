@@ -1,0 +1,74 @@
+{
+  "towers": [
+    {
+      "file": "tower_lv1.png",
+      "size": 64,
+      "anchor": {
+        "x": 32,
+        "y": 61
+      },
+      "platform": {
+        "x": 32,
+        "y": 24
+      }
+    },
+    {
+      "file": "tower_lv2.png",
+      "size": 80,
+      "anchor": {
+        "x": 40,
+        "y": 77
+      },
+      "platform": {
+        "x": 40,
+        "y": 33
+      }
+    },
+    {
+      "file": "tower_lv3.png",
+      "size": 96,
+      "anchor": {
+        "x": 48,
+        "y": 93
+      },
+      "platform": {
+        "x": 48,
+        "y": 41
+      }
+    }
+  ],
+  "operator": {
+    "file": "operator.png",
+    "frameSize": 24,
+    "frames": 8,
+    "anchor": {
+      "x": 12,
+      "y": 22
+    },
+    "order": [
+      "idle1",
+      "idle2",
+      "prepare",
+      "windup",
+      "release",
+      "followThrough",
+      "recover",
+      "settle"
+    ],
+    "releaseAt": 0.3
+  },
+  "bomb": {
+    "file": "bomb.png",
+    "frameSize": 16,
+    "frames": 5
+  },
+  "explosion": {
+    "file": "explosion.png",
+    "frameSize": 64,
+    "frames": 5,
+    "anchor": {
+      "x": 32,
+      "y": 60
+    }
+  }
+}

@@ -24,6 +24,38 @@ function readPNG(file){
   }
   return {width,height,pixels};
 }
+test('goblin archer has twenty transparent 24px frames with fixed slicing and anchors',()=>{
+  const spec=sprites.specs[6],meta=require('../dist/assets/enemies/archer.json'),png=readPNG(path.join(__dirname,'../dist/assets/enemies',spec.file));
+  assert.equal(png.width,480);assert.equal(png.height,24);assert.deepEqual(meta.anchor,spec.anchor);assert.deepEqual(meta.animations,sprites.animations);
+  for(let frame=0;frame<20;frame++){
+    let opaque=0;
+    for(let y=0;y<24;y++)for(let x=0;x<24;x++){
+      const p=(y*480+frame*24+x)*4,a=png.pixels[p+3];assert.ok(a===0||a===255);if(a)opaque++;else assert.equal(png.pixels.readUIntBE(p,3),0);
+      if(x===0||x===23||y===0||y===23)assert.equal(a,0,`Clipped frame ${frame}`);
+    }
+    assert.ok(opaque>25);
+  }
+  for(const [state,a] of Object.entries(sprites.animations))for(let frame=0;frame<a.count;frame++){
+    const e={id:0,level:6,moving:state!=='idle'};if(['attack','hurt','death'].includes(state))e[state+'At']=0;
+    const f=sprites.sample(e,frame/a.fps+.001);assert.equal(f.state,state);assert.equal(f.sx,(a.start+frame)*24);
+  }
+});
+
+test('tower work atlas has sixteen isolated transparent effect cells',()=>{
+  const manifest=require('../dist/assets/tower-work/sprites.json');
+  const png=readPNG(path.join(__dirname,'../dist/assets/tower-work',manifest.file));
+  assert.equal(png.width,manifest.cellSize*manifest.columns);assert.equal(png.height,manifest.cellSize*manifest.rows);
+  for(let cell=0;cell<16;cell++){
+    let opaque=0;const size=manifest.cellSize;
+    for(let y=0;y<size;y++)for(let x=0;x<size;x++){
+      const index=((Math.floor(cell/4)*size+y)*png.width+cell%4*size+x)*4,alpha=png.pixels[index+3];
+      assert.ok(alpha===0||alpha===255);if(alpha)opaque++;else assert.equal(png.pixels.readUIntBE(index,3),0);
+      if(x===0||y===0||x===size-1||y===size-1)assert.equal(alpha,0,`effect ${cell} bleeds into its neighbour`);
+    }
+    assert.ok(opaque>20,`effect ${cell} is empty`);
+  }
+});
+
 test('tower PNGs have exact requested sizes, real transparency and shared footprint metadata',()=>{
   const towerSprites=require('../dist/tower-sprites.js'),towerManifest=require('../dist/assets/towers/sprites.json');
   for(let level=1;level<=3;level++){
@@ -39,12 +71,12 @@ test('tower PNGs have exact requested sizes, real transparency and shared footpr
     assert.ok(opaque>200);assert.ok(transparent>200);
   }
 });
-test('all 60 frames have exact RGBA dimensions, transparent margins and fixed slicing metadata',()=>{
+test('all original enemy frames have exact RGBA dimensions, transparent margins and fixed slicing metadata',()=>{
   assert.deepEqual(manifest.animations,sprites.animations);
   for(let level=1;level<=3;level++){
     const s=sprites.specs[level],m=manifest.enemies[level],png=readPNG(path.join(__dirname,'../dist/assets/enemies',s.file));
-    assert.equal(png.width,s.size*20);assert.equal(png.height,s.size);assert.deepEqual(m.anchor,s.anchor);
-    for(let frame=0;frame<20;frame++){
+    assert.equal(png.width,s.size*(s.frames||20));assert.equal(png.height,s.size);assert.deepEqual(m.anchor,s.anchor);
+    for(let frame=0;frame<(s.frames||20);frame++){
       let opaque=0,transparent=0;
       for(let y=0;y<s.size;y++)for(let x=0;x<s.size;x++){
         const p=(y*png.width+frame*s.size+x)*4,a=png.pixels[p+3];assert.ok(a===0||a===255);

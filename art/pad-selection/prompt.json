@@ -1,0 +1,13 @@
+{
+  "tool": "image_gen (built-in)",
+  "reference": "User-provided green/red dashed pixel selection frames",
+  "prompt": "Use case: background-extraction. Edit target: provided reference UI atlas. Produce a clean transparent game UI sprite sheet with exactly TWO square dashed selection frames side by side: GREEN frame on the left, RED frame on the right. Match the reference: chunky square pixel-art segments, very dark black-green/black-red outlines, bright lime green/red main fill, tiny pale highlight blocks on upper-left edges, darker lower-right edges. Each frame has four L-shaped corner brackets and two short detached bars between corners on EACH edge, large empty center. Same shape and scale for both variants. Straight front view, axis aligned true square frames, identical border thickness. Entire backgrounds, centers and gaps must have actual alpha transparency, no white, no checkerboard. No text, no shadows outside outline, no glow, no decoration. Generous transparent separation so each frame can be cropped independently. Crisp pixel steps, no antialiasing.",
+  "outputs": [
+    "dist/assets/ui/pad-allowed.png",
+    "dist/assets/ui/pad-blocked.png"
+  ],
+  "size": [
+    96,
+    96
+  ]
+}

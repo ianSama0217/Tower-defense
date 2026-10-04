@@ -1,0 +1,7 @@
+<!doctype html><html lang="zh-Hant"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><base href="../"><title>戰績視窗驗證</title><link rel="stylesheet" href="fonts.css"><link rel="stylesheet" href="tutorial.css"><link rel="stylesheet" href="game-hud.css"><link rel="stylesheet" href="wood-theme.css"><link rel="stylesheet" href="result-panel.css"><style>body{background:url('assets/ui/forest-world-map.png') center/cover}.preview-controls{position:fixed;bottom:0;left:0}</style></head><body><div class="preview-controls"><button id="win">通關預覽</button><button id="lose">失敗預覽</button></div><dialog id="result" aria-labelledby="result-title"></dialog><script src="level-progress.js"></script><script src="result-panel.js"></script><script>
+const result=BattleResult.mount(document.getElementById('result'),{onRestart:()=>document.getElementById('win').focus()});
+const data={won:true,stars:3,best:3,saved:true,waves:4,kills:26,lives:3,towers:3,nextHref:null};
+document.getElementById('win').onclick=()=>result.show(data);
+document.getElementById('lose').onclick=()=>result.show({...data,won:false,stars:0,waves:3,kills:18,lives:0});
+result.show(location.hash==='#lost'?{...data,won:false,stars:0,waves:3,kills:18,lives:0}:data);
+</script></body></html>

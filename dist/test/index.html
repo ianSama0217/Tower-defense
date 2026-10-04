@@ -21,24 +21,24 @@
       <label><input data-sound-muted type="checkbox"> 靜音</label><a href="sound-preview.html">試聽音效</a><button id="simulate" disabled aria-pressed="false">開始行為測試</button>
       <label><input id="tower-fire" type="checkbox"> 塔可射擊</label>
       <button id="kill-enemy" disabled>擊殺選取怪物</button>
-      <button id="bomber-demo" disabled>載入爆炸範例</button>
+      <button id="bomber-demo" disabled>載入爆炸範例</button><button id="bomb-tower-demo" disabled>載入炸彈塔範例</button>
       <span id="simulation-status" role="status">放置塔與怪物後，可測試追塔、自爆與範圍傷害。</span>
     </div>
     <section id="test-scene" class="stage-area" aria-label="素材測試區">
-      <div class="stage-caption"><span><i aria-hidden="true"></i>自由測試區 <small id="stage-size">1280 × 768</small></span><div class="stage-view-controls"><label><input id="show-enemy-ranges" type="checkbox" checked> 怪物攻擊範圍</label><span id="object-count">0 個物件</span><button id="toggle-fullscreen" type="button" aria-controls="test-scene" aria-pressed="false">全螢幕</button></div></div>
+      <div class="stage-caption"><span><i aria-hidden="true"></i>自由測試區 <small id="stage-size">1280 × 768</small></span><div class="stage-view-controls"><label><input id="show-enemy-ranges" type="checkbox" checked> 怪物攻擊範圍</label><label><input id="show-bomb-ranges" type="checkbox" checked> 炸彈塔射程</label><span id="object-count">0 個物件</span><button id="toggle-fullscreen" type="button" aria-controls="test-scene" aria-pressed="false">全螢幕</button></div></div>
       <div class="range-legend"><span class="range-detection">藍虛線：判定半徑</span><span class="range-attack">實線：攻擊半徑</span><span class="range-trigger">黃虛線：引爆距離</span><span class="range-blast">紅虛線：爆炸半徑</span><span>選取怪物查看數值 · 腳底為圓心 · 範圍與素材倍率無關</span></div>
       <div id="stage-wrap"><canvas id="test-stage" width="1280" height="768" tabindex="0" aria-label="素材測試畫布。點選放置素材；方向鍵調整游標，Enter 放置；選取模式下可拖曳物件，Delete 移除選取。"></canvas></div>
       <div id="empty-hint" aria-hidden="true"><b>從下方選一個素材</b><span>點一下草地，開始佈置你的測試場景。</span></div>
       <div class="stage-footer"><span id="lab-status" role="status">正在載入素材…</span><span class="stage-note">行為測試結束後會還原素材擺放</span></div>
     </section>
     <section class="asset-tray" aria-labelledby="asset-title">
-      <div class="tray-heading"><h2 id="asset-title">素材庫</h2><div class="category-tabs" aria-label="素材分類"><button data-category="enemy" aria-pressed="true">怪物單位 <span>5</span></button><button data-category="tower" aria-pressed="false">防禦塔 <span>3</span></button><button data-category="environment" aria-pressed="false">場景元素 <span>36</span></button></div><span id="asset-count"></span></div>
-      <div class="animation-tools"><label>怪物動作 <select id="enemy-animation"><option value="idle">待機</option><option value="walk" selected>行走</option><option value="attack">攻擊</option><option value="hurt">受傷</option><option value="death">死亡</option></select></label><button id="play-animation" aria-pressed="false">暫停動畫</button><button id="flip-object">翻轉方向</button><span id="selection-label">載入中</span></div>
+      <div class="tray-heading"><h2 id="asset-title">素材庫</h2><div class="category-tabs" aria-label="素材分類"><button data-category="enemy" aria-pressed="true">怪物單位 <span>6</span></button><button data-category="tower" aria-pressed="false">防禦塔 <span>3</span></button><button data-category="bomb-tower" aria-pressed="false">炸彈塔 <span>3</span></button><button data-category="wall" aria-pressed="false">城牆 <span>2</span></button><button data-category="environment" aria-pressed="false">場景元素 <span>36</span></button></div><span id="asset-count"></span></div>
+      <div class="animation-tools"><label>怪物動作 <select id="enemy-animation"><option value="idle">待機</option><option value="walk" selected>行走</option><option value="charge">衝鋒</option><option value="attack">攻擊</option><option value="hurt">受傷</option><option value="death">死亡</option></select></label><button id="play-animation" aria-pressed="false">暫停動畫</button><button id="flip-object">翻轉方向</button><span id="selection-label">載入中</span></div>
       <p id="enemy-description" class="enemy-description"></p>
       <div id="asset-list" aria-label="可放置素材"></div>
       <p class="tray-help">選素材 → 點畫布放置 <span>·</span> 選取／移動可拖曳調整 <span>·</span> Delete 移除 <span>·</span> Ctrl / ⌘ + Z 復原</p>
     </section>
   </main>
-  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="test/test.js"></script>
+  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="wall-sprites.js"></script><script src="bomb-towers.js"></script><script src="bomb-tower-sprites.js"></script><script src="test/test.js"></script>
 </body>
 </html>

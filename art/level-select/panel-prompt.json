@@ -1,0 +1,5 @@
+{
+  "tool": "built-in image_gen",
+  "output": "dist/assets/ui/stage-parchment.png",
+  "prompt": "Use case: precise-object-edit. Input image is a UI sprite reference sheet. Extract and recreate ONLY the blank framed parchment panel at the TOP LEFT as one standalone game UI background. Final canvas wide 3:2 aspect ratio (1536x1024 ideal), full-frame wooden rectangular border enclosing a completely empty warm cream parchment center. Match the source crisp chunky pixel-art, warm orange-brown wood grain, dark edge outline, tiny iron rivets, green ivy leaves clustered only at the extreme top-left and bottom-right corners. Border about 4% of canvas width, inner parchment covers the entire remaining space. Thin golden inside trim. Keep the middle 85% of the image entirely empty, softly textured pale parchment so code can overlay UI. Panel fills the canvas edge to edge, no outer margin. No buttons, no banners, no text, no symbols, no stars, no enemies, no other parts of the sheet. No checkerboard. Opaque game panel, pixelated edges and handcrafted wood shading."
+}

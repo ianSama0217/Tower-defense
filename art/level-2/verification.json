@@ -1,0 +1,17 @@
+{
+  "browser": "Edge",
+  "checks": [
+    "unlocked level-two entry",
+    "archer silhouette before encounter",
+    "nine pads and six-wave HUD",
+    "build and upgrade",
+    "pause freezes construction",
+    "simultaneous lanes",
+    "live archer wave",
+    "390px layout and drawer",
+    "separate second-level result and stars",
+    "restart",
+    "first-level regression"
+  ],
+  "errors": []
+}

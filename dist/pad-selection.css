@@ -1,0 +1,29 @@
+/* A 96×96 map-space frame surrounds each 72×60 pedestal on the 1280×768 map. */
+#pads .pad-button {
+  width: 7.5%;
+  height: 12.5%;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  outline: none;
+}
+
+#pads .pad-button::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: url('assets/ui/pad-allowed.png') center / 100% 100% no-repeat;
+  image-rendering: pixelated;
+  pointer-events: none;
+  opacity: 0;
+}
+
+/* Reserved for future placement restrictions; current stage 1/2 pads are allowed. */
+#pads .pad-button[data-placement-state='blocked']::after {
+  background-image: url('assets/ui/pad-blocked.png');
+}
+
+#pads .pad-button:not(:disabled):is(:hover, :focus-visible, [aria-pressed='true'])::after {
+  opacity: 1;
+}

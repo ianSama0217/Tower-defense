@@ -1,0 +1,20 @@
+/* Native cursor: 40×48 transparent pixels, click hotspot at the index fingertip.
+   Important keeps existing button, disabled, and slider cursor rules consistent. */
+html,
+html *,
+html *::before,
+html *::after,
+dialog::backdrop {
+  cursor: url('assets/ui/cursor-hand.png') 6 2, auto !important;
+}
+
+/* Include the card's image, labels and decorative layers so the cursor stays
+   consistent anywhere over an action that cannot be afforded. */
+#tower-drawer button[data-insufficient-funds='true'],
+#tower-drawer button[data-insufficient-funds='true'] *,
+#tower-drawer button[data-insufficient-funds='true']::before,
+#tower-drawer button[data-insufficient-funds='true']::after,
+#tower-drawer button[data-insufficient-funds='true'] *::before,
+#tower-drawer button[data-insufficient-funds='true'] *::after {
+  cursor: url('assets/ui/cursor-blocked.png') 6 2, not-allowed !important;
+}

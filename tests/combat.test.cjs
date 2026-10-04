@@ -8,7 +8,8 @@ function tower(g,id){assert.equal(g.build(id).ok,true);g.updateTowerActions(5);g
 function enemy(g,distance=16,routeIndex=0,level=1){
   distance*=g.worldScale;
   const route=g.level.routes[routeIndex],spec=ENEMIES[level];
-  const e={id:g.nextId++,level,hp:spec.hp,maxHp:spec.hp,distance,routeIndex,remaining:route.length-distance,attackCooldown:0,...position(distance,route)};
+  // These fixtures exercise ordinary attacks after the initial orc charge.
+  const e={id:g.nextId++,chargeConsumed:true,level,hp:spec.hp,maxHp:spec.hp,distance,routeIndex,remaining:route.length-distance,attackCooldown:0,...position(distance,route)};
   g.enemies.push(e);return e;
 }
 

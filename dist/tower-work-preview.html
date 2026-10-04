@@ -1,0 +1,12 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>升級與拆除動畫</title><link rel="stylesheet" href="fonts.css">
+<style>
+*{box-sizing:border-box}body{margin:0;background:#13241f;color:#e4e9cf;font:16px var(--font-ui);padding:24px}main{max-width:1200px;margin:auto}h1{font-size:28px;margin:12px 0}p{color:#b5c3ae;line-height:1.7}a{color:#d4e4a2}.controls{display:flex;align-items:center;gap:16px;flex-wrap:wrap;padding:16px 0}button,select{font:inherit;color:inherit;background:#304638;border:1px solid #809170;border-radius:6px;padding:9px 14px}input{accent-color:#b5d476}#timeline{flex:1;min-width:140px}canvas{display:block;width:100%;height:auto;background:#23392e;border:1px solid #536b4b;border-radius:8px;image-rendering:pixelated}#status{min-width:190px}h2{font-size:20px;margin-top:30px}.strip{overflow-x:auto}.strip canvas{min-width:920px}.error{color:#ffaf87}
+</style></head>
+<body><main><a href="tower-preview.html">← 箭塔素材</a><h1>升級與拆除動畫</h1><p>升級：木架施工 → 敲擊 → 煙塵 → 新塔完成。拆除：裂痕 → 崩落 → 殘骸 → 清空。<br>鐵鎚以 0.8 秒循環敲擊；工程階段依實際進度前進。</p>
+<div class="controls"><label>動作 <select id="kind"><option value="upgrade">升級 · 5 秒</option><option value="demolish">拆除 · 3 秒</option></select></label><button id="play">暫停</button><button id="restart">重新播放</button><label>速度 <select id="speed"><option value="1">1×</option><option value="2">2×</option><option value="4">4×</option></select></label></div>
+<canvas id="live" width="1200" height="330" aria-label="各級箭塔的即時升級或拆除动画"></canvas>
+<div class="controls"><input id="timeline" type="range" min="0" max="1000" value="0" aria-label="工程進度"><output id="status" aria-live="off">載入中</output></div>
+<h2>八階段逐格預覽</h2><p>可拖曳進度檢查；暫停時畫面會保持在同一格。</p><div class="strip"><canvas id="strip" width="1440" height="260" aria-label="八階段動畫分解"></canvas></div>
+</main><script src="tower-sprites.js"></script><script src="tower-work.js"></script><script src="tower-work-preview.js"></script></body></html>

@@ -1,0 +1,65 @@
+{
+  "source": "art/level-select/ui-kit-source.png",
+  "sprites": {
+    "title": {
+      "left": 27,
+      "top": 16,
+      "width": 999,
+      "height": 168
+    },
+    "subtitle": {
+      "left": 169,
+      "top": 197,
+      "width": 637,
+      "height": 95
+    },
+    "heading": {
+      "left": 39,
+      "top": 312,
+      "width": 731,
+      "height": 104
+    },
+    "record-label": {
+      "left": 32,
+      "top": 472,
+      "width": 230,
+      "height": 73
+    },
+    "cleared": {
+      "left": 505,
+      "top": 474,
+      "width": 281,
+      "height": 73
+    },
+    "panel": {
+      "left": 807,
+      "top": 313,
+      "width": 370,
+      "height": 233
+    },
+    "challenge": {
+      "left": 28,
+      "top": 572,
+      "width": 1011,
+      "height": 169
+    },
+    "close": {
+      "left": 1084,
+      "top": 589,
+      "width": 142,
+      "height": 140
+    },
+    "card": {
+      "left": 36,
+      "top": 762,
+      "width": 306,
+      "height": 246
+    },
+    "nameplate": {
+      "left": 688,
+      "top": 786,
+      "width": 460,
+      "height": 92
+    }
+  }
+}

@@ -1,0 +1,12 @@
+{
+  "browser": "Edge",
+  "checks": [
+    "preview assets loaded",
+    "pause keeps identical pixels",
+    "demolition reaches empty pad",
+    "390 px viewport has no overflow",
+    "tutorial pause freezes both jobs",
+    "upgrade and demolition finish at correct levels"
+  ],
+  "errors": []
+}

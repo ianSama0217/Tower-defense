@@ -1,0 +1,47 @@
+{
+  "file": "enemy_goblin_archer.png",
+  "frameWidth": 24,
+  "frameHeight": 24,
+  "width": 480,
+  "height": 24,
+  "frames": 20,
+  "spacing": 0,
+  "margin": 0,
+  "anchor": {
+    "x": 12,
+    "y": 21
+  },
+  "facing": "right",
+  "animations": {
+    "idle": {
+      "start": 0,
+      "count": 4,
+      "fps": 5,
+      "loop": true
+    },
+    "walk": {
+      "start": 4,
+      "count": 4,
+      "fps": 8,
+      "loop": true
+    },
+    "attack": {
+      "start": 8,
+      "count": 4,
+      "fps": 10,
+      "loop": false
+    },
+    "hurt": {
+      "start": 12,
+      "count": 2,
+      "fps": 10,
+      "loop": false
+    },
+    "death": {
+      "start": 14,
+      "count": 6,
+      "fps": 8,
+      "loop": false
+    }
+  }
+}

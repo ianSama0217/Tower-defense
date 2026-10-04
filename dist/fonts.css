@@ -13,3 +13,5 @@
 }
 
 button, input, select, textarea { font-family: inherit; }
+
+html{font-family:var(--font-ui)}

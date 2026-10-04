@@ -7,10 +7,10 @@
 *{box-sizing:border-box}body{margin:0;background:#171c24;color:#e7e7e2;font:15px var(--font-ui);padding:32px}h1{font-size:25px;margin:0 0 8px}p{color:#aebbc9}button,select{font:inherit;padding:8px 14px;background:#303b49;color:inherit;border:1px solid #637084;border-radius:6px;margin-right:8px}.enemy{margin-top:30px;padding:20px;background:#242c37;border-radius:12px}.states{display:flex;gap:18px;flex-wrap:wrap}.state{min-width:145px;text-align:center}.stage{height:200px;display:flex;align-items:flex-end;justify-content:center;background:conic-gradient(#e4e5e9 25%,#b4bac3 0 50%,#e4e5e9 0 75%,#b4bac3 0) 0 0/16px 16px;border-radius:6px}canvas{image-rendering:pixelated;display:block}small{color:#aebbc9}.strip{overflow:auto;margin-top:18px;background:conic-gradient(#e4e5e9 25%,#b4bac3 0 50%,#e4e5e9 0 75%,#b4bac3 0) 0 0/16px 16px}.strip img{image-rendering:pixelated;display:block}.light .stage,.light .strip{background:#f6f0db}.dark .stage,.dark .strip{background:#080b10}a{color:#b7decf}
 </style>
 <h1>敵方單位 · 精靈圖驗收</h1>
-<p>原有單位 20 格；炸彈哥布林與史萊姆各 24 格（待機／移動／受傷／死亡各 6 格，無攻擊）。單列、零間距、RGBA 真透明。紅線為固定腳底 anchor。</p>
+<p>一般單位 20 格；獸人 24 格（原有 20 格＋衝鋒 4 格）；炸彈哥布林與史萊姆各 24 格（待機／移動／受傷／死亡各 6 格，無攻擊）。單列、零間距、RGBA 真透明。紅線為固定腳底 anchor。</p>
 <button id="play">暫停</button><button id="step">逐格</button><button id="flip">翻轉方向</button><select id="background"><option value="">透明棋盤</option><option value="light">淺色背景</option><option value="dark">深色背景</option></select>
 <main id="units"></main><script src="enemy-sprites.js"></script><script>
-const labels=['','Lv1 哥布林','Lv2 獸人','Lv3 獨眼巨人','炸彈哥布林','史萊姆'],cards=[];
+const labels=['','Lv1 哥布林','Lv2 獸人','Lv3 獨眼巨人','炸彈哥布林','史萊姆','哥布林弓箭手'],cards=[];
 let running=true,time=0,previous=0,facing=1,manualTick=null;
 for(let level=1;level<EnemySprites.specs.length;level++){
   const spec=EnemySprites.specs[level],section=document.createElement('section');section.className='enemy';

@@ -1,0 +1,14 @@
+{
+  "tool": "image_gen (built-in)",
+  "reference": "User-provided pixel pointing-hand image",
+  "prompt": "Use case: background-extraction. Asset type: game mouse cursor. Edit the attached reference into one isolated transparent pixel-art pointing hand cursor. Preserve very closely its exact silhouette and pose: extended index finger pointing to upper left, curled fingers on right, small thumb on left, wrist below. Preserve thick pure black stepped pixel outline, white glove fill and pale ice blue/cyan blocky shading at right and bottom. Remove only the white outside background; white inside glove must remain opaque. Crisp square pixel steps, no smoothing, no glow, no shadow outside outline, no extra objects or text. Single hand upright in same orientation as reference, full silhouette visible with small transparent margin. True alpha transparency.",
+  "output": "dist/assets/ui/cursor-hand.png",
+  "size": [
+    40,
+    48
+  ],
+  "hotspot": [
+    6,
+    2
+  ]
+}

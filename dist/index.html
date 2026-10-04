@@ -5,11 +5,13 @@
   <meta name="theme-color" content="#eeeae0"><meta name="description" content="森林像素塔防素材與行為測試，提供五關選關畫面預覽。">
   <link rel="preload" href="assets/fonts/fusion-pixel-12px-proportional-zh_hant.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="cursor.css">
 <title>幾何防線 · 森林守衛</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='4' fill='%233b6b60'/%3E%3Cpath d='M16 9v14' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="start-screen.css">
   <link rel="stylesheet" href="level-select.css">
+  <link rel="stylesheet" href="settings-panel.css">
 </head>
 <body>
   <section id="start-screen" aria-labelledby="menu-title">
@@ -62,22 +64,16 @@
     </div>
 
   </section>
-  <dialog id="world-settings" aria-labelledby="world-settings-title">
-    <div class="world-settings-panel">
-      <div class="world-settings-heading"><h2 id="world-settings-title">遊戲設定</h2><button id="world-settings-close" aria-label="關閉設定" autofocus>×</button></div>
-      <label class="world-volume-label" for="world-volume">音效音量</label>
-      <input id="world-volume" data-sound-volume type="range" min="0" max="100" value="50">
-      <label class="world-mute-label"><input id="world-muted" data-sound-muted type="checkbox"> 靜音</label>
-      <button id="world-back">返回首頁</button>
-    </div>
-  </dialog>
-  <dialog id="stage-dialog" aria-labelledby="stage-title" aria-describedby="stage-status">
+  <dialog id="world-settings" data-settings-panel="map" aria-labelledby="world-settings-title"></dialog>
+  <dialog id="stage-dialog" aria-labelledby="stage-title" aria-describedby="stage-name">
     <div class="stage-panel">
-      <h2 id="stage-title">第 1 關</h2><button id="stage-close" aria-label="關閉關卡資訊" autofocus>×</button>
-      <img class="panel-leaf leaf-left" src="assets/environment/fern.png" alt=""><img class="panel-leaf leaf-right" src="assets/environment/fern.png" alt="">
-      <div class="stage-body"><figure class="stage-landscape"><div id="stage-preview" role="img"></div><figcaption id="stage-name">林間入口</figcaption></figure>
-      <section class="enemy-info" aria-labelledby="enemy-heading"><h3 id="enemy-heading">敵人資訊</h3><ul id="stage-enemies"></ul><p id="enemies-pending" hidden>敵人配置準備中</p></section></div>
-      <p id="stage-status"></p>
+      <header class="stage-heading"><h2 id="stage-title">第 1 關</h2><p id="stage-name">林間入口</p></header>
+      <button id="stage-close" aria-label="關閉關卡資訊" autofocus>×</button>
+      <div class="stage-body">
+        <figure class="stage-landscape"><div id="stage-preview" role="img"></div></figure>
+        <section class="enemy-info" aria-labelledby="enemy-heading"><h3 id="enemy-heading">敵人資訊</h3><ul id="stage-enemies"></ul><p id="enemies-pending" hidden>敵人配置準備中</p></section>
+      </div>
+      <div class="stage-record"><span class="record-label">最佳紀錄</span><span id="stage-stars" class="record-stars" role="img" aria-label="尚未取得星星"><span></span><span></span><span></span></span><span id="stage-clear-status"></span></div>
       <button id="stage-enter"><img src="assets/ui/ready-swords.png" alt=""><span id="stage-enter-label">開始挑戰</span></button>
     </div>
   </dialog>
@@ -91,6 +87,6 @@
       <button class="wood-button settings-done" autofocus>返回木牌</button>
     </form>
   </dialog>
-  <script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="start-screen.js"></script><script src="enemy-sprites.js"></script><script src="level-progress.js"></script><script src="level-select.js"></script><script src="menu.js"></script>
+  <script src="sound-manager.js"></script><script src="settings-panel.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="start-screen.js"></script><script src="enemy-sprites.js"></script><script src="level-progress.js"></script><script src="level-select.js"></script><script src="menu.js"></script>
 </body>
 </html>

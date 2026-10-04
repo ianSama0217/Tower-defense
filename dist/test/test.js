@@ -10,8 +10,10 @@
   let asset = null, category = 'enemy', mode = 'place', selected = null, facing = 1, ready = false;
   let time = 0, previous = 0, paused = false, pointer = null, dragging = null, nextId = 1;
   let simulation=null;
-  const description={4:'炸彈哥布林 · 60 HP · 不普攻，追向最近的塔；接近或被擊殺時爆炸，對範圍內的塔與其他怪物造成 60 傷害。',5:'史萊姆 · 32 HP · 普通移速，不攻擊，沿路前進。'};
+  const description={2:'獸人 · 112 HP · 出場衝鋒，速度為原速 1.5 倍；首次撞塔或城牆造成 120 傷害，之後恢復原速，每秒普攻 10 傷害。',4:'炸彈哥布林 · 60 HP · 不普攻，追向最近的塔；接近或被擊殺時爆炸，對範圍內的塔與其他怪物造成 60 傷害。',5:'史萊姆 · 32 HP · 普通移速，不攻擊，沿路前進。',6:'哥布林弓箭手 · 40 HP · 射程內停下拉弓，每 1.4 秒射一箭，命中塔時造成 6 傷害。'};
   const arrowImage=new Image();arrowImage.src='assets/projectiles/arrow.png';
+  const wallImages={};
+  const bombImages={};
   const ground = document.createElement('canvas'); ground.width=W;ground.height=H;
   function status(message){$('lab-status').textContent=message;}
   function record(){history.push(objects.map(o=>({...o})));if(history.length>50)history.shift();}
@@ -27,6 +29,9 @@
     if(!states[$('enemy-animation').value])$('enemy-animation').value='walk';
     $('enemy-animation').disabled=!!simulation||active?.category!=='enemy';
     $('enemy-description').textContent=active?.category==='enemy'?(description[active.level]||'判定範圍內有塔就鎖定最近一座，靠近後停下攻擊；摧毀後繼續搜尋附近的塔，沒有目標才回到路線。'):'';
+    if(active?.category==='wall')$('enemy-description').textContent='城牆 · 300 HP · 敵人優先攻擊 · 無法修復。測試場可自由擺放，正式關卡每場限 3 個、每個 100 金幣。';
+    if(active?.category==='bomb-tower'){const s=BombTowers.specs[active.level];$('enemy-description').textContent=`炸彈塔 Lv.${active.level} · ${s.hp} HP · 攻擊距離 55～125 px · 爆炸半徑 ${s.blastRadius} px · 傷害 ${s.damage} · 每 ${s.interval} 秒投彈。會傷害友軍與自己；距離小於 55 不投彈。勾選「塔可射擊」開始測試。`;}
+    if(active?.category==='enemy')$('enemy-description').textContent+=' 附近城牆優先；史萊姆也會攻擊城牆。';
     if(active?.category==='enemy'){
       const r=TD.enemyRanges(active.level,simulation?.worldScale||1);
       $('enemy-description').textContent+=r.attack?` 判定半徑 ${r.detection} px；攻擊半徑 ${r.attack} px。`:r.blast?` 引爆距離 ${r.trigger} px；爆炸半徑 ${r.blast} px。`:' 攻擊半徑 0 px。';
@@ -34,7 +39,7 @@
     $('simulate').disabled=!ready||(!simulation&&!objects.some(o=>o.asset.category==='enemy'));
     $('simulate').textContent=simulation?'結束行為測試':'開始行為測試';$('simulate').setAttribute('aria-pressed',String(!!simulation));
     $('kill-enemy').disabled=!simulation||!simulation.enemies.some(e=>e.id===selected&&e.hp>0);
-    for(const id of ['object-scale','flip-object','tool-place','bomber-demo'])$(id).disabled=!ready||!!simulation;
+    for(const id of ['object-scale','flip-object','tool-place','bomber-demo','bomb-tower-demo'])$(id).disabled=!ready||!!simulation;
     document.querySelectorAll('.asset-card,[data-category]').forEach(button=>button.disabled=!!simulation);
     $('tool-place').setAttribute('aria-pressed',String(mode==='place'));
     $('tool-move').setAttribute('aria-pressed',String(mode==='move'));
@@ -52,15 +57,23 @@
       const icon=document.createElement('canvas');icon.width=128;icon.height=116;icon.setAttribute('aria-hidden','true');
       const ic=icon.getContext('2d');ic.imageSmoothingEnabled=false;
       const scale=Math.min(104/item.width,104/item.height);
-      ic.drawImage(item.image,0,0,item.width,item.height,Math.round((128-item.width*scale)/2),Math.round((116-item.height*scale)/2),Math.round(item.width*scale),Math.round(item.height*scale));
+      if(item.category==='wall')WallSprites.draw(ic,item.image,{x:64,y:58,orientation:item.orientation,...TD.wallSize(item.orientation,2,80)},2);
+      else if(item.category==='bomb-tower')BombTowerSprites.draw(ic,bombImages,{x:64,y:110,level:item.level},Math.min(1.4,104/item.width),0);
+      else ic.drawImage(item.image,0,0,item.width,item.height,Math.round((128-item.width*scale)/2),Math.round((116-item.height*scale)/2),Math.round(item.width*scale),Math.round(item.height*scale));
       const title=document.createElement('b');title.textContent=item.name;
-      const dimensions=document.createElement('small');dimensions.textContent=`${item.width} × ${item.height} px`;
+      const dimensions=document.createElement('small');dimensions.textContent=item.category==='wall'?'80 px 道路寬度（2 倍）':`${item.width} × ${item.height} px`;
       button.append(icon,title,dimensions);button.addEventListener('click',()=>pickAsset(item));$('asset-list').append(button);
     }
   }
-  function bounds(o){return{x:o.x-o.asset.anchor.x*o.scale,y:o.y-o.asset.anchor.y*o.scale,w:o.asset.width*o.scale,h:o.asset.height*o.scale};}
+  function labWall(o){return o.unit||{...o,orientation:o.asset.orientation,hp:TD.WALL.hp,maxHp:TD.WALL.hp,...TD.wallSize(o.asset.orientation,o.scale,40*o.scale)};}
+  function bounds(o){if(o.asset.category==='wall')return WallSprites.bounds(labWall(o),o.scale);return{x:o.x-o.asset.anchor.x*o.scale,y:o.y-o.asset.anchor.y*o.scale,w:o.asset.width*o.scale,h:o.asset.height*o.scale};}
   function paint(o,alpha=1){
     const a=o.asset;let frame=0;
+    if(a.category==='bomb-tower'){BombTowerSprites.draw(ctx,bombImages,{...o,...o.unit,level:a.level},o.scale,time,alpha);return;}
+    if(a.category==='wall'){
+      const wall=labWall(o);
+      WallSprites.draw(ctx,wallImages[`${a.orientation}-${WallSprites.stage(wall.hp,wall.maxHp)}`],wall,o.scale,alpha);return;
+    }
     if(a.category==='enemy'){
       if(o.unit)frame=EnemySprites.sample(o.unit,time).index;
       else{const animation=(a.animations||EnemySprites.animations)[o.animation]||a.animations.walk,elapsed=Math.max(0,time-o.started);
@@ -73,6 +86,7 @@
     if(!simulation)return objects;
     const scene=objects.filter(o=>o.asset.category==='environment');
     for(const s of simulation.slots)if(s.level){const o=objects.find(o=>o.id===s.objectId);scene.push({...o,unit:s});}
+    for(const w of simulation.walls){const o=objects.find(o=>o.id===w.objectId);scene.push({...o,unit:w});}
     for(const e of [...simulation.enemies.filter(e=>e.hp>0),...simulation.corpses]){const o=objects.find(o=>o.id===e.id);scene.push({...o,x:e.x,y:e.y,facing:e.facing??1,unit:e});}
     return scene;
   }
@@ -93,6 +107,14 @@
     }
     ctx.restore();
   }
+  function paintBombRanges(o,alpha=1){
+    if(o.asset.category!=='bomb-tower'||o.unit?.hp<=0)return;
+    const r=BombTowers.ranges(o.asset.level,simulation?.worldScale||1);
+    ctx.save();ctx.globalAlpha=alpha;ctx.lineWidth=2;
+    ctx.beginPath();ctx.arc(o.x,o.y,r.min,0,Math.PI*2);ctx.fillStyle='#ec7b6722';ctx.fill();ctx.strokeStyle='#ef8d72';ctx.setLineDash([5,5]);ctx.stroke();
+    ctx.beginPath();ctx.arc(o.x,o.y,r.max,0,Math.PI*2);ctx.strokeStyle='#f6d782';ctx.setLineDash([]);ctx.stroke();
+    ctx.font='14px "Fusion Pixel"';ctx.textAlign='center';ctx.fillStyle='#fff0c4';ctx.strokeStyle='#1f2c20';ctx.lineWidth=3;const label=`投彈 ${r.min}～${r.max} · 爆炸 R ${r.blast}`;ctx.strokeText(label,o.x,o.y+r.max+19);ctx.fillText(label,o.x,o.y+r.max+19);ctx.restore();
+  }
   function draw(){
     ctx.imageSmoothingEnabled=false;
     const background=$('stage-background').value;
@@ -103,14 +125,23 @@
     const scene=visibleObjects();
     const showRanges=$('show-enemy-ranges').checked;
     if(showRanges)scene.forEach(o=>paintRanges(o));
+    if($('show-bomb-ranges').checked)scene.forEach(o=>paintBombRanges(o));
     [...scene].sort((a,b)=>a.y-b.y||a.id-b.id).forEach(o=>{
-      paint(o);if(o.unit&&o.unit.deathAt==null){const b=bounds(o);ctx.fillStyle='#17241d';ctx.fillRect(o.x-24,b.y-12,48,4);ctx.fillStyle='#8fcd68';ctx.fillRect(o.x-24,b.y-12,48*o.unit.hp/o.unit.maxHp,4);ctx.fillStyle='#f1e4c5';ctx.font='11px sans-serif';ctx.textAlign='center';ctx.fillText(`${o.unit.hp} HP`,o.x,b.y-17);}
+      paint(o);if(o.unit&&o.unit.hp>0&&o.unit.deathAt==null){if(o.asset.category==='wall'){WallSprites.drawHealth(ctx,o.unit,o.scale);return;}const b=bounds(o);ctx.fillStyle='#17241d';ctx.fillRect(o.x-24,b.y-12,48,4);ctx.fillStyle='#8fcd68';ctx.fillRect(o.x-24,b.y-12,48*o.unit.hp/o.unit.maxHp,4);ctx.fillStyle='#f1e4c5';ctx.font='11px "Fusion Pixel"';ctx.textAlign='center';ctx.fillText(`${o.unit.hp} HP`,o.x,b.y-17);}
     });
     if(simulation&&arrowImage.complete&&arrowImage.naturalWidth)for(const b of simulation.bullets){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.atan2(b.target.y-b.y,b.target.x-b.x));ctx.drawImage(arrowImage,-30,-6,32,12);ctx.restore();}
+    if(simulation&&arrowImage.complete&&arrowImage.naturalWidth)for(const b of simulation.enemyArrows){ctx.save();ctx.translate(b.x,b.y-20);ctx.rotate(Math.atan2(b.target.y-b.y,b.target.x-b.x));ctx.drawImage(arrowImage,-24,-4.5,24,9);ctx.restore();}
+    if(simulation){
+      for(const b of simulation.bombs)BombTowerSprites.drawBomb(ctx,bombImages.bomb,b,simulation.time,simulation.worldScale);
+      for(const e of simulation.effects)if(e.kind==='tower-bomb-explosion'){
+        if($('show-bomb-ranges').checked){ctx.save();ctx.strokeStyle='#ff9b60';ctx.globalAlpha=e.life/e.duration;ctx.lineWidth=2;ctx.beginPath();ctx.arc(e.x,e.y,e.radius,0,Math.PI*2);ctx.stroke();ctx.restore();}
+        BombTowerSprites.drawExplosion(ctx,bombImages.explosion,e);
+      }
+    }
     const item=scene.find(o=>o.id===selected);
     if(item){const b=bounds(item);ctx.strokeStyle='#ffe199';ctx.lineWidth=2;ctx.setLineDash([5,4]);ctx.strokeRect(b.x-3,b.y-3,b.w+6,b.h+6);ctx.setLineDash([]);ctx.fillStyle='#ffe199';ctx.fillRect(item.x-3,item.y-3,6,6);}
     if(showRanges&&item)paintRanges(item,true);
-    if(!simulation&&mode==='place'&&pointer&&asset){const preview={asset,x:pointer.x,y:pointer.y,scale:Number($('object-scale').value),facing,animation:$('enemy-animation').value,started:time};if(showRanges)paintRanges(preview,true,.55);paint(preview,.55);}
+    if(!simulation&&mode==='place'&&pointer&&asset){const preview={asset,x:pointer.x,y:pointer.y,scale:Number($('object-scale').value),facing,animation:$('enemy-animation').value,started:time};if(showRanges)paintRanges(preview,true,.55);if($('show-bomb-ranges').checked)paintBombRanges(preview,.55);paint(preview,.55);}
   }
   function coordinates(event){const rect=canvas.getBoundingClientRect();return{x:Math.max(0,Math.min(W,(event.clientX-rect.left)*W/rect.width)),y:Math.max(0,Math.min(H,(event.clientY-rect.top)*H/rect.height))};}
   function place(p){
@@ -144,9 +175,10 @@
     window.gameSound.stopAll();
     if(simulation){simulation=null;objects.forEach(o=>o.started=time);status('已結束測試並還原原始擺放。');$('simulation-status').textContent='放置塔與怪物後，可測試追塔、自爆與範圍傷害。';update();return;}
     if(!objects.some(o=>o.asset.category==='enemy'))return;
-    const sim=new TD.Game();sim.start();sim.lives=150;sim.time=time;
+    const sim=new BombTowers.BombTowerGame();sim.start();sim.lives=150;sim.time=time;
     sim.sound=window.gameSound;
-    sim.slots=objects.filter(o=>o.asset.category==='tower').map((o,id)=>({id,objectId:o.id,x:o.x,y:o.y,level:o.asset.level,hp:100,maxHp:100,cooldown:0,action:null,destroyedAt:null}));
+    sim.slots=objects.filter(o=>['tower','bomb-tower'].includes(o.asset.category)).map((o,id)=>({id,objectId:o.id,x:o.x,y:o.y,level:o.asset.level,kind:o.asset.category==='bomb-tower'?'bomb':'arrow',visualScale:o.scale,towerId:sim.nextTowerId++,kills:0,hp:100,maxHp:100,cooldown:0,action:null,destroyedAt:null}));
+    sim.walls=objects.filter(o=>o.asset.category==='wall').map((o,id)=>({...labWall(o),id:-id-1,objectId:o.id,kind:'wall',level:1,towerId:sim.nextTowerId++}));
     sim.enemies=objects.filter(o=>o.asset.category==='enemy').map(o=>{
       const spec=TD.ENEMIES[o.asset.level],routeIndex=sim.level.routes.length;
       sim.level.routes.push({path:[{x:0,y:o.y},{x:W,y:o.y}],segments:[W],length:W});
@@ -164,6 +196,13 @@
     }
     selected=objects.find(o=>o.asset.level===4&&o.asset.category==='enemy').id;mode='move';$('tower-fire').checked=false;update();
     status('範例已載入。開始行為測試可看追塔自爆；立即擊殺炸彈哥布林可看波及旁邊怪物。');
+  });
+  $('bomb-tower-demo').addEventListener('click',()=>{
+    if(simulation||!ready)return;record();objects.length=0;
+    const add=(type,level,x,y)=>objects.push({id:nextId++,asset:catalog.find(a=>a.category===type&&(level==null||a.level===level)),x,y,scale:2,facing:1,animation:'walk',started:time});
+    for(const [level,x] of [[1,280],[2,600],[3,920]]){add('bomb-tower',level,x,380);for(const [dx,dy] of level===1?[[-86,-16],[-74,0],[-86,16]]:[[88,-16],[100,0],[88,16]])add('enemy',5,x+dx,380+dy);}
+    add('wall',null,700,430);selected=null;mode='move';pointer=null;$('tower-fire').checked=true;$('show-bomb-ranges').checked=true;$('show-enemy-ranges').checked=false;update();
+    status('已載入三級炸彈塔。開始測試：左側查看近距離自傷，中間查看友方城牆受傷，右側查看範圍爆炸。');
   });
   document.querySelectorAll('[data-category]').forEach(button=>button.addEventListener('click',()=>{if(!ready)return;category=button.dataset.category;pickAsset(catalog.find(item=>item.category===category));}));
   document.addEventListener('keydown',event=>{
@@ -234,18 +273,25 @@
   syncSceneView();
   function load(category,name,file,spec,level){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>{const width=spec?.size||image.naturalWidth,height=spec?.size||image.naturalHeight;resolve({category,name,image,width,height,level,animations:spec?.animations,anchor:spec?.anchor||{x:width/2,y:height-2}});};image.onerror=()=>reject(new Error(`無法載入 ${file}`));image.src=file;});}
   const loads=[];
-  for(const level of [5,1,2,3,4]){const spec=EnemySprites.specs[level];loads.push(load('enemy',spec.name||['','Lv1 哥布林','Lv2 獸人','Lv3 獨眼巨人'][level],`assets/enemies/${spec.file}`,spec,level));}
+  for(const [i,spec] of BombTowerSprites.specs.entries())if(spec)loads.push(load('bomb-tower',`Lv${i} 炸彈塔`,`assets/bomb-towers/${spec.file}`,spec,i).then(item=>{bombImages[i]=item.image;return item;}));
+  for(const name of ['operator','bomb','explosion'])loads.push(new Promise((resolve,reject)=>{const image=new Image();bombImages[name]=image;image.onload=()=>resolve(null);image.onerror=()=>reject(new Error(`無法載入炸彈塔 ${name}`));image.src=`assets/bomb-towers/${name}.png`;}));
+  for(const orientation of ['horizontal','vertical']){
+    loads.push(load('wall',`城牆 · ${orientation==='vertical'?'直向':'橫向'}`,WallSprites.file(orientation),{anchor:{x:32,y:76}}).then(item=>({...item,orientation})));
+    for(const hp of WallSprites.stages)loads.push(new Promise((resolve,reject)=>{const image=new Image();wallImages[`${orientation}-${hp}`]=image;image.onload=()=>resolve(null);image.onerror=reject;image.src=WallSprites.file(orientation,hp,100);}));
+  }
+  for(const level of [5,1,6,2,3,4]){const spec=EnemySprites.specs[level];loads.push(load('enemy',spec.name||['','Lv1 哥布林','Lv2 獸人','Lv3 獨眼巨人'][level],`assets/enemies/${spec.file}`,spec,level));}
   TowerSprites.specs.slice(1).forEach((spec,i)=>loads.push(load('tower',['Lv1 木造箭塔','Lv2 石造箭塔','Lv3 強化箭塔'][i],`assets/towers/${spec.file}`,spec,i+1)));
   Environment.names.forEach(name=>loads.push(load('environment',names[name]||name,`assets/environment/${name}.png`)));
   Promise.all(loads).then(items=>{
-    catalog.push(...items);const gc=ground.getContext('2d');gc.imageSmoothingEnabled=false;gc.fillStyle='#718b3d';gc.fillRect(0,0,W,H);
+    catalog.push(...items.filter(Boolean));const gc=ground.getContext('2d');gc.imageSmoothingEnabled=false;gc.fillStyle='#718b3d';gc.fillRect(0,0,W,H);
     const grass=catalog.find(item=>item.name===names.grass).image;
     gc.globalAlpha=.5;for(let y=0;y<H;y+=64)for(let x=0;x<W;x+=64)gc.drawImage(grass,x,y,64,64);
-    ready=true;pickAsset(catalog[0]);resize();status(`已載入 ${catalog.length} 個素材。從下方選擇素材，再點畫布放置。`);
+    ready=true;pickAsset(catalog.find(item=>item.category===category));resize();status(`已載入 ${catalog.length} 個素材。從下方選擇素材，再點畫布放置。`);
   }).catch(error=>{status(`${error.message}，請重新整理。`);$('selection-label').textContent='素材載入失敗';console.error(error);});
   function frame(now){
     const dt=Math.min((now-previous)/1000,.05);previous=now;
     if(!paused&&!document.hidden){time+=dt;if(simulation){
+      simulation.bombFireEnabled=$('tower-fire').checked;
       if(!$('tower-fire').checked)simulation.slots.forEach(s=>s.cooldown=Infinity);
       let left=dt;while(left>0){const step=Math.min(left,1/60);simulation.update(step);left-=step;}
     }}

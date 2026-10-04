@@ -48,7 +48,7 @@
 #settings-dialog { width: min(440px, calc(100vw - 40px)); max-height: calc(100dvh - 40px); padding: 0; color: #eee4bc; background: #293d2e; border: 4px solid #182d25; border-radius: 0; box-shadow: 0 0 0 4px #9d8551, 0 0 0 8px #253226, 12px 16px #10251d66; }
 #settings-dialog::backdrop { background: #12271ec9; }
 .settings-panel { padding: 28px; }
-.settings-eyebrow { color: #b4bc86; font: 10px monospace; letter-spacing: .25em; margin: 0 0 12px; }
+.settings-eyebrow { color: #b4bc86; font: 10px var(--font-ui); letter-spacing: .25em; margin: 0 0 12px; }
 #settings-title { font-size: 26px; letter-spacing: .15em; margin-bottom: 26px; }
 .setting-row { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 20px 0; border-top: 2px solid #566248; }
 .setting-row label { font-size: 14px; }

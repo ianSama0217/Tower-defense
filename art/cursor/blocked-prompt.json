@@ -1,0 +1,14 @@
+{
+  "tool": "image_gen (built-in)",
+  "reference": "User-provided white pixel hand with red prohibited badge",
+  "prompt": "Use case: background-extraction. Asset type: disabled game mouse cursor. Edit the attached reference into a single isolated transparent pixel-art pointing hand with red prohibited badge at its lower right. Preserve the exact pose and silhouette of the reference: index finger pointing upper-left, white glove with pale icy blue block highlights and shadows, thick black stepped square-pixel outline. Preserve the red circular no-entry/prohibition badge overlapping the lower-right half of the hand, with a black outline and a red diagonal slash from upper-left to lower-right. Match the reference's proportions and pixel blocks very closely. Remove the outside white background to real alpha transparency. White glove remains opaque, do not erase white inside the hand. No text, no outside drop shadow, no glow, no extra objects. Crisp pixel edges. Full cursor visible with small transparent margin.",
+  "output": "dist/assets/ui/cursor-blocked.png",
+  "size": [
+    48,
+    48
+  ],
+  "hotspot": [
+    6,
+    2
+  ]
+}
