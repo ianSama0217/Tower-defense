@@ -34,10 +34,13 @@
 .enemy-info h3{display:flex;align-items:center;min-height:57px;font-size:27px;line-height:1.3;background:url('assets/ui/stage-kit/heading.png') center/100% 100% no-repeat;color:#fff0cd;text-shadow:2px 2px #392719,-1px -1px #392719;border:0;margin:0;padding:10px 28px;font-weight:400;image-rendering:pixelated}
 #stage-enemies{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;margin:16px 0 0;padding:0;list-style:none}
 .enemy-card{display:flex;align-items:center;justify-content:flex-end;flex-direction:column;min-width:0;min-height:194px;padding:8px 14px 14px;border:0;background:url('assets/ui/stage-kit/card.png') center/100% 100% no-repeat;image-rendering:pixelated}
-.enemy-portrait{display:block;width:112px;height:112px;flex-shrink:0;background-repeat:no-repeat;image-rendering:pixelated;filter:drop-shadow(0 3px #826e4655)}
+.enemy-portrait{display:block;width:var(--portrait-size,112px);height:var(--portrait-size,112px);flex-shrink:0;background-repeat:no-repeat;background-size:calc(var(--enemy-frames,20)*var(--portrait-size,112px)) var(--portrait-size,112px);image-rendering:pixelated;filter:drop-shadow(0 3px #826e4655)}
 .enemy-card.is-undiscovered .enemy-portrait{filter:brightness(0)}
 .enemy-name{display:grid;place-items:center;width:100%;height:36px;padding:0 3px;text-align:center;background:none;border:0;color:#fff0cb;font-size:21px;line-height:1.2;white-space:nowrap;text-shadow:2px 2px #3f2c1a}
 .enemy-card.is-undiscovered .enemy-name{color:#e7d5b2}
+#stage-enemies.three-enemies{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px;--portrait-size:80px}
+.three-enemies .enemy-card{min-height:138px;padding:8px 8px 14px}
+.three-enemies .enemy-name{font-size:14px;white-space:normal}
 #enemies-pending{font-size:18px;text-align:center;line-height:1.6;margin:56px 0;color:#79623e}
 .stage-record{display:flex;justify-content:center;align-items:center;gap:16px;width:90%;min-height:58px;margin:18px auto 0;padding:0;border:0;background:none}
 .record-label{display:grid;place-items:center;width:154px;min-height:47px;padding:8px 14px;background:url('assets/ui/stage-kit/record-label.png') center/100% 100% no-repeat;border:0;color:#fff0cd;font-size:23px;white-space:nowrap;text-shadow:2px 2px #412d1e;image-rendering:pixelated}
@@ -50,6 +53,11 @@
  .stage-body{grid-template-columns:1fr;gap:12px}.stage-landscape{min-height:0;height:122px;border-width:6px}#stage-preview{min-height:0;height:100%;background-size:270%}.enemy-info h3{min-height:44px;font-size:22px;padding:8px 20px}#stage-enemies{margin-top:8px;gap:10px}.enemy-card{min-height:154px;padding:0 10px 9px}.enemy-name{font-size:17px;height:30px}.stage-record{width:100%;gap:5px;min-height:40px;margin-top:12px}.record-label{width:auto;min-height:36px;font-size:15px;padding:6px 8px}.record-stars{gap:0}.record-stars span{width:23px;height:23px}#stage-clear-status{min-width:84px;min-height:34px;font-size:14px;padding:5px 8px}#stage-clear-status.is-cleared{min-width:96px;padding-left:28px}#stage-enter{width:100%;font-size:24px;min-height:66px;padding:8px 12% 8px 35%}#enemies-pending{font-size:16px;margin:35px 0}
 }
 @media(prefers-reduced-motion:reduce){.node-art{transition:none}}
+@media(max-width:600px){
+ #stage-enemies.three-enemies{gap:6px;--portrait-size:64px}
+ .three-enemies .enemy-card{min-height:112px;padding:8px 6px 10px}
+ .three-enemies .enemy-name{font-size:12px}
+}
 
 /* The gear uses the same atlas cell and wooden button finish as the battle HUD. */
 #world-settings-open{position:absolute;z-index:2;top:max(12px,env(safe-area-inset-top));right:max(12px,env(safe-area-inset-right));display:grid;place-items:center;width:54px;height:54px;padding:2px 6px;border:2px solid #26170f;border-radius:6px;background:#cda473 url('assets/ui/wood-texture.png') center 12%/240px;box-shadow:inset 0 2px #f2d5a4,inset 0 -2px #93603f,2px 2px #1b110ea6}

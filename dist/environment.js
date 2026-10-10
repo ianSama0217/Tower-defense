@@ -10,12 +10,29 @@
     }
     return rects;
   }
+  function entranceFlags(level,displayScale=1){
+    const {width,roadWidth}=level.mapConfig,seen=new Set(),flags=[];
+    const w=24*displayScale,h=40*displayScale,margin=4*displayScale;
+    for(const route of level.routes){
+      const entry=route.path[0];if(!entry)continue;
+      const key=`${entry.x},${entry.y}`;if(seen.has(key))continue;seen.add(key);
+      // Straddle the lower road shoulder; this decorative marker has no collision.
+      flags.push({x:Math.round(Math.max(margin,Math.min(width-margin-w,entry.x-w/2))),y:Math.round(entry.y+roadWidth/2-28*displayScale),w,h});
+    }
+    return flags;
+  }
   function placements(level,images,displayScale=1){
-    const dense=level.environment==='deep-forest';
-    const random=rng(dense?20406:48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
+    const flowering=level.environment==='flower-forest',dense=flowering||level.environment==='deep-forest';
+    const random=rng(flowering?31005:dense?20406:48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
     // Reserve the full tower silhouette above every build pad as well as its click area.
     const reserved=level.slots.map(s=>({x:s.x-24*displayScale,y:s.y-56*displayScale,w:48*displayScale,h:78*displayScale}));
+    if(images.enemyEntranceFlag)reserved.push(...entranceFlags(level,displayScale).map(p=>({x:p.x-4*displayScale,y:p.y-4*displayScale,w:p.w+8*displayScale,h:p.h+8*displayScale})));
     const groups=dense?[{count:78,names:names.slice(0,7),scale:.9},{count:35,names:['boulders','mossRock','rock','lowRock','stump','fallenLog','log'],scale:.65},{count:85,names:['bush','flowers','orangeBush','berryBush'],scale:.65},{count:220,names:['fern','tuft','whiteFlowers','pinkFlowers','pebble'],scale:.6}]:[{count:19,names:names.slice(0,11),scale:.85},{count:15,names:['boulders','standingRock','rockCluster','mossRock','rock','lowRock','stump','fallenLog','log'],scale:.8},{count:28,names:['bush','flowers','orangeBush','berryBush'],scale:.75},{count:45,names:['fern','tuft','reeds','whiteFlowers','pinkFlowers','pebble'],scale:.75}];
+    if(flowering)groups.splice(0,groups.length,
+      {count:72,names:names.slice(0,7),scale:.85},
+      {count:45,names:['mossRock','rock','lowRock','rockCluster','stump','fallenLog'],scale:.55},
+      {count:95,names:['bush','flowers','orangeBush','berryBush'],scale:.55},
+      {count:380,names:['fern','tuft','whiteFlowers','pinkFlowers','pebble','flowers'],scale:.42});
     for(const group of groups){let count=0;for(let attempt=0;attempt<(dense?9000:1600)&&count<group.count;attempt++){
       const name=group.names[Math.floor(random()*group.names.length)],img=images[name],scale=group.scale*(.85+random()*.3),w=Math.round(img.naturalWidth*scale)*displayScale,h=Math.round(img.naturalHeight*scale)*displayScale;
       const box={x:Math.floor(3+random()*(map.width-w-6)),y:Math.floor(4+random()*(map.height-h-8)),w,h};
@@ -27,7 +44,7 @@
     }}
     return placed.sort((a,b)=>a.y+a.h-b.y-b.h);
   }
-  function makeBackground(level,images,displayScale=1){
+  function makeBackground(level,images,displayScale=1,{decorate=true}={}){
     const {width,height}=level.mapConfig,c=document.createElement('canvas');c.width=width;c.height=height;
     const ctx=c.getContext('2d');ctx.imageSmoothingEnabled=false;ctx.fillStyle='#718b3d';ctx.fillRect(0,0,width,height);
     const textureDensity=width*height/(640*384*displayScale*displayScale);
@@ -79,8 +96,9 @@
         const w=(1+Math.floor(detailRandom()*3))*displayScale,h=(1+Math.floor(detailRandom()*2))*displayScale;
         if(x>=0&&y>=0&&x+w<=width&&y+h<=height)ctx.drawImage(grassUnderlay,x,y,w,h,x,y,w,h);
       }
-      if(detailRandom()>.3)continue;
-      const isStone=detailRandom()<.25,name=isStone?'pebble':detailRandom()<.2?'fern':'tuft';
+      const flowering=level.environment==='flower-forest';
+      if(detailRandom()>(flowering?.55:.3))continue;
+      const isStone=detailRandom()<.25,name=isStone?'pebble':flowering&&detailRandom()<.45?(detailRandom()<.5?'whiteFlowers':'pinkFlowers'):detailRandom()<.2?'fern':'tuft';
       const scale=(isStone?.22+detailRandom()*.14:.38+detailRandom()*.27)*displayScale,img=images[name];
       const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);
       const inward=(isStone?-1:1)*(1+detailRandom()*3)*displayScale;
@@ -91,10 +109,11 @@
       for(let j=0;j<3;j++){const dx=Math.round((detailRandom()-.5)*w*1.6),dy=Math.round((detailRandom()-.5)*h);ctx.fillRect(Math.round(edge.x+dx),Math.round(edge.y+dy),displayScale*(1+j%2),displayScale);}
       ctx.globalAlpha=1;ctx.drawImage(img,x,y,w,h);
     }
-    const scenery=placements(level,images,displayScale);
+    const scenery=decorate?placements(level,images,displayScale):[];
     for(const p of scenery)ctx.drawImage(images[p.name],p.x,p.y,p.w,p.h);
+    if(images.enemyEntranceFlag)for(const p of entranceFlags(level,displayScale))ctx.drawImage(images.enemyEntranceFlag,p.x,p.y,p.w,p.h);
     return {canvas:c,scenery};
   }
-  const api={names,roadRects,placements,makeBackground};
+  const api={names,roadRects,entranceFlags,placements,makeBackground};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Environment=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

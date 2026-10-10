@@ -1,0 +1,55 @@
+{
+  "file": "boss_goblin_captain.png",
+  "name": "Boss 哥布林隊長",
+  "size": 48,
+  "frames": 27,
+  "anchor": {
+    "x": 24,
+    "y": 44
+  },
+  "animations": {
+    "idle": {
+      "start": 0,
+      "count": 4,
+      "fps": 5,
+      "loop": true
+    },
+    "walk": {
+      "start": 4,
+      "count": 4,
+      "fps": 7,
+      "loop": true
+    },
+    "attack": {
+      "start": 8,
+      "count": 4,
+      "fps": 8,
+      "loop": false
+    },
+    "warcry": {
+      "start": 12,
+      "count": 6,
+      "fps": 8,
+      "loop": false
+    },
+    "hurt": {
+      "start": 18,
+      "count": 3,
+      "fps": 10,
+      "loop": false
+    },
+    "death": {
+      "start": 21,
+      "count": 6,
+      "fps": 7,
+      "loop": false
+    }
+  },
+  "width": 1296,
+  "height": 48,
+  "frameWidth": 48,
+  "frameHeight": 48,
+  "layout": "horizontal",
+  "spacing": 0,
+  "margin": 0
+}

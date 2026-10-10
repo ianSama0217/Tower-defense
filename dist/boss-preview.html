@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="zh-Hant"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link rel="stylesheet" href="fonts.css"><title>Boss 獨眼巨人 · 素材驗收</title>
+<style>
+*{box-sizing:border-box}body{margin:0;background:#17241e;color:#f1e9d2;font:16px var(--font-ui);padding:28px}h1{font-size:28px}p{line-height:1.6;color:#c4d0bc}a{color:#c5e79b}button,select{font:inherit;padding:8px 14px;background:#304539;color:#fff;border:1px solid #758466;margin:0 8px 10px 0}main{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px}.card{background:#26362e;border:1px solid #4b614f;padding:16px;border-radius:12px;text-align:center}.stage{background:conic-gradient(#b9c1b8 25%,#d7dcd3 0 50%,#b9c1b8 0 75%,#d7dcd3 0) 0 0/16px 16px;display:flex;justify-content:center}canvas{image-rendering:pixelated;width:240px;height:240px;max-width:100%}small{display:block;margin-top:12px;color:#c4d0bc}.light .stage{background:#f2ead6}.dark .stage{background:#0a100d}.download{margin:24px 0}
+</style>
+<h1>Boss 獨眼巨人</h1><p>角色 27 格，全部固定 96×96；站立本體約 80 px。飛行石頭 32×32、落地效果 48×48，均為獨立圖集。紅色定位點為腳底／旋轉中心。<a href="test/">前往 /test 放置素材</a></p>
+<button id="play">暫停</button><button id="step">逐格</button><button id="restart">重播</button><button id="flip">翻轉</button><select id="background" aria-label="背景"><option value="">透明棋盤</option><option value="light">淺色</option><option value="dark">深色</option></select>
+<main id="cards"></main><p class="download"><a href="assets/boss/boss_cyclops.png" download>角色圖集</a> · <a href="assets/boss/boss_cyclops_rock.png" download>石頭圖集</a> · <a href="assets/boss/boss_cyclops_rock_impact.png" download>落地圖集</a> · <a href="assets/boss/sprites.json" download>固定座標 JSON</a></p>
+<script src="boss-sprites.js"></script><script>
+const labels={idle:'待機',walk:'行走',attack:'近戰',throw:'投擲',hurt:'受傷',death:'死亡',fly:'石頭飛行',impact:'石頭落地'},cards=[];
+let running=true,time=0,previous=null,manual=null,facing=1;
+for(const [key,spec] of Object.entries(BossSprites.specs)){
+  const image=new Image();image.src=`assets/boss/${spec.file}`;
+  for(const [state,a] of Object.entries(spec.animations)){
+    const card=document.createElement('section');card.className='card';card.innerHTML=`<h2>${labels[state]} · ${a.count} 格</h2><div class="stage"><canvas width="240" height="240" aria-label="${labels[state]}動畫"></canvas></div><small>${spec.size}×${spec.size}／格 · anchor (${spec.anchor.x}, ${spec.anchor.y})</small><small class="frame"></small>`;
+    document.getElementById('cards').append(card);cards.push({key,spec,state,a,image,canvas:card.querySelector('canvas'),label:card.querySelector('.frame')});
+  }
+}
+function draw(now){
+  if(running&&previous!==null)time+=Math.min(.05,(now-previous)/1000);previous=now;
+  for(const {key,spec,state,a,image,canvas,label} of cards){
+    const elapsed=manual===null?time%(a.count/a.fps+.7):(manual%a.count)/a.fps,frame=BossSprites.sample(key,state,elapsed),ctx=canvas.getContext('2d');
+    ctx.clearRect(0,0,240,240);ctx.imageSmoothingEnabled=false;ctx.save();ctx.translate(120,key==='rock'?120:220);ctx.scale(facing*2,2);
+    if(image.complete&&image.naturalWidth)ctx.drawImage(image,frame.sx,0,spec.size,spec.size,-spec.anchor.x,-spec.anchor.y,spec.size,spec.size);
+    ctx.strokeStyle='#b74448';ctx.lineWidth=.5;ctx.strokeRect(-spec.anchor.x,-spec.anchor.y,spec.size,spec.size);ctx.fillStyle='#fa5959';ctx.fillRect(-1,-1,2,2);ctx.restore();
+    label.textContent=`frame ${frame.index} · x=${frame.sx} · y=0`;
+  }
+  requestAnimationFrame(draw);
+}
+document.getElementById('play').onclick=()=>{running=!running;manual=null;document.getElementById('play').textContent=running?'暫停':'播放';};
+document.getElementById('step').onclick=()=>{running=false;manual=manual===null?0:manual+1;document.getElementById('play').textContent='播放';};
+document.getElementById('restart').onclick=()=>{time=0;manual=null;running=true;document.getElementById('play').textContent='暫停';};
+document.getElementById('flip').onclick=()=>facing*=-1;
+document.getElementById('background').onchange=e=>document.body.className=e.target.value;
+requestAnimationFrame(draw);
+</script></html>

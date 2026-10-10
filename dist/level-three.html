@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-Hant">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="preload" href="assets/fonts/fusion-pixel-12px-proportional-zh_hant.woff2" as="font" type="font/woff2" crossorigin>
+<link rel="stylesheet" href="fonts.css">
+<link rel="stylesheet" href="cursor.css">
+<link rel="stylesheet" href="pad-selection.css">
+<title>第三關 · 古木岔路</title><link rel="stylesheet" href="tutorial.css"><link rel="stylesheet" href="game-hud.css"><link rel="stylesheet" href="wood-theme.css"><link rel="stylesheet" href="tower-drawer.css"><link rel="stylesheet" href="wave-clock.css"><link rel="stylesheet" href="settings-panel.css"><link rel="stylesheet" href="result-panel.css"></head>
+<body>
+  <div class="game-window">
+  <main class="game-layout">
+    <section class="battlefield" aria-label="第三關戰場"><h1 class="sr-only">第三關 · 古木岔路</h1><div class="map-space"><div class="map-frame" id="map-frame"><div class="map-world"><canvas id="battlefield" width="1280" height="768" aria-label="森林中央上下環形岔路與十個建造臺座"></canvas><div id="pads" aria-label="建造臺座"></div></div>
+      <header class="game-header" aria-label="遊戲狀態與控制">
+        <div class="hud-hearts" id="hearts" role="img" aria-label="剩餘生命 3 / 3"></div>
+        <div class="hud">
+          <div class="hud-stat" title="金幣"><span class="hud-icon icon-coin" aria-hidden="true"></span><span class="sr-only">金幣</span><b id="coins">120</b></div>
+          <div class="hud-stat" title="波次"><span class="hud-icon icon-wave" aria-hidden="true"></span><span class="sr-only">波次</span><b id="wave">0 / 6</b></div>
+          <button id="speed" class="hud-button" aria-label="切換遊戲速度，目前 1 倍" title="切換至 2 倍速"><span id="speed-label">1×</span><span id="speed-play" aria-hidden="true" hidden></span></button>
+          <button id="pause" class="hud-button" aria-label="設定" aria-haspopup="dialog" aria-expanded="false" title="設定"><span class="hud-icon icon-settings" aria-hidden="true"></span></button>
+        </div>
+      </header><button id="wave-control" data-state="ready" aria-label="準備完成，開始第一波" title="準備完成，開始第一波" disabled><img id="ready-swords" src="assets/ui/ready-swords.png" alt=""><canvas id="wave-clock" width="64" height="64" aria-hidden="true" hidden></canvas></button><p id="wave-status" class="sr-only" role="status"></p><div id="pause-shade" hidden><img src="assets/ui/game-paused.png" alt="遊戲已暫停" draggable="false"></div>
+    </div></div></section>
+    <aside class="tower-drawer" id="tower-drawer" aria-label="臺座建築選單" aria-hidden="true" inert>
+      <div class="tower-details" hidden><h2 id="tower-title">選擇臺座</h2><p id="tower-info"></p><p id="feedback" role="status"></p></div>
+<div class="tower-card"><button id="build" aria-label="建造箭塔"><img id="tower-preview" src="assets/towers/tower_lv1.png" alt="箭塔"><span class="price-tag" id="build-price" aria-hidden="true"><span class="card-coin"></span><span class="amount"></span></span><span class="time-tag" id="build-time" aria-hidden="true"><span class="build-time-icon"></span><span class="duration"></span></span></button></div><div id="tower-stats" class="tower-stats" aria-label="箭塔資訊" hidden>
+ <div class="stat-column">
+  <div id="stat-damage" class="tower-stat" tabindex="0"><span class="stat-icon stat-damage" aria-hidden="true"></span><b></b></div>
+  <div id="stat-rate" class="tower-stat" tabindex="0"><span class="stat-icon stat-rate" aria-hidden="true"></span><b></b></div>
+  <div id="stat-range" class="tower-stat" tabindex="0"><span class="stat-icon stat-range" aria-hidden="true"></span><b></b></div>
+ </div>
+ <div class="stat-column">
+  <div id="stat-health" class="tower-stat" tabindex="0"><span class="stat-icon stat-health" aria-hidden="true"></span><b></b></div>
+  <div id="stat-target" class="tower-stat" tabindex="0" title="目標：地面與空中" aria-label="目標：地面與空中"><span class="stat-icon stat-target" aria-hidden="true"></span><span class="target-icons" aria-hidden="true"><img src="assets/ui/target-ground.png" alt=""><img src="assets/ui/target-air.png" alt=""></span></div>
+  <div id="stat-kills" class="tower-stat" tabindex="0"><span class="stat-icon stat-kills" aria-hidden="true"></span><b></b></div>
+ </div>
+</div><div class="tower-actions" id="tower-actions" hidden><div class="action-card"><button id="upgrade" aria-label="升級"><span class="action-icon upgrade-icon" aria-hidden="true"></span><span class="price-tag" id="upgrade-price" aria-hidden="true"><span class="card-coin"></span><span class="amount"></span></span><span class="time-tag" id="upgrade-time" aria-hidden="true"><span class="build-time-icon"></span><span class="duration"></span></span></button></div><div class="action-card"><button id="repair" aria-label="修復"><span class="action-icon repair-icon" aria-hidden="true"></span><span class="price-tag" id="repair-price" aria-hidden="true"><span class="card-coin"></span><span class="amount"></span></span><span class="time-tag" id="repair-time" aria-hidden="true"><span class="build-time-icon"></span><span class="duration"></span></span></button></div><div class="action-card"><button id="demolish" aria-label="拆除"><span class="action-icon demolish-icon" aria-hidden="true"></span><span class="price-tag" id="demolish-price" aria-hidden="true"><span class="card-coin"></span><span class="amount"></span></span><span class="time-tag" id="demolish-time" aria-hidden="true"><span class="build-time-icon"></span><span class="duration"></span></span></button></div></div>
+    </aside>
+  </main>
+  </div>
+  <dialog id="game-settings" data-settings-panel="battle" aria-labelledby="settings-title"></dialog>
+  <dialog id="result" aria-labelledby="result-title"></dialog>
+  <script src="enemy-sprites.js"></script><script src="friendly-sprites.js"></script><script src="tower-sprites.js"></script><script src="tower-work.js"></script><script src="sound-manager.js"></script><script src="settings-panel.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="timed-waves.js"></script><script src="level-three.js"></script><script src="game-hud.js"></script><script src="tower-menu.js"></script><script src="wave-clock.js"></script><script src="level-progress.js"></script><script src="result-panel.js"></script><script src="wall-sprites.js"></script><script src="fence-sprites.js"></script><script src="road-building.js"></script><script src="arrow-rain.js"></script><script src="tutorial.js"></script>
+</body></html>

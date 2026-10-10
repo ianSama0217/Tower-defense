@@ -4,7 +4,7 @@
   const stages=[
     {name:'林間入口',enemies:[5,1],href:'tutorial.html'},
     {name:'花徑哨站',enemies:[1,6],href:'level-two.html'},
-    {name:'古木岔路',enemies:[]},
+    {name:'古木岔路',enemies:[1,6,2],href:'level-three.html'},
     {name:'暮色防線',enemies:[]},
     {name:'荊棘王座',enemies:[]}
   ];

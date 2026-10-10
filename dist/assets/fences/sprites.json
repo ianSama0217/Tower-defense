@@ -1,0 +1,62 @@
+{
+  "stages": [
+    100,
+    80,
+    50,
+    25,
+    0
+  ],
+  "width": 96,
+  "height": 36,
+  "baseline": 36,
+  "crosses": 4,
+  "repeat": false,
+  "verticalRotation": 90,
+  "sourceCells": [
+    {
+      "left": 40,
+      "top": 317,
+      "width": 396,
+      "height": 139
+    },
+    {
+      "left": 488,
+      "top": 318,
+      "width": 394,
+      "height": 139
+    },
+    {
+      "left": 923,
+      "top": 317,
+      "width": 361,
+      "height": 139
+    },
+    {
+      "left": 1324,
+      "top": 321,
+      "width": 370,
+      "height": 136
+    },
+    {
+      "left": 1735,
+      "top": 373,
+      "width": 403,
+      "height": 83
+    }
+  ],
+  "variationSource": "art/fences/source-varied.png",
+  "variationCells": {
+    "50": {
+      "left": 911,
+      "top": 301,
+      "width": 351,
+      "height": 149
+    },
+    "100": {
+      "left": 40,
+      "top": 301,
+      "width": 388,
+      "height": 148
+    }
+  }
+}

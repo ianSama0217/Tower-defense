@@ -10,6 +10,7 @@ dialog::backdrop {
 
 /* Include the card's image, labels and decorative layers so the cursor stays
    consistent anywhere over an action that cannot be afforded. */
+#pads.road-blocked,
 #tower-drawer button[data-insufficient-funds='true'],
 #tower-drawer button[data-insufficient-funds='true'] *,
 #tower-drawer button[data-insufficient-funds='true']::before,

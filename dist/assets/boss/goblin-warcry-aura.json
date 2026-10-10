@@ -1,0 +1,25 @@
+{
+  "file": "goblin_warcry_aura.png",
+  "name": "戰吼增益光環",
+  "size": 48,
+  "frames": 4,
+  "anchor": {
+    "x": 24,
+    "y": 34
+  },
+  "animations": {
+    "aura": {
+      "start": 0,
+      "count": 4,
+      "fps": 8,
+      "loop": true
+    }
+  },
+  "width": 192,
+  "height": 48,
+  "frameWidth": 48,
+  "frameHeight": 48,
+  "layout": "horizontal",
+  "spacing": 0,
+  "margin": 0
+}

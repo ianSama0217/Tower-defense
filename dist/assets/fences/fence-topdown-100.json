@@ -1,0 +1,24 @@
+{
+  "file": "fence-topdown-100.png",
+  "state": 100,
+  "canvas": {
+    "width": 96,
+    "height": 32
+  },
+  "anchor": {
+    "x": 48,
+    "y": 16
+  },
+  "visibleBounds": {
+    "x": 12,
+    "y": 9,
+    "width": 72,
+    "height": 13
+  },
+  "roadWidth": 96,
+  "roadCoverage": 0.75,
+  "crossPairs": 4,
+  "rendering": "nearest-neighbor; Canvas imageSmoothingEnabled=false",
+  "source": "art/fences/topdown/source.png",
+  "scope": "Standalone complete-state candidate; not registered in campaign or damage-state atlas."
+}

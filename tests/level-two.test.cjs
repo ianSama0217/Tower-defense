@@ -40,7 +40,7 @@ test('second level has immediate engineering access, uses game-time intermission
 test('second-level win records only second-level stars and unlocks the third stop',()=>{
   const values=new Map([[P.KEY,'[3,0,0,0,0]']]),storage={getItem:k=>values.get(k),setItem:(k,v)=>values.set(k,v)};
   const g=new LevelTwoGame();g.phase='won';g.lives=2;g.wave=6;g.kills=103;
-  const result=summarize(g,storage);assert.equal(result.waves,6);assert.equal(result.best,2);assert.equal(result.nextHref,undefined);
+  const result=summarize(g,storage);assert.equal(result.waves,6);assert.equal(result.best,2);assert.equal(result.nextHref,'level-three.html');
   assert.deepEqual(P.read(storage),[3,2,0,0,0]);assert.equal(P.unlocked(P.read(storage),2),true);
   g.phase='lost';g.lives=0;assert.equal(summarize(g,storage).stars,0);assert.deepEqual(P.read(storage),[3,2,0,0,0]);
 });

@@ -1,0 +1,48 @@
+const {chromium}=require('playwright'),assert=require('node:assert/strict');
+const path=require('node:path'),os=require('node:os');
+(async()=>{
+  const browser=await chromium.launch({headless:true,channel:'msedge'});
+  try{
+    const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
+    page.on('pageerror',error=>errors.push(error.message));
+    page.on('response',response=>{if(response.status()>=400)errors.push(`${response.status()} ${response.url()}`);});
+    await page.addInitScript(()=>{let api;Object.defineProperty(window,'BombTowers',{get:()=>api,set:value=>{const Base=value.BombTowerGame;value.BombTowerGame=class extends Base{constructor(...args){super(...args);window.arrowRainTestGame=this;}};api=value;}});});
+    await page.goto('http://127.0.0.1:4173/test');
+    await page.locator('#arrow-rain-demo').click();
+    assert.equal(await page.locator('#object-count').textContent(),'6 個物件');
+    await page.locator('#simulate').click();
+    assert.equal(await page.locator('#arrow-rain-fast-forward').isVisible(),true);
+    await page.locator('#arrow-rain-fast-forward').click();
+    await page.waitForFunction(()=>window.arrowRainTestGame?.arrowRainFired);
+    const state=await page.evaluate(()=>({time:arrowRainTestGame.battleTime,health:arrowRainTestGame.enemies.map(e=>e.hp),kills:arrowRainTestGame.kills}));
+    assert.equal(state.time,30);assert.deepEqual(state.health,[45,45,45]);assert.equal(state.kills,3);
+    await page.waitForTimeout(350);
+    await page.locator('#play-animation').click();
+    assert.match(await page.locator('#simulation-status').textContent(),/箭雨 已發射/);
+    await page.locator('#test-stage').screenshot({path:path.join(os.tmpdir(),'td-arrow-rain-preview.png')});
+    await page.locator('#simulate').click();
+    assert.equal(await page.locator('#object-count').textContent(),'6 個物件');
+    await page.setViewportSize({width:390,height:844});
+    assert.equal(await page.evaluate(()=>document.documentElement.scrollWidth>innerWidth),false);
+    await page.addInitScript(()=>{let api;Object.defineProperty(window,'Tutorial',{get:()=>api,set:value=>{const Base=value.TutorialGame;value.TutorialGame=class extends Base{constructor(...args){super(...args);window.arrowRainCampaignGame=this;}};api=value;}});});
+    await page.setViewportSize({width:1440,height:1000});
+    await page.goto('http://127.0.0.1:4173/tutorial.html');
+    await page.waitForFunction(()=>window.arrowRainCampaignGame&&!document.querySelector('#wave-control').disabled);
+    await page.evaluate(()=>{const g=arrowRainCampaignGame;g.moveEnemy=()=>{};g.enemySpaceFree=()=>true;});
+    await page.locator('#wave-control').click();
+    await page.waitForFunction(()=>document.querySelector('#wave-control').title.includes('等待最後一名敵人進場'));
+    assert.equal(await page.evaluate(()=>WaveClock.sample(arrowRainCampaignGame).angle),Math.PI/2);
+    await page.evaluate(()=>{const g=arrowRainCampaignGame;for(let i=0;i<100&&(g.spawnQueue.length||g.pendingSpawns.length);i++)g.update(.1);});
+    await page.waitForFunction(()=>document.querySelector('#wave-control').title.includes('30 秒後發射'));
+    await page.evaluate(()=>arrowRainCampaignGame.update(15));
+    await page.waitForFunction(()=>document.querySelector('#wave-control').title.includes('15 秒後發射'));
+    const clock=await page.evaluate(()=>WaveClock.sample(arrowRainCampaignGame));
+    assert.ok(Math.abs(clock.angle-Math.PI*1.25)<.1);assert.equal(clock.rainFired,false);
+    await page.locator('#battlefield').screenshot({path:path.join(os.tmpdir(),'td-arrow-rain-clock-preview.png')});
+    await page.evaluate(()=>{const g=arrowRainCampaignGame;g.update(30-g.battleTime);});
+    await page.waitForFunction(()=>document.querySelector('#wave-control').title.includes('箭雨已發射'));
+    assert.equal(await page.evaluate(()=>arrowRainCampaignGame.arrowRainFired),true);
+    assert.deepEqual(errors,[]);
+    console.log('Arrow rain test scene and campaign clock passed.');
+  }finally{await browser.close();}
+})().catch(error=>{console.error(error);process.exitCode=1;});

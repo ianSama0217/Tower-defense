@@ -1,0 +1,113 @@
+{
+  "checks": [
+    {
+      "page": "tutorial",
+      "width": 1586,
+      "flags": [
+        {
+          "x": 1224,
+          "y": 392,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        }
+      ]
+    },
+    {
+      "page": "tutorial",
+      "width": 390,
+      "flags": [
+        {
+          "x": 1224,
+          "y": 392,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        }
+      ]
+    },
+    {
+      "page": "level-two",
+      "width": 1586,
+      "flags": [
+        {
+          "x": 1224,
+          "y": 168,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        },
+        {
+          "x": 1224,
+          "y": 568,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        }
+      ]
+    },
+    {
+      "page": "level-two",
+      "width": 390,
+      "flags": [
+        {
+          "x": 1224,
+          "y": 168,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        },
+        {
+          "x": 1224,
+          "y": 568,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        }
+      ]
+    },
+    {
+      "page": "level-three",
+      "width": 1586,
+      "flags": [
+        {
+          "x": 1224,
+          "y": 392,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        }
+      ]
+    },
+    {
+      "page": "level-three",
+      "width": 390,
+      "flags": [
+        {
+          "x": 1224,
+          "y": 392,
+          "w": 48,
+          "h": 80,
+          "straddlesRoad": true,
+          "inside": true,
+          "clear": true
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

@@ -17,7 +17,7 @@
     return {...TD.createScenario({
       paths:[[[1280,184],[890,184],[890,392],[0,392]],[[1280,584],[890,584],[890,392],[0,392]]],
       slots:[[56,288],[276,288],[504,288],[750,288],[56,504],[276,504],[504,504],[750,504],[1006,392]],
-      mapConfig:{...TD.MAP_CONFIG,roadWidth:80},worldScale:2,initialMoney:120,
+      mapConfig:{...TD.MAP_CONFIG,roadWidth:80},worldScale:TD.CAMPAIGN_WORLD_SCALE,initialMoney:120,
       manualWaves:true,spawnInterval:SPAWN_INTERVAL,waveRewards:[30,30,30,30,30,0],waves
     }),stageIndex:1,environment:'deep-forest'};
   }

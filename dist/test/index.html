@@ -12,33 +12,34 @@
   <main>
     <div class="lab-toolbar" aria-label="測試工具">
       <div class="tool-group"><button id="tool-place" aria-pressed="true">＋ 放置</button><button id="tool-move" aria-pressed="false">↔ 選取／移動</button></div>
-      <label>倍率 <select id="object-scale"><option value="1">1×</option><option value="2" selected>2×</option><option value="3">3×</option><option value="4">4×</option></select></label>
+      <label>畫面縮放 <select id="view-zoom"><option value="fit">符合視窗</option><option value="0.5">50%</option><option value="0.75">75%</option><option value="1">100%</option><option value="1.5">150%</option><option value="2">200%</option></select></label><span id="zoom-readout" aria-live="polite"></span>
       <label>背景 <select id="stage-background"><option value="forest">森林草地</option><option value="checker">透明棋盤</option><option value="dark">深色</option></select></label>
-      <label class="grid-toggle"><input id="show-grid" type="checkbox" checked> 格線</label>
+      <label class="grid-toggle"><input id="show-grid" type="checkbox" checked> 格線</label><span class="scale-note">素材與戰鬥使用正式關卡比例</span>
       <div class="tool-group history-tools"><button id="undo" disabled>復原</button><button id="remove" disabled>移除選取</button><button id="clear" disabled>清空</button></div>
     </div>
     <div class="simulation-toolbar" aria-label="怪物行為測試">
       <label><input data-sound-muted type="checkbox"> 靜音</label><a href="sound-preview.html">試聽音效</a><button id="simulate" disabled aria-pressed="false">開始行為測試</button>
       <label><input id="tower-fire" type="checkbox"> 塔可射擊</label>
-      <button id="kill-enemy" disabled>擊殺選取怪物</button>
-      <button id="bomber-demo" disabled>載入爆炸範例</button><button id="bomb-tower-demo" disabled>載入炸彈塔範例</button>
+      <button id="warcry-demo" disabled>載入戰吼範例</button><button id="warcry-now" disabled>立即預覽戰吼</button><button id="shield-preview" disabled aria-pressed="false">盾兵推進預覽</button><button id="kill-enemy" disabled>擊殺選取怪物</button>
+      <button id="bomber-demo" disabled>載入爆炸範例</button><button id="bomb-tower-demo" disabled>載入炸彈塔範例</button><button id="arrow-rain-demo" disabled>載入箭雨範例</button><button id="arrow-rain-fast-forward" disabled hidden>快轉至箭雨前 1 秒</button><button id="fence-demo" disabled>載入柵欄範例</button>
       <span id="simulation-status" role="status">放置塔與怪物後，可測試追塔、自爆與範圍傷害。</span>
     </div>
     <section id="test-scene" class="stage-area" aria-label="素材測試區">
       <div class="stage-caption"><span><i aria-hidden="true"></i>自由測試區 <small id="stage-size">1280 × 768</small></span><div class="stage-view-controls"><label><input id="show-enemy-ranges" type="checkbox" checked> 怪物攻擊範圍</label><label><input id="show-bomb-ranges" type="checkbox" checked> 炸彈塔射程</label><span id="object-count">0 個物件</span><button id="toggle-fullscreen" type="button" aria-controls="test-scene" aria-pressed="false">全螢幕</button></div></div>
-      <div class="range-legend"><span class="range-detection">藍虛線：判定半徑</span><span class="range-attack">實線：攻擊半徑</span><span class="range-trigger">黃虛線：引爆距離</span><span class="range-blast">紅虛線：爆炸半徑</span><span>選取怪物查看數值 · 腳底為圓心 · 範圍與素材倍率無關</span></div>
-      <div id="stage-wrap"><canvas id="test-stage" width="1280" height="768" tabindex="0" aria-label="素材測試畫布。點選放置素材；方向鍵調整游標，Enter 放置；選取模式下可拖曳物件，Delete 移除選取。"></canvas></div>
+      <div class="range-legend"><span class="range-detection">藍虛線：判定半徑</span><span class="range-attack">實線：攻擊半徑</span><span class="range-trigger">黃虛線：引爆距離</span><span class="range-blast">紅虛線：爆炸半徑</span><span>選取怪物查看數值 · 縮放僅改變視野，戰鬥範圍與關卡一致</span></div>
+      <div id="stage-wrap"><div id="stage-content"><canvas id="test-stage" width="1280" height="768" tabindex="0" aria-label="素材測試畫布。点選放置素材；方向鍵調整游標，Enter 放置；選取模式下可拖曳物件，Delete 移除選取。放大後可使用捲軸檢視地圖。"></canvas></div></div>
       <div id="empty-hint" aria-hidden="true"><b>從下方選一個素材</b><span>點一下草地，開始佈置你的測試場景。</span></div>
       <div class="stage-footer"><span id="lab-status" role="status">正在載入素材…</span><span class="stage-note">行為測試結束後會還原素材擺放</span></div>
     </section>
     <section class="asset-tray" aria-labelledby="asset-title">
-      <div class="tray-heading"><h2 id="asset-title">素材庫</h2><div class="category-tabs" aria-label="素材分類"><button data-category="enemy" aria-pressed="true">怪物單位 <span>6</span></button><button data-category="tower" aria-pressed="false">防禦塔 <span>3</span></button><button data-category="bomb-tower" aria-pressed="false">炸彈塔 <span>3</span></button><button data-category="wall" aria-pressed="false">城牆 <span>2</span></button><button data-category="environment" aria-pressed="false">場景元素 <span>36</span></button></div><span id="asset-count"></span></div>
-      <div class="animation-tools"><label>怪物動作 <select id="enemy-animation"><option value="idle">待機</option><option value="walk" selected>行走</option><option value="charge">衝鋒</option><option value="attack">攻擊</option><option value="hurt">受傷</option><option value="death">死亡</option></select></label><button id="play-animation" aria-pressed="false">暫停動畫</button><button id="flip-object">翻轉方向</button><span id="selection-label">載入中</span></div>
-      <p id="enemy-description" class="enemy-description"></p>
+      <div class="tray-heading"><h2 id="asset-title">素材庫</h2><div class="category-tabs" aria-label="素材分類"><button data-category="enemy" aria-pressed="true">怪物單位 <span>6</span></button><button data-category="friendly" aria-pressed="false">友方單位 <span>1</span></button><button data-category="boss" aria-pressed="false">Boss 素材 <span>5</span></button><button data-category="tower" aria-pressed="false">防禦塔 <span>3</span></button><button data-category="bomb-tower" aria-pressed="false">炸彈塔 <span>3</span></button><button data-category="wall" aria-pressed="false">城牆 <span>2</span></button><button data-category="environment" aria-pressed="false">場景元素 <span>36</span></button></div><span id="asset-count"></span></div>
+      <div class="animation-tools"><label>單位動作 <select id="enemy-animation"><option value="idle">待機</option><option value="walk" selected>行走</option><option value="push">舉盾推進</option><option value="charge">衝鋒</option><option value="attack">攻擊</option><option value="warcry">戰吼</option><option value="aura">增益光環</option><option value="throw">投擲</option><option value="fly">石頭飛行</option><option value="impact">石頭落地</option><option value="hurt">受傷</option><option value="death">死亡</option></select></label><button id="play-animation" aria-pressed="false">暫停動畫</button><button id="flip-object">翻轉方向</button><span id="selection-label">載入中</span></div>
+      <label id="fence-condition-label" hidden>柵欄耐久 <select id="fence-condition"><option value="100">100% 完整</option><option value="80">80% 輕微毀損</option><option value="50">50% 半毀</option><option value="25">25% 接近倒塌</option><option value="0">0% 殘骸</option></select></label>
+      <p id="warcry-status" class="enemy-description" role="status" hidden></p><p id="enemy-description" class="enemy-description"></p>
       <div id="asset-list" aria-label="可放置素材"></div>
       <p class="tray-help">選素材 → 點畫布放置 <span>·</span> 選取／移動可拖曳調整 <span>·</span> Delete 移除 <span>·</span> Ctrl / ⌘ + Z 復原</p>
     </section>
   </main>
-  <script src="enemy-sprites.js"></script><script src="tower-sprites.js"></script><script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="wall-sprites.js"></script><script src="bomb-towers.js"></script><script src="bomb-tower-sprites.js"></script><script src="test/test.js"></script>
+  <script src="enemy-sprites.js"></script><script src="boss-sprites.js"></script><script src="goblin-captain.js"></script><script src="friendly-sprites.js"></script><script src="tower-sprites.js"></script><script src="sound-manager.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="engine.js"></script><script src="timed-waves.js"></script><script src="arrow-rain.js"></script><script src="test/wall-topdown-frames.js"></script><script src="test/wall-topdown-sprites.js"></script><script src="bomb-towers.js"></script><script src="bomb-tower-sprites.js"></script><script src="fence-sprites.js"></script><script src="test/fences.js"></script><script src="test/test.js"></script>
 </body>
 </html>

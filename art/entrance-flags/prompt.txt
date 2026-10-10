@@ -1,0 +1,4 @@
+Built-in image_gen, transparent_background=true.
+Edit target: user-provided red skull flag.
+
+Use case: background-extraction. Edit target: the attached red pixel-art enemy entrance flag. Remove the black background and isolate precisely the single original flag on genuine transparent alpha. Preserve the red torn banner, white horned skull emblem, spear-tipped wooden pole, metal crossbar and fastenings, original silhouette and pixel-art colors. No redesign, no extra objects, no text, no ground or cast shadow. Center the entire uncropped flag with small transparent margins. Asset for a pixel-art tower defense game, legible at 48px wide by 80px tall.

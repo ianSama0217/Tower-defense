@@ -1,0 +1,51 @@
+{
+  "file": "friendly_shield_soldier.png",
+  "name": "友方盾兵",
+  "size": 48,
+  "frames": 22,
+  "anchor": {
+    "x": 24,
+    "y": 44
+  },
+  "faction": "friendly",
+  "canAttack": false,
+  "animations": {
+    "idle": {
+      "start": 0,
+      "count": 4,
+      "fps": 5,
+      "loop": true
+    },
+    "walk": {
+      "start": 4,
+      "count": 4,
+      "fps": 7,
+      "loop": true
+    },
+    "push": {
+      "start": 8,
+      "count": 6,
+      "fps": 9,
+      "loop": true
+    },
+    "hurt": {
+      "start": 14,
+      "count": 3,
+      "fps": 10,
+      "loop": false
+    },
+    "death": {
+      "start": 17,
+      "count": 5,
+      "fps": 7,
+      "loop": false
+    }
+  },
+  "width": 1056,
+  "height": 48,
+  "frameWidth": 48,
+  "frameHeight": 48,
+  "layout": "horizontal",
+  "spacing": 0,
+  "margin": 0
+}

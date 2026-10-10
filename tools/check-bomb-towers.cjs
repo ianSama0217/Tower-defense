@@ -5,7 +5,7 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   const page=await browser.newPage({viewport:{width:1440,height:1000}}),errors=[];
   page.on('pageerror',e=>errors.push(e.message));page.on('response',r=>{if(r.status()>=400)errors.push(`${r.status()} ${r.url()}`);});
   await page.addInitScript(()=>{let api;Object.defineProperty(window,'BombTowers',{get:()=>api,set:v=>{const Base=v.BombTowerGame;v.BombTowerGame=class extends Base{constructor(...args){super(...args);window.testBombGame=this;}};api=v;}});});
-  await page.goto('http://127.0.0.1:4173/test');await page.locator('[data-category="bomb-tower"]').click();assert.equal(await page.locator('.asset-card').count(),3);assert.match(await page.locator('#enemy-description').textContent(),/55～125/);
+  await page.goto('http://127.0.0.1:4173/test');await page.locator('[data-category="bomb-tower"]').click();assert.equal(await page.locator('.asset-card').count(),3);assert.match(await page.locator('#enemy-description').textContent(),/110～250/);
   await page.locator('#bomb-tower-demo').click();assert.equal(await page.locator('#object-count').textContent(),'13 個物件');
   await page.screenshot({path:'art/bomb-towers/test-desktop.png',fullPage:true});
   await page.locator('#simulate').click();await page.waitForFunction(()=>window.testBombGame?.bombs.length>0);await page.locator('#play-animation').click();

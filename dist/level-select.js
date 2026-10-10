@@ -52,13 +52,14 @@
     $('stage-preview').setAttribute('aria-label',`${stage.name}區域示意圖`);
     const encountered=new Set(LevelProgress.readEncountered(storage()));
     $('stage-enemies').replaceChildren();
+    $('stage-enemies').classList.toggle('three-enemies',stage.enemies.length===3);
     stage.enemies.forEach(id=>{
       const spec=EnemySprites.specs[id],item=document.createElement('li'),sprite=document.createElement('span'),label=document.createElement('span');
       const known=encountered.has(id);
       item.className=known?'enemy-card':'enemy-card is-undiscovered';
       sprite.className='enemy-portrait';sprite.setAttribute('aria-hidden','true');
       sprite.style.backgroundImage=`url("assets/enemies/${spec.file}")`;
-      sprite.style.backgroundSize=`${(spec.frames||20)*112}px 112px`;
+      sprite.style.setProperty('--enemy-frames',spec.frames||20);
       label.className='enemy-name';label.textContent=known?enemyNames[id]:'未遭遇';item.append(sprite,label);$('stage-enemies').append(item);
     });
     $('enemies-pending').hidden=stage.enemies.length>0;
@@ -67,7 +68,7 @@
     $('stage-clear-status').textContent=stars[index]?'已通關':!open?'尚未解鎖':'尚未通關';
     $('stage-clear-status').classList.toggle('is-cleared',stars[index]>0);
     $('stage-enter').disabled=!open||!stage.href;
-    $('stage-enter-label').textContent=!open?'尚未解鎖':!stage.href?'關卡準備中':'開始挑戰';
+    $('stage-enter-label').textContent=!open?'尚未解鎖':!stage.href?'關卡準備中':stage.preview?'預覽關卡':'開始挑戰';
     if(!dialog.open)dialog.showModal();
     fitDialog(dialog);
   }

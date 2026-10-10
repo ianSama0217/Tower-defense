@@ -1,0 +1,98 @@
+{
+  "layout": "horizontal",
+  "spacing": 0,
+  "margin": 0,
+  "format": "RGBA",
+  "assets": {
+    "cyclops": {
+      "file": "boss_cyclops.png",
+      "frameWidth": 96,
+      "frameHeight": 96,
+      "frames": 27,
+      "width": 2592,
+      "height": 96,
+      "anchor": {
+        "x": 48,
+        "y": 90
+      },
+      "animations": {
+        "idle": {
+          "start": 0,
+          "count": 4,
+          "fps": 5,
+          "loop": true
+        },
+        "walk": {
+          "start": 4,
+          "count": 4,
+          "fps": 7,
+          "loop": true
+        },
+        "attack": {
+          "start": 8,
+          "count": 4,
+          "fps": 8,
+          "loop": false
+        },
+        "throw": {
+          "start": 12,
+          "count": 6,
+          "fps": 8,
+          "loop": false
+        },
+        "hurt": {
+          "start": 18,
+          "count": 3,
+          "fps": 10,
+          "loop": false
+        },
+        "death": {
+          "start": 21,
+          "count": 6,
+          "fps": 7,
+          "loop": false
+        }
+      }
+    },
+    "rock": {
+      "file": "boss_cyclops_rock.png",
+      "frameWidth": 32,
+      "frameHeight": 32,
+      "frames": 6,
+      "width": 192,
+      "height": 32,
+      "anchor": {
+        "x": 16,
+        "y": 16
+      },
+      "animations": {
+        "fly": {
+          "start": 0,
+          "count": 6,
+          "fps": 12,
+          "loop": true
+        }
+      }
+    },
+    "impact": {
+      "file": "boss_cyclops_rock_impact.png",
+      "frameWidth": 48,
+      "frameHeight": 48,
+      "frames": 4,
+      "width": 192,
+      "height": 48,
+      "anchor": {
+        "x": 24,
+        "y": 43
+      },
+      "animations": {
+        "impact": {
+          "start": 0,
+          "count": 4,
+          "fps": 10,
+          "loop": false
+        }
+      }
+    }
+  }
+}

@@ -22,6 +22,14 @@
 @media(max-width:600px){.game-window{--drawer-height:146px;--card-width:clamp(60px,20vw,80px);--card-height:130px}.tower-drawer{padding:5px 8px;gap:6px}.tower-actions{gap:6px}.tower-card button,.action-card button{padding:6px 2px}#tower-preview,.action-icon{width:60px;height:60px}.price-tag{font-size:24px}.time-tag{font-size:19px}.card-coin,.build-time-icon{width:23px;height:23px}}
 @media(prefers-reduced-motion:reduce){.tower-drawer{transition:none}}
 /* Built towers become centered portraits with a two-column stat block beside them. */
+#wall-preview{display:block;flex:none;width:96px;height:72px;image-rendering:pixelated}
+.road-build-info{display:flex;margin:0;align-self:center;color:#382013}
+.road-stat-icon{display:flex;align-items:center;justify-content:center;flex:none;width:36px;height:36px}
+#road-stat-health b{font-size:18px}
+#build-stock{font-variant-numeric:tabular-nums}
+#build[data-unavailable='true'] #wall-preview{filter:grayscale(.65) brightness(.65)}
+#pads.road-hover{cursor:pointer}
+@media(max-width:600px){#wall-preview{width:60px;height:60px;object-fit:contain}.road-build-info{font-size:12px;line-height:1.7}}
 #build.is-built #tower-preview{width:82px;height:100px}
 .tower-stats{display:flex;align-self:center;gap:18px;flex:none;min-width:204px;height:126px;padding:3px 0}
 .stat-column{display:flex;flex-direction:column;gap:4px}

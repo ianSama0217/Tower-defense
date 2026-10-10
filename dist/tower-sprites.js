@@ -7,6 +7,7 @@
   ];
   // Sprite canvas and building occupancy are independent. All upgrades share one pad.
   function placement(level,padSize,worldScale=1){const s=specs[level],scale=Math.min(1,padSize/worldScale/32*.65);return {width:s.size*scale,height:s.size*scale,anchorX:s.anchor.x*scale,anchorY:s.anchor.y*scale,groundOffset:padSize*.35};}
-  const api={specs,placement};
+  function worldRect(level,x,y,padSize,worldScale){const p=placement(level,padSize,worldScale);return {x:x-p.anchorX*worldScale,y:y+p.groundOffset-p.anchorY*worldScale,w:p.width*worldScale,h:p.height*worldScale};}
+  const api={specs,placement,worldRect};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TowerSprites=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

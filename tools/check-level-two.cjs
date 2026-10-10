@@ -50,7 +50,7 @@ const fs=require('node:fs');
     await page.locator('#result').waitFor({state:'visible'});
     assert.match(await page.locator('.result-heading').textContent(),/第 2 關/);
     assert.equal(await page.locator('#result-waves').textContent(),'6');
-    assert.equal(await page.locator('#result-next').isDisabled(),true);
+    assert.equal(await page.locator('#result-next').isDisabled(),false);
     assert.deepEqual(await page.evaluate(()=>JSON.parse(localStorage.getItem('td-level-stars'))),[3,3,0,0,0]);
     await page.locator('#restart').click();assert.equal(await page.locator('#wave').textContent(),'0 / 6');
     await page.goto('http://127.0.0.1:4173/tutorial.html');

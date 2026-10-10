@@ -1,0 +1,19 @@
+{
+  "checks": [
+    "third-stage challenge entry and three enemy cards",
+    "unknown orc silhouette preserved before combat",
+    "ten pads",
+    "first wave waits for manual start",
+    "build and upgrade",
+    "pause freezes construction and wave time",
+    "390px layout and drawer",
+    "road hover and fence menu",
+    "fence costs and automatic orientation",
+    "funds and three-fence limit",
+    "mobile fence placement",
+    "six waves and 116 kills with accelerated test damage",
+    "victory records third-stage stars",
+    "restart and undefended defeat preserve best stars"
+  ],
+  "errors": []
+}

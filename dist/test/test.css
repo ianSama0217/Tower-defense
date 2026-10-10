@@ -16,3 +16,11 @@
 body.scene-expanded{overflow:hidden}
 .stage-area:fullscreen #stage-wrap,.stage-area.stage-expanded #stage-wrap{min-height:0}
 @media(max-width:520px){.stage-view-controls{gap:8px}.stage-caption{gap:8px;flex-wrap:wrap}.stage-caption>span:first-child{gap:6px}#toggle-fullscreen{padding:7px 9px}.stage-view-controls #object-count{font-size:10px}}
+
+/* Additional sandbox-only fence controls. */
+.category-tabs{flex-wrap:wrap}.tray-heading{height:auto;min-height:49px;flex-wrap:wrap}#fence-condition-label{margin:10px 16px;display:block}#fence-condition-label[hidden]{display:none}
+
+/* Camera zoom changes only the viewport; world coordinates stay fixed. */
+#stage-wrap{overflow:auto;min-width:0;overscroll-behavior:contain}
+#stage-content{position:relative;min-width:100%;min-height:100%}
+#zoom-readout,.scale-note{font-size:11px;color:#b8c99f}

@@ -18,7 +18,7 @@ test('each cleared wave starts a full 15-second intermission and cannot be skipp
   assert.equal(g.wave,1);assert.equal(g.money,32);assert.equal(g.intermissionRemaining,INTERMISSION_SECONDS);
   assert.equal(sample(g).mode,'intermission');assert.equal(sample(g).angle,0);assert.equal(g.startNextWave(),false);
   g.update(14.99);assert.equal(g.wave,1);assert.ok(g.intermissionRemaining>0);
-  g.update(.01);assert.equal(g.wave,2);assert.equal(g.awaitingWave,false);assert.equal(g.intermissionRemaining,null);assert.equal(sample(g).mode,'combat');
+  g.update(.01);assert.equal(g.wave,2);assert.equal(g.awaitingWave,false);assert.equal(g.intermissionRemaining,null);assert.equal(sample(g).mode,'combat');assert.equal(sample(g).remaining,30);assert.equal(sample(g).waitingForSpawns,true);assert.equal(g.arrowRainFired,false);
 });
 
 test('second-wave reward is paid once; the next wave starts even if an upgrade is unfinished',()=>{
@@ -52,26 +52,19 @@ test('defeat stops automatic waves and reset clears failed combat',()=>{
   g.start();assert.equal(g.lives,3);assert.equal(g.enemies.length,0);assert.equal(g.intermissionRemaining,null);
 });
 
-test('six-enemy wave advances from 3 to 12 by 1.5 hours per kill, never by elapsed time',()=>{
+test('red clock waits for all spawns then maps the 30-second countdown to the red sector',()=>{
   const g=setup();g.startNextWave();
   assert.equal(sample(g).green,false);assert.equal(sample(g).angle,Math.PI/2);
-  clearCurrent(g);g.update(15);
-  assert.equal(sample(g).green,true);assert.equal(sample(g).total,6);assert.equal(sample(g).kills,0);
-  assert.equal(sample(g).angle,Math.PI/2);
-  g.update(.1);assert.equal(sample(g).angle,Math.PI/2);
-  for(let count=1;count<=6;count++){
-    runUntil(g,()=>g.kills-g.waveStartKills===count);
-    const clock=sample(g);assert.equal(clock.mode,'combat');assert.equal(clock.kills,count);
-    assert.ok(Math.abs(clock.angle-(Math.PI/2+count*Math.PI/4))<1e-10);
-  }
-  assert.equal(sample(g).angle,2*Math.PI);
-  clearCurrent(g);assert.equal(sample(g).green,true);assert.equal(sample(g).angle,0);
-  g.update(15);assert.equal(sample(g).kills,0);assert.equal(sample(g).total,8);assert.equal(sample(g).angle,Math.PI/2);
-  g.start();assert.equal(g.waveStartKills,0);
+  g.kills=2;assert.equal(sample(g).angle,Math.PI/2);
+  assert.equal(sample(g).waitingForSpawns,true);
+  g.arrowRainStartedAt=g.time;
+  g.battleTime=15;assert.equal(sample(g).angle,Math.PI*1.25);assert.equal(sample(g).remaining,15);
+  g.battleTime=30;assert.equal(sample(g).angle,2*Math.PI);assert.equal(sample(g).remaining,0);
+  g.start();assert.equal(g.battleTime,0);
 });
 
-test('escaped enemies reduce hearts without being counted as clock kills',()=>{
+test('escaped enemies reduce hearts without advancing the clock by their count',()=>{
   const g=new TutorialGame(()=>0);g.start();g.startNextWave();
   runUntil(g,()=>g.lives===2);
-  assert.equal(sample(g).kills,0);assert.equal(sample(g).angle,Math.PI/2);
+  assert.equal(g.kills,0);assert.ok(sample(g).angle>Math.PI/2);
 });
