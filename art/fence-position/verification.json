@@ -1,0 +1,11 @@
+{
+  "checks": [
+    "vertical and horizontal ghost at right-side visual anchor",
+    "built art matches preview",
+    "stored collision coordinates and dimensions unchanged",
+    "attack target point unchanged",
+    "health bar follows art",
+    "390px layout"
+  ],
+  "errors": []
+}

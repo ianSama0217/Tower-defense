@@ -15,7 +15,7 @@ test('preparation waits indefinitely for swords; first wave starts exactly once'
 
 test('each cleared wave starts a full 15-second intermission and cannot be skipped',()=>{
   const g=setup();g.startNextWave();clearCurrent(g);
-  assert.equal(g.wave,1);assert.equal(g.money,32);assert.equal(g.intermissionRemaining,INTERMISSION_SECONDS);
+  assert.equal(g.wave,1);assert.equal(g.money,24);assert.equal(g.intermissionRemaining,INTERMISSION_SECONDS);
   assert.equal(sample(g).mode,'intermission');assert.equal(sample(g).angle,0);assert.equal(g.startNextWave(),false);
   g.update(14.99);assert.equal(g.wave,1);assert.ok(g.intermissionRemaining>0);
   g.update(.01);assert.equal(g.wave,2);assert.equal(g.awaitingWave,false);assert.equal(g.intermissionRemaining,null);assert.equal(sample(g).mode,'combat');assert.equal(sample(g).remaining,30);assert.equal(sample(g).waitingForSpawns,true);assert.equal(g.arrowRainFired,false);
@@ -23,8 +23,8 @@ test('each cleared wave starts a full 15-second intermission and cannot be skipp
 
 test('second-wave reward is paid once; the next wave starts even if an upgrade is unfinished',()=>{
   const g=setup();g.startNextWave();clearCurrent(g);g.update(15);clearCurrent(g);
-  assert.equal(g.wave,2);assert.equal(g.money,32+48+80);const reward=g.money;
-  g.update(13);assert.equal(g.money,reward);assert.equal(g.build(0).ok,true);assert.equal(g.money,reward-80);
+  assert.equal(g.wave,2);assert.equal(g.money,24+36+80);const reward=g.money;
+  g.update(13);assert.equal(g.money,reward);assert.equal(g.build(0).ok,true);assert.equal(g.money,reward-70);
   g.update(2);assert.equal(g.wave,3);assert.equal(g.slots[0].level,1);assert.ok(g.slots[0].action);
   g.update(3);assert.equal(g.slots[0].level,2);assert.equal(g.slots[0].action,null);
 });

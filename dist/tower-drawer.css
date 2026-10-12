@@ -1,6 +1,8 @@
 .game-window{--drawer-height:158px;--card-width:104px;--card-height:140px}
 .game-layout{grid-template-rows:minmax(0,1fr)}
-.tower-drawer{position:absolute;z-index:5;left:0;right:0;bottom:0;height:var(--drawer-height);display:flex;align-items:center;gap:16px;padding:7px 24px;background:#c99b6c url('assets/ui/wood-texture.png') center/100% 360px;border-top:3px solid #362015;border-radius:8px 8px 0 0;box-shadow:inset 0 3px #f4d6a0,0 -5px 18px #21120b55;color:#382013;transform:translateY(105%);visibility:hidden;transition:transform .23s ease-out,visibility .23s;pointer-events:none}
+.tower-drawer{position:absolute;z-index:5;isolation:isolate;left:0;right:0;bottom:0;height:var(--drawer-height);display:flex;align-items:center;gap:16px;padding:7px 24px;background:transparent;border-top:3px solid #362015;border-radius:8px 8px 0 0;box-shadow:inset 0 3px #f4d6a0,0 -5px 18px #21120b55;color:#382013;transform:translateY(105%);visibility:hidden;transition:transform .23s ease-out,visibility .23s;pointer-events:none}
+/* Fade only the wood surface so controls and their labels remain opaque. */
+.tower-drawer::before{content:'';position:absolute;inset:0;z-index:-1;border-radius:inherit;background:#c99b6c url('assets/ui/wood-texture.png') center/100% 360px;opacity:.7;pointer-events:none}
 .tower-drawer.is-open{transform:translateY(0);visibility:visible;pointer-events:auto}
 .tower-details{display:none}
 .tower-card,.action-card{width:var(--card-width);height:var(--card-height);flex:none}
@@ -24,6 +26,7 @@
 /* Built towers become centered portraits with a two-column stat block beside them. */
 #wall-preview{display:block;flex:none;width:96px;height:72px;image-rendering:pixelated}
 .road-build-info{display:flex;margin:0;align-self:center;color:#382013}
+.road-build-reason:not(.sr-only){max-width:220px;font:14px/1.5 var(--font-ui);color:#76231c;text-shadow:0 1px #ffe5b5}
 .road-stat-icon{display:flex;align-items:center;justify-content:center;flex:none;width:36px;height:36px}
 #road-stat-health b{font-size:18px}
 #build-stock{font-variant-numeric:tabular-nums}

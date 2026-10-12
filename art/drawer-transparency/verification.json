@@ -1,0 +1,18 @@
+{
+  "styles": {
+    "surfaceOpacity": "0.7",
+    "drawerOpacity": "1",
+    "buttonOpacity": "1",
+    "surfacePointerEvents": "none",
+    "background": "rgba(0, 0, 0, 0)"
+  },
+  "checks": [
+    "desktop empty and built drawers",
+    "mobile empty and built drawers",
+    "build button creates tower",
+    "controls stay opaque",
+    "no horizontal overflow",
+    "no browser errors"
+  ],
+  "errors": []
+}

@@ -9,16 +9,16 @@ test('unselected pads have no menu, empty pads show the configured build price',
   g.money=59;assert.equal(state(g,0).build.reason,'金幣不足');
 });
 test('upgrade prices and tutorial locks agree with actual transactions',()=>{
-  const g=game();g.build(0);g.update(5);let m=state(g,0);assert.equal(m.upgrade.amount,80);assert.equal(m.upgrade.disabled,true);
+  const g=game();g.build(0);g.update(5);let m=state(g,0);assert.equal(m.upgrade.amount,70);assert.equal(m.upgrade.disabled,true);
   g.wave=2;g.money=300;m=state(g,0);assert.equal(m.upgrade.disabled,false);
   const before=g.money;g.build(0);assert.equal(before-g.money,m.upgrade.amount);assert.equal(state(g,0).upgrade.reason,'工程進行中');
-  g.update(5);m=state(g,0);assert.equal(m.upgrade.amount,125);assert.equal(m.investment,140);
+  g.update(5);m=state(g,0);assert.equal(m.upgrade.amount,110);assert.equal(m.investment,130);
   g.build(0);g.update(5);m=state(g,0);assert.equal(m.upgrade.amount,null);assert.equal(m.upgrade.reason,'已達最高等級');
 });
 test('repair price matches engine and full-health or unfinished towers cannot be repaired',()=>{
   const g=game();g.slots[0].level=1;g.slots[0].hp=40;
   assert.equal(state(g,0).repair.reason,'滿級箭塔才能修復');
-  g.slots[0].level=3;g.money=50;const m=state(g,0);assert.equal(m.repair.amount,TD.TOWER_ACTIONS.repair.cost);assert.equal(m.repair.disabled,false);
+  g.slots[0].level=3;g.money=40;const m=state(g,0);assert.equal(m.repair.amount,TD.TOWER_ACTIONS.repair.cost);assert.equal(m.repair.disabled,false);
   assert.equal(g.repair(0).ok,true);assert.equal(g.money,0);g.update(3);assert.equal(state(g,0).repair.reason,'生命已滿');
 });
 test('demolition previews positive refunds for each level and credits only on completion',()=>{

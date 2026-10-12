@@ -34,32 +34,32 @@ test('all enemy types rejoin at their current projection and spend only the rema
 
 test('nearest re-entry may be on a later segment around a bend',()=>{
   const g=setup([[[0,0],[200,0],[200,400]]]),e=enemy(g,{x:160,y:300});
-  g.moveEnemy(e,.1);close(e.x,165.7);close(e.y,300);assert.equal(e.offRoute,true);
-  g.moveEnemy(e,(40-5.7)/57);close(e.x,200);close(e.y,300);close(e.distance,500);assert.equal(e.offRoute,false);
-  g.moveEnemy(e,.1);close(e.x,200);close(e.y,305.7);close(e.remaining,94.3);
+  g.moveEnemy(e,.1);close(e.x,165);close(e.y,300);assert.equal(e.offRoute,true);
+  g.moveEnemy(e,35/50);close(e.x,200);close(e.y,300);close(e.distance,500);assert.equal(e.offRoute,false);
+  g.moveEnemy(e,.1);close(e.x,200);close(e.y,305);close(e.remaining,95);
 });
 
 test('diagonal roads use the perpendicular projection, not a waypoint or old departure point',()=>{
   const g=setup([[[0,0],[300,300],[600,300]]]),e=enemy(g,{distance:20,x:200,y:100});
-  const distance=Math.hypot(50,50);g.moveEnemy(e,distance/57);
+  const distance=Math.hypot(50,50);g.moveEnemy(e,distance/50);
   close(e.x,150);close(e.y,150);close(e.distance,Math.hypot(150,150));assert.equal(e.offRoute,false);
 });
 
 test('rejoining behind the old route progress does not cause forward teleportation',()=>{
-  const g=setup(),e=enemy(g,{distance:500,x:200,y:150});g.moveEnemy(e,50/57);
+  const g=setup(),e=enemy(g,{distance:500,x:200,y:150});g.moveEnemy(e,50/50);
   close(e.x,200);close(e.y,100);close(e.distance,200);close(e.remaining,800);
-  g.moveEnemy(e,.1);close(e.x,205.7);
+  g.moveEnemy(e,.1);close(e.x,205);
 });
 
 test('return stays on the assigned branch and equally near segments prefer the previous progress',()=>{
   const g=setup([[[0,100],[1000,100]],[[0,175],[1000,175]]]),e=enemy(g,{x:200,y:170});
-  g.moveEnemy(e,.1);assert.equal(e.routeIndex,0);close(e.x,200);close(e.y,164.3);
+  g.moveEnemy(e,.1);assert.equal(e.routeIndex,0);close(e.x,200);close(e.y,165);
   const loop=setup([[[0,0],[200,0],[200,200],[0,200]]]),other=enemy(loop,{distance:500,x:100,y:100});
-  loop.moveEnemy(other,.1);close(other.x,100);close(other.y,105.7);
+  loop.moveEnemy(other,.1);close(other.x,100);close(other.y,105);
 });
 
 test('nearest points clamp to road endpoints and arrival still resolves an escape once',()=>{
   const g=setup(),e=enemy(g,{distance:100,x:1030,y:140});
-  g.moveEnemy(e,50/57);close(e.x,1000);close(e.y,100);assert.equal(e.escaped,true);assert.equal(g.lives,2);
+  g.moveEnemy(e,50/50);close(e.x,1000);close(e.y,100);assert.equal(e.escaped,true);assert.equal(g.lives,2);
   g.update(1);assert.equal(g.lives,2);
 });

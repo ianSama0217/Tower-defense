@@ -25,9 +25,10 @@
         [[1280,400],[832,400],[832,272],[448,272],[448,400],[0,400]],
         [[1280,400],[832,400],[832,528],[448,528],[448,400],[0,400]]
       ],
-      slots:[[128,296],[320,296],[128,512],[320,512],
-        [640,168],[544,400],[736,400],[640,632],
-        [960,296],[960,512]],
+      // Keep the split and merge inside neighboring towers' overlapping coverage.
+      slots:[[160,304],[352,304],[160,496],[352,496],
+        [640,176],[560,400],[720,400],[640,624],
+        [928,304],[928,496]],
       worldScale:TD.CAMPAIGN_WORLD_SCALE,initialMoney:120,manualWaves:true,spawnInterval:SPAWN_INTERVAL,waveRewards:[30,30,30,30,30,0],waves
     }),stageIndex:2,environment:'flower-forest',entranceProtectionTiles:2,roadBuilding:'fence'};
   }

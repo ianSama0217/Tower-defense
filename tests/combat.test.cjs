@@ -16,38 +16,38 @@ function enemy(g,distance=16,routeIndex=0,level=1){
 test('enemies attack the nearest active tower and respect range and cooldown',()=>{
   const g=setup(),far=tower(g,0),near=tower(g,1),e=enemy(g);
   g.update(.01);
-  assert.equal(e.targetId,near.id);assert.equal(near.hp,94);assert.equal(far.hp,100);
+  assert.equal(e.targetId,near.id);assert.equal(near.hp,88);assert.equal(far.hp,100);
   for(let i=0;i<20;i++)g.update(.01);
-  assert.equal(near.hp,94);
+  assert.equal(near.hp,88);
   for(let i=0;i<110;i++)g.update(.01);
   // A locked attacker stays in place and attacks the same tower again.
-  assert.equal(near.hp,88);assert.equal(far.hp,100);assert.equal(e.targetId,near.id);
+  assert.equal(near.hp,76);assert.equal(far.hp,100);assert.equal(e.targetId,near.id);
   const isolated=setup(),outOfRange=tower(isolated,2);enemy(isolated);isolated.update(.01);
   assert.equal(outOfRange.hp,100);assert.equal(isolated.enemies[0].targetId,null);
 });
 
 test('a newly built nearer tower does not interrupt a locked target',()=>{
   const g=setup(),far=tower(g,0),e=enemy(g);g.update(.01);
-  assert.equal(far.hp,94);
+  assert.equal(far.hp,88);
   const near=tower(g,1);e.attackCooldown=0;g.update(.01);
-  assert.equal(e.targetId,0);assert.equal(near.hp,100);assert.equal(far.hp,88);
+  assert.equal(e.targetId,0);assert.equal(near.hp,100);assert.equal(far.hp,76);
 });
 
 test('attacking enemies stop on their route and resume after destroying the tower',()=>{
   const g=setup(),t=tower(g,1),e=enemy(g),before=e.distance;g.update(.1);
   assert.equal(e.distance,before);assert.equal(e.moving,false);
   assert.deepEqual({x:e.x,y:e.y},position(e.distance,g.level.routes[0]));
-  assert.equal(t.hp,94);assert.ok(g.effects.some(effect=>effect.kind==='enemy-attack'));
+  assert.equal(t.hp,88);assert.ok(g.effects.some(effect=>effect.kind==='enemy-attack'));
   t.hp=6;e.attackCooldown=0;g.update(.01);assert.equal(t.level,0);
   g.update(.1);assert.equal(e.targetId,null);assert.equal(e.moving,true);
   assert.equal(e.distance,before+ENEMIES[e.level].speed*g.worldScale*.1);
 });
 
-test('all tower levels cap at 100 HP; successful upgrades heal, rejected upgrades do not',()=>{
+test('tower health scales to 100/125/150; successful upgrades heal, rejected upgrades do not',()=>{
   const g=setup();const t=tower(g,1);assert.equal(t.hp,TOWER_MAX_HP);assert.equal(t.maxHp,100);
-  t.hp=25;assert.equal(g.build(1).ok,true);assert.equal(t.level,1);assert.equal(t.hp,25);g.update(5);assert.equal(t.level,2);assert.equal(t.hp,100);assert.equal(t.maxHp,100);
+  t.hp=25;assert.equal(g.build(1).ok,true);assert.equal(t.level,1);assert.equal(t.hp,25);g.update(5);assert.equal(t.level,2);assert.equal(t.hp,125);assert.equal(t.maxHp,125);
   t.hp=40;assert.equal(g.build(1).ok,false);assert.equal(t.hp,40);
-  g.money=125;assert.equal(g.build(1).ok,true);g.update(5);assert.equal(t.level,3);assert.equal(t.hp,100);assert.equal(t.maxHp,100);
+  g.money=125;assert.equal(g.build(1).ok,true);g.update(5);assert.equal(t.level,3);assert.equal(t.hp,150);assert.equal(t.maxHp,150);
   t.hp=60;g.money=1000;assert.equal(g.build(1).ok,false);assert.equal(t.hp,60);
 });
 
@@ -55,7 +55,7 @@ test('destroyed towers stop being targets, give no refund, and can be rebuilt at
   const g=setup(),far=tower(g,0),near=tower(g,1);near.hp=1;
   enemy(g);const second=enemy(g);const money=g.money;g.update(.01);
   assert.equal(near.hp,0);assert.equal(near.level,0);assert.equal(near.cooldown,0);assert.notEqual(near.destroyedAt,null);
-  assert.equal(second.targetId,far.id);assert.equal(far.hp,94);assert.equal(g.money,money);
+  assert.equal(second.targetId,far.id);assert.equal(far.hp,88);assert.equal(g.money,money);
   assert.equal(g.demolish(1).ok,false);
   assert.equal(g.build(1).ok,true);assert.equal(near.hp,100);assert.equal(near.level,1);assert.equal(near.destroyedAt,null);g.updateTowerActions(5);
   assert.equal(g.demolish(1).ok,true);assert.equal(near.hp,100);g.update(3);assert.equal(near.hp,0);
@@ -73,7 +73,7 @@ function arena(paths,slots,scale=1){const g=new Game(Math.random,createScenario(
 test('all attackers stop at range entry even during a large movement step',()=>{
   for(const type of [1,2,3])for(const scale of [1,2]){
     const g=arena([[[0,100],[1000,100]]],[[400,100]],scale),s=tower(g,0),e=enemy(g,0,0,type);
-    g.update(10);
+    g.update(20);
     assert.equal(e.x,400-enemyRanges(type,scale).attack);assert.equal(e.y,100);
     assert.equal(e.moving,false);assert.equal(e.targetId,s.id);assert.equal(e.facing,1);
     assert.equal(s.hp,100-ENEMIES[type].attackDamage);
@@ -84,7 +84,7 @@ test('range interception follows bends and ignores towers outside the route corr
   const g=arena([[[0,0],[100,0],[100,200]]],[[200,40],[100,160]]);
   const outside=tower(g,0),inside=tower(g,1),e=enemy(g,0);g.update(10);
   assert.equal(e.x,100);assert.equal(e.y,160-ENEMIES[1].attackRange);
-  assert.equal(e.targetId,inside.id);assert.equal(outside.hp,100);assert.equal(inside.hp,94);
+  assert.equal(e.targetId,inside.id);assert.equal(outside.hp,100);assert.equal(inside.hp,88);
 });
 test('demolition holds attackers until completion and then releases them without a stale target',()=>{
   const g=arena([[[0,100],[1000,100]]],[[20,100]]),s=tower(g,0),e=enemy(g,0);
@@ -133,7 +133,7 @@ test('off-road detection uses the remaining movement budget and returns continuo
     g.update(10);
     assert.equal(e.targetId,s.id);assert.equal(e.moving,false);assert.equal(e.offRoute,true);
     assert.ok(Math.abs(Math.hypot(e.x-s.x,e.y-s.y)-32*scale)<1e-7);
-    assert.equal(s.hp,94);const anchor=position(e.distance,g.level.routes[0]);
+    assert.equal(s.hp,88);const anchor=position(e.distance,g.level.routes[0]);
     const before={x:e.x,y:e.y};g.damageTower(s,100);g.update(.01);
     assert.equal(e.targetId,null);assert.ok(Math.hypot(e.x-before.x,e.y-before.y)<=ENEMIES[1].speed*scale*.01+1e-7);
     for(let i=0;i<100;i++)g.update(.01);

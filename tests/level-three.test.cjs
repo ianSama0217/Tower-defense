@@ -74,7 +74,7 @@ test('third-stage reference has equal approaches and branches, with two inner pa
     assert.deepEqual(route.path.at(-1),{x:0,y:400});
   }
   assert.equal(s.slots.length,10);
-  assert.deepEqual(s.slots.filter(pad=>pad.y===400),[{x:544,y:400},{x:736,y:400}]);
+  assert.deepEqual(s.slots.filter(pad=>pad.y===400),[{x:560,y:400},{x:720,y:400}]);
   assert.ok(s.slots.every(pad=>pad.x!==1152));
   assert.equal(s.mapConfig.roadWidth,96);
   assert.deepEqual(P.stages[2].enemies,[1,6,2]);
@@ -97,7 +97,7 @@ test('first wave waits for the player while construction works, and restart rese
 test('all six waves match the requested counts, order and five-second reinforcement gaps',()=>{
   const expected=[[[1,6],[6,4]],[[1,10],[6,6]],[[1,10],[6,6],[2,2]],[[2,2],[1,8],[6,8]],[[2,2],[1,12],[6,8]],[[2,2],[6,8],[2,2],[1,12],[6,8]]];
   let seed=123;const g=new LevelThreeGame(()=>((seed=(Math.imul(seed,1664525)+1013904223)>>>0)/4294967296)),seen=[];
-  g.start();g.onEnemySpawn=()=>{const e=g.enemies.at(-1);seen.push({wave:g.wave,type:e.level,route:e.routeIndex,time:g.time});g.damageEnemy(e,999);};
+  g.start();g.onEnemySpawn=()=>{const e=g.enemies.at(-1);seen.push({wave:g.wave,type:e.level,route:e.routeIndex,time:g.time});g.damageEnemy(e,999);if(e.hp>0)g.damageEnemy(e,999);};
   g.startNextWave();
   for(let i=0;i<40000&&g.phase==='playing';i++)g.update(1/60);
   assert.equal(g.phase,'won');assert.equal(g.wave,6);assert.equal(g.kills,116);
@@ -111,7 +111,7 @@ test('all six waves match the requested counts, order and five-second reinforcem
     }
     if(wave>1)assert.ok(events[0].time-seen.filter(e=>e.wave===wave-1).at(-1).time>=15);
   }
-  const rewards=58*11+48*12+10*18;
+  const rewards=58*10+48*10+10*20;
   assert.equal(g.money,120+rewards+5*30);g.update(60);assert.equal(g.money,120+rewards+5*30);
   const data=new Map([[P.KEY,'[3,3,0,0,0]']]),storage={getItem:k=>data.get(k),setItem:(k,v)=>data.set(k,v)};
   const result=require('../dist/result-panel.js').summarize(g,storage);
@@ -121,14 +121,14 @@ test('random choices follow the matching middle branch without changing the shar
   for(const [random,routeIndex,direction] of [[()=>0,0,-1],[()=>.999,1,1]]){
     const g=new LevelThreeGame(random);g.start();g.startNextWave();g.update(.01);
     const e=g.enemies[0];assert.equal(e.routeIndex,routeIndex);assert.equal(e.y,400);
-    for(let i=0;i<300;i++)g.update(1/60);
+    for(let i=0;i<360;i++)g.update(1/60);
     assert.equal(Math.sign(e.y-400),direction);assert.ok(e.x<832&&e.x>448);assert.ok(Math.abs(e.y-(routeIndex?528:272))<=48);
   }
 });
 test('reinforcements wait five seconds after actual batch entry even when the entrance was blocked',()=>{
   const g=new LevelThreeGame(()=>0),seen=[];let open=false;
   g.start();g.wave=2;g.launchWave();g.enemySpaceFree=()=>open;
-  g.onEnemySpawn=()=>{const e=g.enemies.at(-1);seen.push({type:e.level,time:g.time});g.damageEnemy(e,999);};
+  g.onEnemySpawn=()=>{const e=g.enemies.at(-1);seen.push({type:e.level,time:g.time});g.damageEnemy(e,999);if(e.hp>0)g.damageEnemy(e,999);};
   for(let i=0;i<1500;i++)g.update(1/60);
   assert.equal(seen.length,0);assert.equal(g.pendingSpawns.length,16);
   open=true;g.update(1/60);assert.equal(seen.length,16);

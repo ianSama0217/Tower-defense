@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "wave launch immediately disables road button",
+    "visible combat reason on desktop and mobile",
+    "direct placement cannot spend money or stock during combat",
+    "pause cannot unlock road construction",
+    "intermission restores road construction",
+    "road button builds during preparation",
+    "next wave disables road construction",
+    "tower button still builds during combat",
+    "no mobile overflow or browser errors"
+  ],
+  "errors": []
+}

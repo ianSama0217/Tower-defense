@@ -55,7 +55,7 @@ function enemy(game,level=5,x=0){const spec=ENEMIES[level];const e={id:game.next
 test('build/upgrade sounds occur only on completion; failed or destroyed jobs stay silent',()=>{
   const g=arena(),events=attach(g);g.build(0);assert.deepEqual(events,[]);g.updateTowerActions(5);assert.deepEqual(events,[['Build']]);
   events.length=0;g.build(0);g.updateTowerActions(4);assert.deepEqual(events,[]);g.updateTowerActions(1);assert.deepEqual(events,[['Upgrade']]);
-  events.length=0;g.build(0);g.damageTower(g.slots[0],100);g.updateTowerActions(5);assert.deepEqual(events,[]);
+  events.length=0;g.build(0);g.damageTower(g.slots[0],g.slots[0].maxHp);g.updateTowerActions(5);assert.deepEqual(events,[]);
   g.money=0;g.build(0);assert.deepEqual(events,[]);
 });
 test('actual tower level reaches arrow audio; misses do not play hit sounds',()=>{

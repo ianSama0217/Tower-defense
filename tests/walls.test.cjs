@@ -3,10 +3,10 @@ const TD=require('../dist/engine.js'),Sprites=require('../dist/wall-sprites.js')
 const {TutorialGame}=require('../dist/tutorial-level.js');
 function game(scale=1){const g=new TD.Game(()=>0,TD.createScenario({paths:[[[0,200],[1000,200]]],slots:[[240,310]],waves:[[1]],manualWaves:true,worldScale:scale,initialMoney:1000}));g.start();return g;}
 function enemy(g,level,x=220){const spec=TD.ENEMIES[level],e={id:g.nextId++,level,x,y:200,distance:x,routeIndex:0,hp:spec.hp,maxHp:spec.hp};g.enemies.push(e);return e;}
-test('three lifetime purchases, exactly $100 each; destruction does not refund stock, restart resets',()=>{
+test('three lifetime purchases, exactly $60 each; destruction does not refund stock, restart resets',()=>{
   const g=game();for(const x of [200,400,600])assert.equal(g.placeWall(x,200).ok,true);
-  assert.equal(g.money,700);assert.equal(g.wallsRemaining,0);
-  g.damageTower(g.walls[0],300);assert.equal(g.placeWall(800,200).ok,false);assert.equal(g.money,700);assert.equal(g.wallsRemaining,0);
+  assert.equal(g.money,820);assert.equal(g.wallsRemaining,0);
+  g.damageTower(g.walls[0],300);assert.equal(g.placeWall(800,200).ok,false);assert.equal(g.money,820);assert.equal(g.wallsRemaining,0);
   g.start();assert.equal(g.wallsRemaining,3);assert.equal(g.walls.length,0);assert.equal(g.money,1000);
 });
 test('placement validates road footprint, orientation, enemy occupancy, overlapping walls, money and phase without charging',()=>{
@@ -14,7 +14,7 @@ test('placement validates road footprint, orientation, enemy occupancy, overlapp
   assert.equal(g.money,1000);assert.equal(g.wallsRemaining,3);
   assert.equal(g.placeWall(300,200,'vertical').ok,true);assert.equal(g.placeWall(300,200).ok,false);
   enemy(g,1,500);assert.equal(g.placeWall(500,200).ok,false);
-  g.money=99;assert.equal(g.placeWall(700,200).ok,false);g.money=1000;g.phase='lost';assert.equal(g.placeWall(700,200).ok,false);
+  g.money=59;assert.equal(g.placeWall(700,200).ok,false);g.money=1000;g.phase='lost';assert.equal(g.placeWall(700,200).ok,false);
 });
 test('orientation swaps footprint, spans road width and scales thickness',()=>{
   const g=game(2),a=g.placeWall(300,200,'vertical').wall,b=g.placeWall(600,200).wall;
@@ -40,16 +40,19 @@ test('slime stops at the wall and attacks it, then resumes route after destructi
 test('large route step cannot skip a wall and melee hits its edge in both orientations',()=>{
   for(const orientation of ['horizontal','vertical']){
     const g=game(),w=g.placeWall(400,200,orientation).wall,e=enemy(g,1,10);g.moveEnemy(e,30);
-    assert.equal(e.escaped,undefined);assert.ok(e.x<w.x);assert.equal(e.targetId,w.id);g.attackTowers(.1);assert.equal(w.hp,294);
+    assert.equal(e.escaped,undefined);assert.ok(e.x<w.x);assert.equal(e.targetId,w.id);g.attackTowers(.1);assert.equal(w.hp,288);
   }
 });
 test('archer arrows damage walls on impact and do not transfer to a replacement',()=>{
   const g=game(),w=g.placeWall(300,200).wall,e=enemy(g,6,210);
-  g.attackTowers(.01);assert.equal(w.hp,300);g.time=.3;g.attackTowers(.3);assert.equal(g.enemyArrows.length,1);g.updateEnemyArrows(1);assert.equal(w.hp,294);
-  e.attackCooldown=0;g.attackTowers(.01);g.time=1;g.attackTowers(.3);g.damageTower(w,999);const fresh=g.placeWall(300,200).wall;g.updateEnemyArrows(5);assert.equal(fresh.hp,300);
+  g.attackTowers(.01);assert.equal(w.hp,300);g.time=.3;g.attackTowers(.3);assert.equal(g.enemyArrows.length,1);g.updateEnemyArrows(1);assert.equal(w.hp,285);
+  e.attackCooldown=0;g.attackTowers(.01);g.time=1;g.attackTowers(.3);g.damageTower(w,999);
+  assert.equal(g.placeWall(300,200).ok,false); // New roads cannot be built during combat.
+  const fresh={...w,hp:300,level:1,towerId:g.nextTowerId++};g.walls.push(fresh);
+  g.updateEnemyArrows(5);assert.equal(fresh.hp,300);
 });
 test('bomber seeks wall first and explosion damages its footprint',()=>{
-  const g=game(),w=g.placeWall(300,200).wall,e=enemy(g,4,100);g.moveEnemy(e,10);assert.equal(e.hp,0);assert.equal(w.hp,240);
+  const g=game(),w=g.placeWall(300,200).wall,e=enemy(g,4,100);g.moveEnemy(e,10);assert.equal(e.hp,0);assert.equal(w.hp,250);
 });
 test('unrelated distant walls do not divert ordinary enemies; destroyed walls cease being targets',()=>{
   const g=game(),w=g.placeWall(800,200).wall,e=enemy(g,1,200),s=g.slots[0];Object.assign(s,{x:220,y:200,level:1,hp:100});

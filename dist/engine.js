@@ -12,28 +12,28 @@
     towerSlotSize: 64,
     debugGrid: false
   };
-  const TOWERS = [null, {damage:12,range:95,interval:.65,cost:60}, {damage:18,range:95,interval:.55,cost:80}, {damage:24,range:115,interval:.5,cost:125}];
+  const TOWERS = [null, {hp:100,damage:18,range:95,interval:.6,cost:60}, {hp:125,damage:26,range:110,interval:.6,cost:70}, {hp:150,damage:34,range:125,interval:.65,cost:110}];
   const TOWER_MAX_HP = 100;
-  const WALL = {cost:10,limit:3,hp:300,length:36,thickness:16,detectionRange:64,attackDamage:6,attackRange:12,attackInterval:1.2};
-  const FENCE = {...WALL,hp:150,name:'柵欄',type:'fence',material:'wood'};
+  const WALL = {cost:60,limit:3,hp:300,length:36,thickness:16,detectionRange:64,attackDamage:6,attackRange:12,attackInterval:1.2};
+  const FENCE = {...WALL,cost:30,hp:150,name:'柵欄',type:'fence',material:'wood'};
   function wallSize(orientation,scale=1,roadWidth=WALL.length*scale){const thickness=Math.min(roadWidth,WALL.thickness*scale);return orientation==='vertical'?{width:thickness,height:roadWidth}:{width:roadWidth,height:thickness};}
   function targetPoint(target,from){
     if(target.kind!=='wall')return target;
     return {x:Math.max(target.x-target.width/2,Math.min(target.x+target.width/2,from.x)),y:Math.max(target.y-target.height/2,Math.min(target.y+target.height/2,from.y))};
   }
   function targetDistance(target,from){const p=targetPoint(target,from);return Math.hypot(p.x-from.x,p.y-from.y);}
-  const TOWER_ACTIONS = {build:{duration:5},upgrade:{duration:5},repair:{duration:3,cost:50},demolish:{duration:3}};
+  const TOWER_ACTIONS = {build:{duration:5},upgrade:{duration:5},repair:{duration:3,cost:40},demolish:{duration:3}};
   const ENEMY_TYPES = {goblin:1,orc:2,cyclops:3,bomber:4,slime:5,archer:6};
   // Compact ground footprints leave room for crowds to reach a building's attack perimeter.
   const ENEMY_RADII = [0,5,7,10,6,5,5];
   const enemyRadius=(type,worldScale=1)=>(ENEMY_RADII[type]??8)*worldScale;
   const ENEMIES = [null,
-    {name:'哥布林',behavior:'attacker',detectionRange:64,hp:44,speed:57,reward:11,attackDamage:6,attackRange:32,attackInterval:1.2},
-    {name:'獸人',behavior:'attacker',detectionRange:64,hp:112,speed:49,reward:18,attackDamage:10,attackRange:32,attackInterval:1,chargeDamage:120,chargeSpeedMultiplier:1.5,chargeBreakDamage:50},
-    {name:'獨眼巨人',behavior:'attacker',detectionRange:128,hp:245,speed:42,reward:28,attackDamage:15,attackRange:32,attackInterval:0.9},
-    {name:'炸彈哥布林',behavior:'bomber',detectionRange:Infinity,hp:60,speed:57,reward:14,attackDamage:0,attackRange:0,attackInterval:0,triggerRange:22,blastRadius:64,blastDamage:60},
-    {name:'史萊姆',behavior:'passive',detectionRange:0,hp:32,speed:49,reward:8,attackDamage:0,attackRange:0,attackInterval:0},
-    {name:'哥布林弓箭手',behavior:'archer',detectionRange:90,hp:40,speed:49,reward:12,attackDamage:6,attackRange:112,attackInterval:1.4,attackWindup:.2,projectileSpeed:220}
+    {name:'哥布林',behavior:'attacker',detectionRange:64,hp:50,speed:50,reward:10,attackDamage:12,attackRange:32,attackInterval:1.2},
+    {name:'獸人',behavior:'attacker',detectionRange:64,hp:80,speed:40,reward:20,attackDamage:20,attackRange:32,attackInterval:1,chargeHealthBonus:40,chargeDamage:50,chargeSpeedMultiplier:1.5,chargeBreakDamage:40},
+    {name:'獨眼巨人',behavior:'attacker',detectionRange:96,hp:200,speed:30,reward:40,attackDamage:30,attackRange:40,attackInterval:1.5},
+    {name:'炸彈哥布林',behavior:'bomber',detectionRange:Infinity,hp:40,speed:60,reward:15,attackDamage:0,attackRange:0,attackInterval:0,triggerRange:22,blastRadius:48,blastDamage:50},
+    {name:'史萊姆',behavior:'passive',detectionRange:0,hp:30,speed:45,reward:6,attackDamage:0,attackRange:0,attackInterval:0},
+    {name:'哥布林弓箭手',behavior:'archer',detectionRange:90,hp:36,speed:50,reward:10,attackDamage:15,attackRange:112,attackInterval:1.4,attackWindup:.2,projectileSpeed:220}
   ];
   function makeRoute(points) {
     const path = points.map(([x,y]) => ({x,y}));
@@ -56,7 +56,7 @@
     }
     return {...level.path.at(-1)};
   }
-  function refundFor(level) {return Math.floor(TOWERS.slice(1,level+1).reduce((sum,t)=>sum+t.cost,0)*.5);}
+  function refundFor(level,specs=TOWERS) {return Math.floor(specs.slice(1,level+1).reduce((sum,t)=>sum+t.cost,0)*.5);}
   class Game {
     constructor(random=Math.random,scenario=createScenario()){this.random=random;this.reset(scenario);}
     reset(scenario=this.level) {
@@ -76,8 +76,12 @@
       this.slots=this.level.slots.map((s,id)=>({...s,id,level:0,cooldown:0,hp:0,maxHp:TOWER_MAX_HP,destroyedAt:null,action:null,towerId:null,kills:0}));
     }
     start(scenario=this.level){this.reset(scenario);this.phase='playing';}
+    towerSpecs(slot){return TOWERS;}
     get roadBuilding(){return this.level.roadBuilding==='fence'?FENCE:{...WALL,name:'城牆',type:'wall',material:'stone'};}
     get wallsRemaining(){return this.roadBuilding.limit-this.wallsUsed;}
+    get canBuildRoadBuildings(){
+      return this.phase==='playing'&&(this.awaitingWave||this.countdown>0)&&!this.spawnQueue.length&&!this.pendingSpawns.length&&!this.enemies.some(enemy=>enemy.hp>0);
+    }
     wallAvailability(){
       const {name,cost,limit}=this.roadBuilding;
       if(this.phase!=='playing')return {ok:false,message:`目前無法放置${name}。`};
@@ -85,6 +89,7 @@
         if(this.level.stageIndex<2)return {ok:false,message:'城牆是第二關通關獎勵，從第三關開始使用。'};
         if(!this.wallsUnlocked)return {ok:false,message:`通過第二關後解鎖${name}。`};
       }
+      if(!this.canBuildRoadBuildings)return {ok:false,message:'戰鬥中無法新增道路建築，請於準備期間建造。'};
       if(!this.wallsRemaining)return {ok:false,message:`本場 ${limit} 個${name}已用完，摧毀後不會補回。`};
       if(this.money<cost)return {ok:false,message:`金幣不足，${name}需要 ${cost} 金幣。`};
       return {ok:true};
@@ -158,6 +163,16 @@
       return target;
     }
     isCharging(e){return !!ENEMIES[e.level].chargeDamage&&!e.chargeConsumed;}
+    prepareChargeHealth(e){
+      const spec=ENEMIES[e.level];
+      if(e.hp<=0||!this.isCharging(e)||e.chargeHealthApplied)return;
+      e.chargeHp=e.chargeMaxHp=spec.chargeHealthBonus||0;
+      e.chargeHealthApplied=true;e.charging=true;
+    }
+    endCharge(e){
+      e.chargeConsumed=true;e.charging=false;
+      e.chargeHp=0;
+    }
     attackRange(e,target){
       // Towers use their 32px footprint radius; walls use their nearest edge plus the orc's body radius.
       if(this.isCharging(e))return (target?.kind==='wall'?8:32)*this.worldScale;
@@ -177,14 +192,14 @@
       if(blocked)return{ok:false,message:blocked};
       if(s.action)return{ok:false,message:'箭塔正在作業中，暫時無法操作。'};
       if(s.level===3)return{ok:false,message:'箭塔已達最高等級。'};
-      const cost=TOWERS[s.level+1].cost;
+      const spec=this.towerSpecs(s)[s.level+1],cost=spec.cost;
       if(this.money<cost)return{ok:false,message:'金幣不足，擊敗敵人可取得金幣。'};
       this.money-=cost;
       if(s.level){
         s.action={kind:'upgrade',elapsed:0,duration:TOWER_ACTIONS.upgrade.duration,targetLevel:s.level+1,cost};
-        return{ok:true,message:`升級開始，5 秒後升至 ${s.level+1} 級並回滿 100 HP；期間停止攻擊。`};
+        return{ok:true,message:`升級開始，5 秒後升至 ${s.level+1} 級並回滿 ${spec.hp} HP；期間停止攻擊。`};
       }
-      s.level=1;s.cooldown=0;s.hp=s.maxHp=TOWER_MAX_HP;s.destroyedAt=null;
+      s.level=1;s.cooldown=0;s.hp=s.maxHp=spec.hp;s.destroyedAt=null;
       s.towerId=this.nextTowerId++;s.kills=0;
       s.action={kind:'build',elapsed:0,duration:TOWER_ACTIONS.build.duration,cost};
       return{ok:true,message:'建造開始，5 秒後完成並開始攻擊。'};
@@ -196,16 +211,16 @@
       if(s.action)return{ok:false,message:'箭塔正在作業中，暫時無法操作。'};
       if(s.hp>=s.maxHp)return{ok:false,message:'箭塔生命已滿，無需修復。'};
       const {cost,duration}=TOWER_ACTIONS.repair;
-      if(this.money<cost)return{ok:false,message:'金幣不足，修復需要 50 金幣。'};
+      if(this.money<cost)return{ok:false,message:`金幣不足，修復需要 ${cost} 金幣。`};
       this.money-=cost;s.action={kind:'repair',elapsed:0,duration,cost};
-      return{ok:true,message:'修復開始，3 秒後回復至 100 HP；期間停止攻擊。'};
+      return{ok:true,message:`修復開始，3 秒後回復至 ${this.towerSpecs(s)[s.level].hp} HP；期間停止攻擊。`};
     }
     demolish(id) {
       if(this.phase!=='playing')return{ok:false,message:'目前無法拆除。'};
       const s=Number.isInteger(id)?this.slots[id]:null;
       if(!s?.level)return{ok:false,message:'請點選已建造的箭塔。'};
       if(s.action)return{ok:false,message:'箭塔正在作業中，暫時無法操作。'};
-      const refund=refundFor(s.level);
+      const refund=refundFor(s.level,this.towerSpecs(s));
       s.action={kind:'demolish',elapsed:0,duration:TOWER_ACTIONS.demolish.duration,refund};
       return{ok:true,refund,message:`拆除開始，3 秒後返還 ${refund} 金幣；期間停止攻擊。`};
     }
@@ -223,7 +238,7 @@
         }else{
           if(action.kind==='build')this.towersBuilt++;
           if(action.kind==='upgrade')s.level=action.targetLevel;
-          if(action.kind!=='build')s.hp=s.maxHp=TOWER_MAX_HP;
+          if(action.kind!=='build')s.hp=s.maxHp=this.towerSpecs(s)[s.level].hp;
           if(action.kind==='upgrade')this.sound?.playUpgrade();
           else this.sound?.playBuild();
         }
@@ -244,17 +259,26 @@
       this.effects.push({x:enemy.x,y:enemy.y,life:.5,kind:'escape'});
     }
     recordChargeDamage(enemy,damage) {
-      if(!this.isCharging(enemy))return;
-      enemy.chargeDamageTaken=(enemy.chargeDamageTaken||0)+damage;
-      if(enemy.chargeDamageTaken>=ENEMIES[enemy.level].chargeBreakDamage){
-        enemy.chargeConsumed=true;enemy.charging=false;
+      const taken=Math.min(enemy.chargeHp,damage);
+      enemy.chargeHp-=taken;
+      enemy.chargeDamageTaken=(enemy.chargeDamageTaken||0)+taken;
+      if(enemy.chargeHp<=0||enemy.chargeDamageTaken>=ENEMIES[enemy.level].chargeBreakDamage){
+        this.endCharge(enemy);
       }
+      return taken;
+    }
+    applyEnemyDamage(enemy,damage) {
+      this.prepareChargeHealth(enemy);
+      // A hit belongs entirely to the current form, even when it exceeds charge HP.
+      let taken;
+      if(this.isCharging(enemy)&&enemy.chargeHp>0)taken=this.recordChargeDamage(enemy,damage);
+      else{taken=Math.min(enemy.hp,damage);enemy.hp=Math.max(0,enemy.hp-damage);}
+      this.effects.push({kind:'damage',x:enemy.x,y:enemy.y,amount:taken,life:.7});
+      enemy.hurtAt=this.time;
     }
     damageEnemy(enemy,damage,sourceTowerId=null) {
       if(enemy.hp<=0||enemy.deathAt!=null||enemy.escaped)return;
-      this.recordChargeDamage(enemy,Math.min(enemy.hp,damage));
-      this.effects.push({kind:'damage',x:enemy.x,y:enemy.y,amount:Math.min(enemy.hp,damage),life:.7});
-      enemy.hp=Math.max(0,enemy.hp-damage);enemy.hurtAt=this.time;
+      this.applyEnemyDamage(enemy,damage);
       if(enemy.hp===0)this.killEnemy(enemy,true,sourceTowerId);
     }
     killEnemy(enemy,reward=true,sourceTowerId=null) {
@@ -280,9 +304,7 @@
         for(const s of [...this.slots,...this.walls])if(targetDistance(s,e)<=radius)this.damageTower(s,spec.blastDamage);
         for(const other of this.enemies){
           if(other.hp<=0||other.deathAt!=null||other.escaped||Math.hypot(other.x-e.x,other.y-e.y)>radius)continue;
-          this.recordChargeDamage(other,Math.min(other.hp,spec.blastDamage));
-          this.effects.push({kind:'damage',x:other.x,y:other.y,amount:Math.min(other.hp,spec.blastDamage),life:.7});
-          other.hp=Math.max(0,other.hp-spec.blastDamage);other.hurtAt=this.time;
+          this.applyEnemyDamage(other,spec.blastDamage);
           if(other.hp===0)pending.push({enemy:other,reward:true});
         }
       }
@@ -447,6 +469,7 @@
       return nearest;
     }
     moveEnemy(e,dt) {
+      this.prepareChargeHealth(e);
       e.charging=this.isCharging(e);
       const spec=ENEMIES[e.level],route=this.level.routes[e.routeIndex],speed=spec.speed*this.worldScale*(e.charging?spec.chargeSpeedMultiplier:1),oldX=e.x,oldY=e.y;
       let travel=speed*dt;
@@ -556,6 +579,7 @@
     attackTowers(dt) {
       for(const e of this.enemies) {
         if(e.hp<=0||e.shieldPushRemaining>0)continue;
+        this.prepareChargeHealth(e);
         const spec=ENEMIES[e.level];
         if(spec.behavior==='bomber')continue;
         e.attackCooldown=Math.max(0,(e.attackCooldown??0)-dt);
@@ -573,7 +597,7 @@
         if(!target||targetDistance(target,e)>this.attackRange(e,target)+1e-7)continue;
         this.stopToAttack(e,target);
         if(this.isCharging(e)){
-          e.chargeConsumed=true;e.charging=false;e.chargeImpactAt=this.time;
+          this.endCharge(e);e.chargeImpactAt=this.time;
           e.attackCooldown=spec.attackInterval;e.attackAt=this.time;
           this.damageTower(target,spec.chargeDamage);
           this.effects.push({kind:'enemy-attack',x:e.x,y:e.y,toX:target.x,toY:target.y,life:.18});
@@ -633,6 +657,7 @@
       const blockedRoutes=new Set();
       this.pendingSpawns=this.pendingSpawns.filter(({level,routeIndex})=>{
         const s=ENEMIES[level],route=this.level.routes[routeIndex],e={level,hp:s.hp,maxHp:s.hp,charging:!!s.chargeDamage,chargeConsumed:false,distance:0,routeIndex,remaining:route.length,...position(0,route)};
+        this.prepareChargeHealth(e);
         if(blockedRoutes.has(routeIndex)||!this.enemySpaceFree(e,e.x,e.y)){blockedRoutes.add(routeIndex);return true;}
         e.id=this.nextId++;this.enemies.push(e);this.lastEnemySpawnAt=this.time;this.onEnemySpawn?.(level);return false;
       });

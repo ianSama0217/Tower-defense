@@ -28,7 +28,7 @@ test('mixed sizes and a charging orc keep their distance at both world scales',(
 test('swept bodies stop large-step tunneling and do not push a stationary attacker',()=>{
   const g=setup(),front=add(g,1,200),back=add(g,2,0);
   g.moveEnemy(back,10);separated(g);assert.equal(front.x,200);assert.ok(back.x<front.x);
-  assert.equal(back.hp,112);assert.equal(back.chargeConsumed,undefined);
+  assert.equal(back.hp,80);assert.equal(back.chargeConsumed,undefined);
   g.damageEnemy(front,999);g.moveEnemy(back,1);assert.ok(back.x>200);assert.equal(g.corpses.length,1);
 });
 

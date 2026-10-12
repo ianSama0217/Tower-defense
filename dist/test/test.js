@@ -13,7 +13,7 @@
   let time = 0, previous = 0, paused = false, pointer = null, dragging = null, nextId = 1;
   let shieldPreview=null;
   let simulation=null,rainDemoLoaded=false,rainDemoActive=false;
-  const description={2:'獸人 · 112 HP · 出場衝鋒，速度為原速 1.5 倍；首次撞塔或城牆造成 120 傷害；衝鋒期間累計受到 50 HP 傷害會中斷衝鋒。撞擊或中斷後恢復原速，每秒普攻 10 傷害，不再衝鋒。',4:'炸彈哥布林 · 60 HP · 不普攻，追向最近的塔；接近或被擊殺時爆炸，對範圍內的塔與其他怪物造成 60 傷害。',5:'史萊姆 · 32 HP · 普通移速，不攻擊，沿路前進。',6:'哥布林弓箭手 · 40 HP · 射程內停下拉弓，每 1.4 秒射一箭，命中塔時造成 6 傷害。'};
+  const description={1:'哥布林 · 50 HP · 速度 50，每 1.2 秒攻擊 12 傷害，擊殺獲得 10 金幣。',2:'獸人 · 本體 80 HP、衝鋒灰條 40 HP · 衝鋒速度 60，首次撞塔或城牆造成 50 傷害。灰條耗盡或撞擊後取消衝鋒，恢復速度 40、每秒普攻 20 傷害；破盾的單次傷害不溢出到本體。擊殺獲得 20 金幣。',3:'獨眼巨人 · 200 HP · 速度 30，每 1.5 秒攻擊 30 傷害，擊殺獲得 40 金幣。',4:'炸彈哥布林 · 40 HP · 速度 60，不普攻，追塔或死亡時爆炸，半徑 48、傷害 50，擊殺獲得 15 金幣。',5:'史萊姆 · 30 HP · 速度 45，沿路前進，不攻擊塔；對阻路建築每 1.2 秒造成 6 傷害，擊殺獲得 6 金幣。',6:'哥布林弓箭手 · 36 HP · 速度 50，射程內停下拉弓，每 1.4 秒射一箭，命中塔時造成 15 傷害。擊殺獲得 10 金幣。'};
   const arrowImage=new Image();arrowImage.src='assets/projectiles/arrow.png';
   const wallImages={};
   const bombImages={};
@@ -90,7 +90,7 @@
   function paint(o,alpha=1){
     const a=o.asset;let frame=0;
     if(a.category==='tower'){const b=bounds(o);ctx.save();ctx.globalAlpha=alpha;ctx.translate(o.x,0);ctx.scale(o.facing,1);ctx.drawImage(a.image,b.x-o.x,b.y,b.w,b.h);ctx.restore();return;}
-    if(a.category==='fence'){TestFences.draw(ctx,fenceImages,TestFences.unit(o),alpha);return;}
+    if(a.category==='fence'){TestFences.draw(ctx,fenceImages,TestFences.unit(o),alpha,simulation?.time??time);return;}
     if(a.category==='bomb-tower'){BombTowerSprites.draw(ctx,bombImages,{...o,...o.unit,level:a.level},o.scale,time,alpha);return;}
     if(a.category==='wall'){
       const wall=labWall(o);
@@ -109,7 +109,7 @@
     if(!simulation)return shieldPreview?objects.map(o=>shieldPreview.find(p=>p.id===o.id)||o):objects;
     const scene=objects.filter(o=>['environment','boss','friendly'].includes(o.asset.category));
     for(const s of simulation.slots)if(s.level){const o=objects.find(o=>o.id===s.objectId);scene.push({...o,unit:s});}
-    for(const w of simulation.walls){const o=objects.find(o=>o.id===w.objectId);scene.push({...o,unit:w});}
+    for(const w of simulation.walls){const o=objects.find(o=>o.id===w.objectId);if(o.asset.category==='fence'&&TestFences.opacity(w,simulation.time)<=0)continue;scene.push({...o,unit:w});}
     for(const e of [...simulation.enemies.filter(e=>e.hp>0),...simulation.corpses]){const o=objects.find(o=>o.id===e.id);scene.push({...o,x:e.x,y:e.y,facing:e.facing??1,unit:e});}
     return scene;
   }
@@ -171,7 +171,7 @@
     if(showRanges)scene.forEach(o=>paintRanges(o));
     if($('show-bomb-ranges').checked)scene.forEach(o=>paintBombRanges(o));
     [...scene].sort((a,b)=>a.y-b.y||a.id-b.id).forEach(o=>{
-      paint(o);if(o.unit&&o.unit.hp>0&&o.unit.deathAt==null){if(o.asset.category==='wall'){WallSprites.drawHealth(ctx,o.unit,o.scale);return;}const b=bounds(o);ctx.fillStyle='#17241d';ctx.fillRect(o.x-24,b.y-12,48,4);ctx.fillStyle='#8fcd68';ctx.fillRect(o.x-24,b.y-12,48*o.unit.hp/o.unit.maxHp,4);ctx.fillStyle='#f1e4c5';ctx.font='11px "Fusion Pixel"';ctx.textAlign='center';ctx.fillText(`${o.unit.hp} HP`,o.x,b.y-17);}
+      paint(o);if(o.unit&&o.unit.hp>0&&o.unit.deathAt==null){if(o.asset.category==='wall'){WallSprites.drawHealth(ctx,o.unit,o.scale);return;}const b=bounds(o),bar=EnemySprites.healthBar(o.unit);EnemySprites.drawHealth(ctx,o.unit,o.x-24,b.y-12,48,true);ctx.fillStyle='#f1e4c5';ctx.font='11px "Fusion Pixel"';ctx.textAlign='center';ctx.fillText(`${bar.hp} HP${bar.charge?' · 衝鋒':''}`,o.x,b.y-17);}
     });
     if(simulation&&arrowImage.complete&&arrowImage.naturalWidth)for(const b of simulation.bullets){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.atan2(b.target.y-b.y,b.target.x-b.x));ctx.drawImage(arrowImage,-40,-8,48,16);ctx.restore();}
     if(simulation&&arrowImage.complete&&arrowImage.naturalWidth)for(const b of simulation.enemyArrows){ctx.save();ctx.translate(b.x,b.y-20);ctx.rotate(Math.atan2(b.target.y-b.y,b.target.x-b.x));ctx.drawImage(arrowImage,-30,-6,32,12);ctx.restore();}
@@ -255,12 +255,13 @@
     if(!objects.some(o=>o.asset.category==='enemy'))return;
     const sim=new BombTowers.BombTowerGame(Math.random,TestFences.createScenario());sim.start();sim.lives=150;sim.time=time;
     sim.sound=window.gameSound;
-    sim.slots=objects.filter(o=>['tower','bomb-tower'].includes(o.asset.category)).map((o,id)=>({id,objectId:o.id,x:o.x,y:o.y,level:o.asset.level,kind:o.asset.category==='bomb-tower'?'bomb':'arrow',visualScale:o.scale,towerId:sim.nextTowerId++,kills:0,hp:100,maxHp:100,cooldown:0,action:null,destroyedAt:null}));
+    sim.slots=objects.filter(o=>['tower','bomb-tower'].includes(o.asset.category)).map((o,id)=>{const kind=o.asset.category==='bomb-tower'?'bomb':'arrow',hp=sim.towerSpecs({kind})[o.asset.level].hp;return {id,objectId:o.id,x:o.x,y:o.y,level:o.asset.level,kind,visualScale:o.scale,towerId:sim.nextTowerId++,kills:0,hp,maxHp:hp,cooldown:0,action:null,destroyedAt:null};});
     sim.walls=objects.filter(o=>['wall','fence'].includes(o.asset.category)).map((o,id)=>{const w=o.asset.category==='fence'?TestFences.unit(o):labWall(o);return {...w,id:-id-1,objectId:o.id,kind:'wall',material:o.asset.category==='fence'?'wood':'stone',level:w.hp>0?1:0,towerId:sim.nextTowerId++};});
     sim.enemies=objects.filter(o=>o.asset.category==='enemy').map(o=>{
       const spec=TD.ENEMIES[o.asset.level],routeIndex=sim.level.routes.length;
       sim.level.routes.push({path:[{x:0,y:o.y},{x:W,y:o.y}],segments:[W],length:W});
-      return {id:o.id,level:o.asset.level,x:o.x,y:o.y,hp:spec.hp,maxHp:spec.hp,distance:o.x,remaining:W-o.x,routeIndex,facing:1,moving:true};
+      const enemy={id:o.id,level:o.asset.level,x:o.x,y:o.y,hp:spec.hp,maxHp:spec.hp,distance:o.x,remaining:W-o.x,routeIndex,facing:1,moving:true};
+      sim.prepareChargeHealth(enemy);return enemy;
     });
     rainDemoActive=rainDemoLoaded;
     if(rainDemoActive){sim.battleTime=0;sim.arrowRainStartedAt=null;sim.lastEnemySpawnAt=sim.time;sim.arrowRainFired=false;sim.arrowRain=null;sim.moveEnemy=enemy=>{enemy.moving=false;};TimedWaves.updateArrowRainClock(sim);}
@@ -273,7 +274,7 @@
     simulation.arrowRainStartedAt=simulation.time-simulation.battleTime;
     status('已快轉至箭雨前 1 秒；倒數後將對每名場上敵人造成 200 傷害。');update();
   });
-  $('kill-enemy').addEventListener('click',()=>{const e=simulation?.enemies.find(e=>e.id===selected&&e.hp>0);if(e){simulation.damageEnemy(e,e.hp);status('已擊殺選取怪物；炸彈會立即造成範圍傷害。');update();}});
+  $('kill-enemy').addEventListener('click',()=>{const e=simulation?.enemies.find(e=>e.id===selected&&e.hp>0);if(e){if(simulation.isCharging(e))simulation.endCharge(e);simulation.damageEnemy(e,e.hp);status('已擊殺選取怪物；炸彈會立即造成範圍傷害。');update();}});
   $('tower-fire').addEventListener('change',()=>{if(simulation)simulation.slots.forEach(s=>s.cooldown=0);});
   $('bomber-demo').addEventListener('click',()=>{
     if(simulation||!ready)return;record();objects.length=0;rainDemoLoaded=false;

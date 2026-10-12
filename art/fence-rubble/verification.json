@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "full rubble at destruction",
+    "half opacity at 1.5 seconds",
+    "pause preserves opacity",
+    "no rubble draw at 3 seconds",
+    "road pixels restored exactly",
+    "same-cell replacement",
+    "actual tower health UI 100/125/150",
+    "repair to 150",
+    "390px layout"
+  ],
+  "errors": []
+}

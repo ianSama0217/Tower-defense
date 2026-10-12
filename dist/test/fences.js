@@ -1,7 +1,7 @@
 (function(root){
  'use strict';
  const TD=typeof module!=='undefined'&&module.exports?require('../engine.js'):root.TD;
- const {stages,hp,stage,bounds,draw}=typeof module!=='undefined'&&module.exports?require('../fence-sprites.js'):root.FenceSprites;
+ const {stages,hp,stage,bounds,draw,opacity}=typeof module!=='undefined'&&module.exports?require('../fence-sprites.js'):root.FenceSprites;
  function createScenario(){return TD.createScenario({paths:[[[0,384],[1280,384]],[[896,96],[896,672]]],worldScale:TD.CAMPAIGN_WORLD_SCALE,mapConfig:{...TD.MAP_CONFIG}});}
  const scenario=createScenario();
  const geometry=new TD.Game(Math.random,scenario);
@@ -13,5 +13,5 @@
   const result=geometry.wallPlacement(x,y,orientation);
   if(!result.ok)result.message=result.message.replaceAll('城牆','柵欄');return result;
  }
- const api={stages,hp,scenario,createScenario,stage,unit,placement,bounds,draw};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TestFences=api;
+ const api={stages,hp,scenario,createScenario,stage,unit,placement,bounds,draw,opacity};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.TestFences=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

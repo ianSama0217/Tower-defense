@@ -8,8 +8,12 @@
   const images={},enemies={},towers={},arrow=new Image(),buttons=[];
   const wallImages={};
   const fenceImages={},roadSpec=g.roadBuilding;
+  function fenceVisual(wall){
+    const frame=wall.frame??roadUI?.cells(g.level).find(({frame:f})=>wall.x>=f.x&&wall.x<f.x+f.w&&wall.y>=f.y&&wall.y<f.y+f.h)?.frame;
+    return FenceSprites.atCellRight(wall,frame);
+  }
   function drawRoadBuilding(context,wall,alpha=1){
-    if(roadSpec.type==='fence')FenceSprites.draw(context,fenceImages,wall,alpha);
+    if(roadSpec.type==='fence')FenceSprites.draw(context,fenceImages,context.canvas.id==='battlefield'?fenceVisual(wall):wall,alpha,g.phase==='playing'?g.time:Infinity);
     else WallSprites.draw(context,wallImages[`${wall.orientation}-${WallSprites.stage(wall.hp??300,wall.maxHp??300)}`],wall,g.worldScale,alpha);
   }
   const hud=new ForestHud.GameHud($('hearts')),settings=$('game-settings');
@@ -64,8 +68,9 @@
     selected=null;roadSelected=placement;roadHover=null;$('feedback').textContent='';updateUI();draw();
   }
   function updateRoadCursor(){
-    $('pads').classList.toggle('road-hover',!!roadHover&&!roadHover.blocked&&!paused);
-    $('pads').classList.toggle('road-blocked',!!roadHover?.blocked&&!paused);
+    const blocked=!!roadHover&&(roadHover.blocked||!roadHover.wall&&!g.canBuildRoadBuildings);
+    $('pads').classList.toggle('road-hover',!!roadHover&&!blocked&&!paused);
+    $('pads').classList.toggle('road-blocked',blocked&&!paused);
   }
   $('pads').addEventListener('pointermove',event=>{roadHover=roadAtPointer(event);updateRoadCursor();});
   $('pads').addEventListener('pointerleave',()=>{roadHover=null;updateRoadCursor();});
@@ -176,7 +181,10 @@
       for(const [id,value,label] of [['road-stat-health',`${hp}/${maxHp}`,`生命：${hp} / ${maxHp}`],['road-stat-time',`${seconds} 秒`,`累計阻擋時間：${seconds} 秒`]]){
         const row=$(id);row.querySelector('b').textContent=value;row.title=label;row.setAttribute('aria-label',label);
       }
-      roadInfo.querySelector('.road-build-reason').textContent=item.reason;
+      const combatBlocked=!wall&&!g.canBuildRoadBuildings;
+      $('road-stat-time').hidden=combatBlocked;
+      const reasonLabel=roadInfo.querySelector('.road-build-reason');
+      reasonLabel.textContent=item.reason;reasonLabel.classList.toggle('sr-only',!combatBlocked);
       const wc=wallPreview.getContext('2d');wc.clearRect(0,0,96,72);
       if(ready)drawRoadBuilding(wc,{x:48,y:36,width:88,height:32,orientation:'horizontal',visualScale:.55,hp,maxHp});
     }
@@ -210,7 +218,7 @@
     if(roadUI?.enabled(g)&&!paused){
       const placement=roadHover||roadSelected;
       if(placement){
-        const valid=placement.wall?.hp>0||!placement.blocked&&g.wallPlacement(placement.x,placement.y,placement.orientation).ok;
+        const valid=placement.wall?.hp>0||g.canBuildRoadBuildings&&!placement.blocked&&g.wallPlacement(placement.x,placement.y,placement.orientation).ok;
         const f=placement.frame;
         ctx.drawImage(valid?images.padAllowed:images.padBlocked,f.x,f.y,f.w,f.h);
       }
@@ -230,12 +238,12 @@
         target={image:towers[slot.action.targetLevel],rect:TowerSprites.worldRect(slot.action.targetLevel,slot.x,slot.y,g.level.mapConfig.towerSlotSize,g.worldScale)};
       }
       TowerWork.draw(ctx,towers[slot.level],rect,slot.action?{...slot.action,material:slot.level===1?'wood':'stone'}:null,target);
-      ctx.fillStyle='#152a1c';ctx.fillRect(slot.x-32,y-12,64,6);ctx.fillStyle=slot.hp>40?'#b0d879':'#ec977c';ctx.fillRect(slot.x-32,y-12,64*slot.hp/100,6);
+      ctx.fillStyle='#152a1c';ctx.fillRect(slot.x-32,y-12,64,6);ctx.fillStyle=slot.hp/slot.maxHp>.4?'#b0d879':'#ec977c';ctx.fillRect(slot.x-32,y-12,64*slot.hp/slot.maxHp,6);
       if(slot.action)TowerWork.drawProgress(ctx,slot.x,y-42,slot.action.elapsed/slot.action.duration,42);
     }});
     for(const e of [...g.enemies,...g.corpses])actors.push({y:e.y,draw:()=>{
       const spec=EnemySprites.specs[e.level],frame=EnemySprites.sample(e,g.time);ctx.save();ctx.translate(e.x,e.y);ctx.scale((e.facing??-1)*g.worldScale,g.worldScale);ctx.drawImage(enemies[e.level],frame.sx,frame.sy,frame.sw,frame.sh,-spec.anchor.x,-spec.anchor.y,spec.size,spec.size);ctx.restore();
-      if(gameDisplay.enemyHealth&&e.hp>0&&e.hp<e.maxHp){ctx.fillStyle='#182a1b';ctx.fillRect(e.x-20,e.y-54,40,4);ctx.fillStyle='#badc7d';ctx.fillRect(e.x-20,e.y-54,40*e.hp/e.maxHp,4);}
+      if(gameDisplay.enemyHealth)EnemySprites.drawHealth(ctx,e,e.x-20,e.y-54);
     }});
     for(const soldier of g.shieldSoldiers)actors.push({y:soldier.y,draw:()=>{
       const spec=FriendlySprites.shield,frame=FriendlySprites.sample('push',g.time-soldier.startedAt);
@@ -243,7 +251,7 @@
       ctx.drawImage(images.shieldSoldier,frame.sx,frame.sy,frame.sw,frame.sh,-spec.anchor.x,-spec.anchor.y,spec.size,spec.size);ctx.restore();
     }});
     actors.sort((a,b)=>a.y-b.y).forEach(actor=>actor.draw());
-    for(const wall of g.walls){if(roadSpec.type==='fence')FenceSprites.drawHealth(ctx,wall);else WallSprites.drawHealth(ctx,wall,g.worldScale);}
+    for(const wall of g.walls){if(roadSpec.type==='fence')FenceSprites.drawHealth(ctx,fenceVisual(wall));else WallSprites.drawHealth(ctx,wall,g.worldScale);}
     for(const b of g.bullets){ctx.save();ctx.translate(b.x,b.y);ctx.rotate(Math.atan2(b.target.y-b.y,b.target.x-b.x));ctx.drawImage(arrow,-40,-8,48,16);ctx.restore();}
     for(const b of g.enemyArrows){ctx.save();ctx.translate(b.x,b.y-20);ctx.rotate(Math.atan2(b.target.y-b.y,b.target.x-b.x));ctx.drawImage(arrow,-30,-6,32,12);ctx.restore();}
     ArrowRain.draw(ctx,arrow,g.arrowRain,g.time);

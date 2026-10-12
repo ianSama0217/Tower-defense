@@ -31,3 +31,37 @@ test('five damage stages and inherited wall combat support destruction',()=>{
  game.damageTower(fence,120);assert.equal(F.stage(fence.hp),25);
  game.damageTower(fence,30);assert.equal(fence.level,0);assert.equal(game.wallTarget({level:5,x:200,y:384}),null);
 });
+test('right-edge artwork and health bar share a visual anchor without moving the collision geometry',()=>{
+ const sprites=require('../dist/fence-sprites.js'),frame={x:960,y:352,w:96,h:96};
+ for(const orientation of ['horizontal','vertical']){
+  const fence={x:1008,y:400,hp:150,maxHp:150,orientation,...TD.wallSize(orientation,2,96)},before={...fence};
+  const visual=sprites.atCellRight(fence,frame),translations=[],bars=[];
+  const ctx={save(){},restore(){},rotate(){},translate(x,y){translations.push({x,y});},drawImage(){},fillRect(x,y,w,h){bars.push({x,y,w,h});}};
+  sprites.draw(ctx,{100:{}},visual);sprites.drawHealth(ctx,visual);
+  assert.deepEqual(translations,[{x:1032,y:400}]);assert.deepEqual(fence,before);
+  assert.equal(visual.x,fence.x);assert.equal(visual.y,fence.y);assert.equal(visual.width,fence.width);assert.equal(visual.height,fence.height);
+  assert.equal(bars[0].x+bars[0].w/2,1032);assert.equal(bars[0].y,sprites.bounds(visual).y-10);
+  if(orientation==='vertical')assert.equal(sprites.bounds(visual).x+sprites.bounds(visual).w,frame.x+frame.w);
+ }
+});
+test('destroyed fence fades with the game clock and stops rendering at three seconds',()=>{
+ const sprites=require('../dist/fence-sprites.js'),drawn=[];
+ const ctx={save(){},restore(){},translate(){},rotate(){},drawImage(){drawn.push(this.globalAlpha);}};
+ const fence={...F.unit({asset,x:240,y:384}),hp:0,destroyedAt:0};
+ sprites.draw(ctx,{0:{}},fence,1,0);sprites.draw(ctx,{0:{}},fence,1,1.5);
+ sprites.draw(ctx,{0:{}},fence,1,2.99);sprites.draw(ctx,{0:{}},fence,1,3);sprites.draw(ctx,{0:{}},fence,1,30);
+ assert.equal(drawn.length,3);assert.equal(drawn[0],1);assert.equal(drawn[1],.5);assert.ok(drawn[2]>0&&drawn[2]<.01);
+ // A static damage-stage preview has no destruction timestamp and remains visible.
+ sprites.draw(ctx,{0:{}},{...fence,destroyedAt:null},1,30);assert.equal(drawn.at(-1),1);
+});
+test('rubble immediately stops blocking and its fade neither refunds stock nor hides a replacement',()=>{
+ const {LevelThreeGame}=require('../dist/level-three.js'),sprites=require('../dist/fence-sprites.js');
+ const game=new LevelThreeGame(()=>0);game.start();game.wallsUnlocked=true;game.money=1000;
+ const fence=game.placeWall(1008,400,'vertical').wall;game.damageTower(fence,150);
+ assert.equal(game.wallTarget({level:1,x:1008,y:400}),null);
+ assert.equal(game.enemyStepFraction({level:1,x:960,y:400},100,0),1);
+ const fresh=game.placeWall(1008,400,'vertical').wall;assert.ok(fresh.hp>0);assert.equal(game.wallsRemaining,1);
+ game.update(1.5);assert.equal(sprites.opacity(fence,game.time),.5);
+ game.update(1.5);assert.equal(sprites.opacity(fence,game.time),0);assert.equal(sprites.opacity(fresh,game.time),1);
+ assert.equal(game.wallsRemaining,1);assert.equal(fresh.hp,150);
+});

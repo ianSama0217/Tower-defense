@@ -23,6 +23,17 @@
     const s=specs[enemy.level];
     return {state,index,sx:index*s.size,sy:0,sw:s.size,sh:s.size};
   }
-  const api={animations,specs,deathDuration,sample};
+  function healthBar(enemy){
+    const charge=enemy.charging&&!enemy.chargeConsumed&&enemy.chargeHp>0;
+    const hp=charge?enemy.chargeHp:enemy.hp,maxHp=charge?enemy.chargeMaxHp:enemy.maxHp;
+    return {hp,maxHp,charge:!!charge,color:charge?'#aeb4bd':'#badc7d',visible:enemy.hp>0&&enemy.deathAt==null&&!enemy.escaped&&(charge||hp<maxHp)};
+  }
+  function drawHealth(ctx,enemy,x,y,width=40,showFull=false){
+    const bar=healthBar(enemy);
+    if(!bar.visible&&!(showFull&&enemy.hp>0&&enemy.deathAt==null&&!enemy.escaped))return;
+    ctx.fillStyle='#182a1b';ctx.fillRect(x,y,width,4);
+    ctx.fillStyle=bar.color;ctx.fillRect(x,y,width*Math.max(0,Math.min(1,bar.hp/bar.maxHp)),4);
+  }
+  const api={animations,specs,deathDuration,sample,healthBar,drawHealth};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.EnemySprites=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

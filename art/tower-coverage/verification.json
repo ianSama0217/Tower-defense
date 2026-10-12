@@ -1,0 +1,10 @@
+{
+  "checks": [
+    "second and third pad counts",
+    "all pads build and upgrade to tier three",
+    "damage/range/interval match engine",
+    "actual canvas range circle",
+    "desktop and 390px layout"
+  ],
+  "errors": []
+}
