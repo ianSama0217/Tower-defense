@@ -18,7 +18,7 @@
   const wallImages={};
   const bombImages={};
   const fenceImages={};
-  let ground=null,groundOverlay=null;
+  let ground=null;
   function status(message){$('lab-status').textContent=message;}
   function record(){history.push(objects.map(o=>({...o})));if(history.length>50)history.shift();}
   function current(){return objects.find(o=>o.id===selected);}
@@ -163,7 +163,6 @@
     if(background==='forest')ctx.drawImage(ground,0,0);
     else if(background==='dark'){ctx.fillStyle='#121e19';ctx.fillRect(0,0,W,H);}
     else for(let y=0;y<H;y+=24)for(let x=0;x<W;x+=24){ctx.fillStyle=(x/24+y/24)%2?'#bbc1ad':'#dce0cc';ctx.fillRect(x,y,24,24);}
-    if(background!=='forest')ctx.drawImage(groundOverlay,0,0);
     if($('show-grid').checked){ctx.strokeStyle=background==='dark'?'#ffffff15':'#213b2b25';ctx.lineWidth=1;ctx.beginPath();for(let x=0;x<W;x+=32){ctx.moveTo(x+.5,0);ctx.lineTo(x+.5,H);}for(let y=0;y<H;y+=32){ctx.moveTo(0,y+.5);ctx.lineTo(W,y+.5);}ctx.stroke();}
     const scene=visibleObjects();
     paintWarcry(scene);
@@ -413,9 +412,7 @@
   Promise.all(loads).then(items=>{
     catalog.push(...items.filter(Boolean));
     const images=Object.fromEntries(Environment.names.map(name=>[name,catalog.find(item=>item.name===names[name]).image]));
-    ground=Environment.makeBackground(TestFences.scenario,images,WORLD_SCALE,{decorate:false}).canvas;
-    groundOverlay=document.createElement('canvas');groundOverlay.width=W;groundOverlay.height=H;const oc=groundOverlay.getContext('2d');oc.imageSmoothingEnabled=false;
-    oc.save();oc.beginPath();for(const r of Environment.roadRects(TestFences.scenario))oc.rect(r.x,r.y,r.w,r.h);oc.clip();oc.drawImage(ground,0,0);oc.restore();
+    ground=Environment.makeBackground({...TestFences.scenario,routes:[]},images,WORLD_SCALE,{decorate:false}).canvas;
     // Props have natural size variation in campaign maps; use a representative
     // placement from the shared scenery generator instead of enlarging every prop.
     const scenery=Environment.placements({...TestFences.scenario,environment:'flower-forest'},images,WORLD_SCALE);

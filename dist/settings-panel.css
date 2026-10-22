@@ -1,4 +1,4 @@
-:is(#world-settings,#game-settings).forest-settings{box-sizing:border-box;width:min(680px,calc(100vw - 24px));max-width:none;max-height:none;padding:0;border:0;border-radius:0;overflow:hidden;background:transparent;color:#46230f;box-shadow:0 16px 60px #101409a6;font-family:var(--font-ui);image-rendering:pixelated}
+:is(#world-settings,#game-settings,#settings-dialog).forest-settings{box-sizing:border-box;width:min(680px,calc(100vw - 24px));max-width:none;max-height:none;padding:0;border:0;border-radius:0;overflow:hidden;background:transparent;color:#46230f;box-shadow:0 16px 60px #101409a6;font-family:var(--font-ui);image-rendering:pixelated}
 .forest-settings::backdrop{background:#081b13b8;backdrop-filter:blur(3px)}
 .forest-settings-panel{position:relative;padding:30px 48px 40px;background:url('assets/ui/settings-kit/parchment.png') center/100% 100% no-repeat}
 .forest-settings-panel::before{content:'';position:absolute;inset:0;pointer-events:none;border:20px solid transparent;border-image:url('assets/ui/settings-kit/frame.png') 24 stretch}

@@ -2,11 +2,12 @@
 <html lang="zh-Hant">
 <head>
   <meta charset="UTF-8"><meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#eeeae0"><meta name="description" content="森林像素塔防素材與行為測試，提供五關選關畫面預覽。">
+  <meta name="theme-color" content="#204a32"><meta name="description" content="林境守衛：築塔守護，守住家園。森林像素塔防遊戲。">
+  <link rel="preload" href="assets/ui/home-forest.png" as="image" fetchpriority="high">
   <link rel="preload" href="assets/fonts/fusion-pixel-12px-proportional-zh_hant.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="stylesheet" href="fonts.css">
 <link rel="stylesheet" href="cursor.css">
-<title>幾何防線 · 森林守衛</title>
+<title>林境守衛</title>
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'%3E%3Crect x='4' y='4' width='24' height='24' rx='4' fill='%233b6b60'/%3E%3Cpath d='M16 9v14' stroke='%23fff' stroke-width='3'/%3E%3C/svg%3E">
   <link rel="stylesheet" href="base.css">
   <link rel="stylesheet" href="start-screen.css">
@@ -15,23 +16,17 @@
 </head>
 <body>
   <section id="start-screen" aria-labelledby="menu-title">
-    <canvas id="forest-scene" aria-hidden="true"></canvas>
-    <div class="forest-light" aria-hidden="true"></div>
-    <div class="menu-brand"><span class="brand-emblem" aria-hidden="true"></span>幾何防線<span class="brand-divider">/</span><span>森林守衛</span></div>
-    <div class="menu-content">
-      <p class="menu-eyebrow"><span aria-hidden="true">✦</span> 林間的冒險，即將開始 <span aria-hidden="true">✦</span></p>
-      <h1 id="menu-title">幾何防線</h1>
-      <p class="menu-subtitle">築起箭塔，守護這片森林。</p>
-      <nav class="wood-sign" aria-label="主選單">
-        <span class="sign-rope rope-left" aria-hidden="true"></span><span class="sign-rope rope-right" aria-hidden="true"></span>
-        <span class="sign-post" aria-hidden="true"></span>
-        <button id="start" class="wood-button" disabled><span class="menu-pointer" aria-hidden="true"></span><span id="start-label">開始遊戲</span><span class="menu-spark" aria-hidden="true">✦</span></button>
-        <button id="settings-open" class="wood-button wood-secondary" aria-haspopup="dialog"><span class="menu-pointer" aria-hidden="true"></span><span>設定</span><span class="menu-spark" aria-hidden="true">✦</span></button>
-        <img class="sign-fern" src="assets/environment/fern.png" alt=""><img class="sign-flowers" src="assets/environment/whiteFlowers.png" alt="">
+    <div class="home-artboard" id="home-artboard">
+      <img class="home-art" id="home-art" src="assets/ui/home-forest.png" width="1739" height="904" alt="" fetchpriority="high" draggable="false">
+      <canvas id="forest-scene" aria-hidden="true"></canvas>
+      <h1 id="menu-title" class="home-sr-only">林境守衛</h1>
+      <p class="home-sr-only">築塔守護・守住家園</p>
+      <nav class="home-menu" aria-label="主選單">
+        <button id="start" class="home-button" disabled><span id="start-label" class="home-sr-only">開始遊戲</span></button>
+        <button id="settings-open" class="home-button" aria-haspopup="dialog" aria-controls="settings-dialog" aria-expanded="false"><span class="home-sr-only">設定</span></button>
       </nav>
-      <p id="menu-status" class="menu-status" role="status">正在準備森林素材…</p>
     </div>
-    <div class="menu-footer"><span class="footer-leaf" aria-hidden="true">◆</span> 每一座箭塔，都是森林的防線 <span class="footer-leaf" aria-hidden="true">◆</span></div>
+    <p id="menu-status" class="menu-status" role="status">正在準備森林素材…</p>
   </section>
   <section id="level-screen" aria-labelledby="world-title" hidden>
     <h1 id="world-title" class="map-sr-only">翡翠森林選關地圖</h1>
@@ -77,16 +72,7 @@
       <button id="stage-enter"><img src="assets/ui/ready-swords.png" alt=""><span id="stage-enter-label">開始挑戰</span></button>
     </div>
   </dialog>
-  <dialog id="settings-dialog" aria-labelledby="settings-title">
-    <form method="dialog" class="settings-panel">
-      <p class="settings-eyebrow">FOREST DEFENSE</p>
-      <h2 id="settings-title">遊戲設定</h2>
-      <div class="setting-row"><label for="default-speed">初始遊戲速度<small>進入關卡後仍可隨時切換</small></label><select id="default-speed"><option value="1">正常 · 1×</option><option value="2">快速 · 2×</option></select></div>
-      <div class="setting-row"><label for="ambient-motion">森林動態<small>首頁的螢火與浮動光點</small></label><input id="ambient-motion" type="checkbox" role="switch" checked></div>
-      <div class="setting-row"><label for="sound-volume">音效音量</label><input id="sound-volume" data-sound-volume type="range" min="0" max="100" value="50"></div><div class="setting-row"><label for="sound-muted">靜音</label><input id="sound-muted" data-sound-muted type="checkbox"></div><a href="sound-preview.html">試聽音效 →</a><p id="settings-note">設定會自動保存在此瀏覽器。</p>
-      <button class="wood-button settings-done" autofocus>返回木牌</button>
-    </form>
-  </dialog>
+  <dialog id="settings-dialog" data-settings-panel="home" aria-labelledby="settings-title"></dialog>
   <script src="sound-manager.js"></script><script src="settings-panel.js"></script><script src="sound-settings.js"></script><script src="environment.js"></script><script src="start-screen.js"></script><script src="enemy-sprites.js"></script><script src="level-progress.js"></script><script src="level-select.js"></script><script src="menu.js"></script>
 </body>
 </html>

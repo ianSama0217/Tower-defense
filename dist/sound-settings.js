@@ -4,19 +4,25 @@
   try{saved=JSON.parse(localStorage.getItem('td-sound-settings'))||{};}catch{}
   const sound=window.gameSound=new SoundManager({volume:saved.volume,muted:saved.muted===true});
   let musicVolume=Number.isFinite(saved.musicVolume)?Math.max(0,Math.min(1,saved.musicVolume)):.6;
-  // Music assets can opt into the independent music channel; no soundtrack is bundled yet.
-  window.gameMusic={get volume(){return musicVolume;},setVolume(value){
+  // Only level pages load MusicManager; menus never create or fetch music.
+  const music=window.MusicManager?new MusicManager({volume:musicVolume}):null;
+  window.gameMusic={get volume(){return musicVolume;},start(stageIndex=0){
+    music?.start(`assets/music/battle-${Math.max(0,Math.min(2,stageIndex))+1}.mp3`);
+  },stop(){music?.stop();},setVolume(value){
     if(!Number.isFinite(value))return;
     musicVolume=Math.max(0,Math.min(1,value));
+    music?.setVolume(musicVolume);
     document.querySelectorAll('[data-background-music]').forEach(media=>{media.volume=musicVolume;});
   }};
   gameMusic.setVolume(musicVolume);
-  const unlock=()=>{void sound.unlock();};
+  const unlock=()=>{void sound.unlock();music?.play();};
   document.addEventListener('pointerdown',unlock,{capture:true});
   document.addEventListener('keydown',unlock,{capture:true});
   document.addEventListener('click',unlock,{capture:true});
-  document.addEventListener('visibilitychange',()=>{if(document.hidden)sound.stopAll();});
-  window.addEventListener('pagehide',()=>sound.stopAll());
+  document.addEventListener('visibilitychange',()=>{if(document.hidden)sound.stopAll();music?.suspend(document.hidden);});
+  music?.suspend(document.hidden);
+  window.addEventListener('pagehide',()=>{sound.stopAll();music?.suspend(true);});
+  window.addEventListener('pageshow',()=>music?.suspend(document.hidden));
   function save(){try{localStorage.setItem('td-sound-settings',JSON.stringify({volume:sound.volume,muted:sound.muted,musicVolume}));}catch{}}
   const volumeInputs=[...document.querySelectorAll('[data-sound-volume]')];
   const musicInputs=[...document.querySelectorAll('[data-music-volume]')];

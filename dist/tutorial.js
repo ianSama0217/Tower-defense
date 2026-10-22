@@ -53,7 +53,7 @@
     button.addEventListener('keydown',event=>{if(!['ArrowRight','ArrowLeft','ArrowUp','ArrowDown'].includes(event.key))return;event.preventDefault();const step=['ArrowLeft','ArrowUp'].includes(event.key)?-1:1;selectPad((s.id+step+buttons.length)%buttons.length);buttons[selected].focus();});
     $('pads').append(button);buttons.push(button);
   }
-  function start(){g.sound.stopAll();g.start();g.wallsUnlocked=LevelProgress.wallsUnlocked(LevelProgress.read(encounterStorage));hud.reset(g.lives);selected=null;roadSelected=null;roadHover=null;paused=false;resultShown=false;$('result').close();$('feedback').textContent='';updateUI();draw();}
+  function start(){g.sound.stopAll();g.start();window.gameMusic.start(g.level.stageIndex??0);g.wallsUnlocked=LevelProgress.wallsUnlocked(LevelProgress.read(encounterStorage));hud.reset(g.lives);selected=null;roadSelected=null;roadHover=null;paused=false;resultShown=false;$('result').close();$('feedback').textContent='';updateUI();draw();}
   Promise.all(loads).then(()=>{background=Environment.makeBackground(g.level,images,g.worldScale).canvas;ready=true;start();}).catch(error=>{$('wave-status').textContent='素材載入失敗，請重新整理頁面。';console.error(error);});
   function perform(action){if(paused||!ready||selected===null)return;const result=g[action](selected);$('feedback').textContent=result.message;updateUI();}
   function selectPad(id){selected=id;roadSelected=null;roadHover=null;$('feedback').textContent='';updateUI();draw();}
@@ -206,7 +206,7 @@
       button.setAttribute('aria-label',`臺座 ${id+1}${slot.level?`，${slot.level} 級箭塔，生命 ${slot.hp}`:'，可建造箭塔'}`);
     });
     if(['won','lost'].includes(g.phase)&&!resultShown&&!hud.isBreaking()){
-      resultShown=true;g.sound.stopAll();
+      resultShown=true;g.sound.stopAll();window.gameMusic.stop();
       let storage=null;try{storage=localStorage;}catch{}
       resultPanel.show(BattleResult.summarize(g,storage));
     }

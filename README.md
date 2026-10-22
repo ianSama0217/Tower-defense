@@ -74,6 +74,8 @@
 
 ## JavaScript 音效
 
+三個關卡分別循環播放使用者提供 MIDI 壓縮檔中的 Battle Theme、Battle Theme II、Battle Theme III，已離線轉為 MP3。首頁與選關不載入或播放音樂；音樂音量沿用設定中的獨立滑桿。結算及離開關卡時停止，重玩時從頭開始，切到其他分頁時暫停；瀏覽器若阻擋自動播放，首次點擊或按鍵後啟用。來源、轉檔與驗證方式見 [關卡音樂](art/music/README.md)。
+
 `dist/sound-manager.js` 使用 Web Audio API 即時合成八種音效，不需下載音訊檔。開啟 `sound-preview.html` 可逐一試聽，包含 Lv.1／2／3 射箭的 1000／900／800 Hz 起始音高；音高向下滑落並疊加短促風聲。
 
 | 方法 | 遊戲觸發時機 |

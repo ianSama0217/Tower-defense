@@ -92,7 +92,7 @@
     event.preventDefault();nodes[next].focus({preventScroll:true});
   });
   $('world-back').addEventListener('click',()=>{
-    settings.close();screen.hidden=true;$('start-screen').hidden=false;document.title='幾何防線 · 森林守衛';
+    settings.close();screen.hidden=true;$('start-screen').hidden=false;document.title='林境守衛';
     root.StartScreen.resume();$('start').focus({preventScroll:true});
   });
   screen.addEventListener('keydown',event=>{if(event.key==='Escape'&&!dialog.open&&!settings.open){event.preventDefault();openSettings();}});
@@ -102,7 +102,7 @@
     ready(){},
     show(){
       root.StartScreen.stop();$('start-screen').hidden=true;screen.hidden=false;
-      document.title='幾何防線 · 翡翠森林';refresh();
+      document.title='林境守衛 · 翡翠森林';refresh();
       const current=nodes.find((node,i)=>LevelProgress.unlocked(stars,i)&&stars[i]===0)||nodes[0];
       fitLayout();current.focus({preventScroll:true});
     }
