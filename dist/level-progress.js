@@ -5,7 +5,7 @@
     {name:'林間入口',enemies:[5,1],href:'tutorial.html'},
     {name:'花徑哨站',enemies:[1,6],href:'level-two.html'},
     {name:'古木岔路',enemies:[1,6,2],href:'level-three.html'},
-    {name:'暮色防線',enemies:[]},
+    {name:'暮色防線',enemies:[1,6,2,4],href:'level-four.html'},
     {name:'荊棘王座',enemies:[]}
   ];
   function normalize(value){return Array.from({length:COUNT},(_,i)=>Number.isInteger(value?.[i])&&value[i]>=0&&value[i]<=3?value[i]:0);}
@@ -18,6 +18,7 @@
   }
   function unlocked(stars,index){return Number.isInteger(index)&&index>=0&&index<COUNT&&(index===0||normalize(stars)[index-1]>=1);}
   function wallsUnlocked(stars){return normalize(stars)[1]>=1;}
+  function bombTowersUnlocked(stars){return normalize(stars)[3]>=1;}
   function starsForResult(phase,lives){return phase==='won'&&Number.isFinite(lives)&&lives>=1?Math.min(3,Math.floor(lives)):0;}
   function record(storage,index,earned){
     const stars=read(storage);
@@ -48,6 +49,6 @@
       }
     };
   }
-  const api={KEY,ENCOUNTER_KEY,stages,read,unlocked,wallsUnlocked,starsForResult,record,readEncountered,createEncounterTracker};
+  const api={KEY,ENCOUNTER_KEY,stages,read,unlocked,wallsUnlocked,bombTowersUnlocked,starsForResult,record,readEncountered,createEncounterTracker};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.LevelProgress=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

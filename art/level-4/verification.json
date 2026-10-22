@@ -1,0 +1,40 @@
+{
+  "errors": [],
+  "fit": {
+    "roadWidth": 96,
+    "fences": [
+      {
+        "width": 32,
+        "height": 96,
+        "orientation": "vertical"
+      },
+      {
+        "width": 96,
+        "height": 32,
+        "orientation": "horizontal"
+      }
+    ],
+    "soldierRows": [
+      408,
+      456
+    ]
+  },
+  "pads": 13,
+  "waves": 6,
+  "totalEnemies": 118,
+  "initialMoney": 150,
+  "buildings": [
+    "arrow",
+    "fence"
+  ],
+  "reward": "bomb-tower",
+  "combat": true,
+  "desktop": [
+    1440,
+    900
+  ],
+  "mobile": [
+    390,
+    844
+  ]
+}

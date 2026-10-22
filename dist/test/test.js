@@ -409,6 +409,8 @@
   for(const level of [5,1,6,2,3,4]){const spec=EnemySprites.specs[level];loads.push(load('enemy',spec.name||['','Lv1 哥布林','Lv2 獸人','Lv3 獨眼巨人'][level],`assets/enemies/${spec.file}`,spec,level));}
   TowerSprites.specs.slice(1).forEach((spec,i)=>loads.push(load('tower',['Lv1 木造箭塔','Lv2 石造箭塔','Lv3 強化箭塔'][i],`assets/towers/${spec.file}`,spec,i+1)));
   Environment.names.forEach(name=>loads.push(load('environment',names[name]||name,`assets/environment/${name}.png`)));
+  // Manually placed landmark; keep it out of the campaign's random scenery pool.
+  loads.push(load('environment','骷髏洞窟','assets/environment/skullCave.png'));
   Promise.all(loads).then(items=>{
     catalog.push(...items.filter(Boolean));
     const images=Object.fromEntries(Environment.names.map(name=>[name,catalog.find(item=>item.name===names[name]).image]));

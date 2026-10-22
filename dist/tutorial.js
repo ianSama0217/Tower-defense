@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const $=id=>document.getElementById(id),g=window.LevelThree?new LevelThree.LevelThreeGame():window.LevelTwo?new LevelTwo.LevelTwoGame():new Tutorial.TutorialGame(),canvas=$('battlefield'),ctx=canvas.getContext('2d');
+  const $=id=>document.getElementById(id),g=window.LevelFour?new LevelFour.LevelFourGame():window.LevelThree?new LevelThree.LevelThreeGame():window.LevelTwo?new LevelTwo.LevelTwoGame():new Tutorial.TutorialGame(),canvas=$('battlefield'),ctx=canvas.getContext('2d');
   g.sound=window.gameSound;
   let encounterStorage=null;try{encounterStorage=localStorage;}catch{}
   const encounters=LevelProgress.createEncounterTracker(encounterStorage);

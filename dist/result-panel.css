@@ -21,6 +21,7 @@
 .result-wall-reward{display:flex;align-items:center;justify-content:center;gap:12px;width:92%;margin:10px auto;padding:10px;background:#ead4a6;border:2px solid #9a7843;text-align:left;color:#4d331a}
 .result-wall-reward b{font-size:20px}.result-wall-reward p{margin:4px 0 0;font-size:14px;line-height:1.4}
 .result-wall-icon{flex:none;width:49px;height:30px;background:url('assets/walls/wall-horizontal-100.png') -7px -46px no-repeat;image-rendering:pixelated}
+.result-bomb-icon{flex:none;width:64px;height:64px;background:url('assets/bomb-towers/tower_lv1.png') center/contain no-repeat;image-rendering:pixelated}
 @media(max-width:600px){.result-wall-reward{width:100%;gap:8px;padding:8px}.result-wall-reward b{font-size:16px}.result-wall-reward p{font-size:12px}}
 .result-buttons{display:flex;justify-content:center;gap:10px;margin:0 auto;width:100%}
 #result .result-buttons button{display:flex;align-items:center;justify-content:center;gap:12px;width:50%;height:84px;border:0;padding:12px 8%;background:url('assets/ui/stage-kit/title.png') center/100% 100% no-repeat;box-shadow:none;border-radius:0;color:#fff1cc;font-size:28px;white-space:nowrap;text-shadow:2px 2px #3d220f,-1px -1px #3d220f}

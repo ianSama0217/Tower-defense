@@ -5,10 +5,10 @@
     const won=game.phase==='won',stars=progress.starsForResult(game.phase,game.lives);
     const stageIndex=game.level?.stageIndex??0;
     let records=progress.read(storage),best=records[stageIndex],saved=true;
-    const hadWalls=progress.wallsUnlocked(records);
+    const hadWalls=progress.wallsUnlocked(records),hadBombTowers=progress.bombTowersUnlocked(records);
     if(won){const record=progress.record(storage,stageIndex,stars);records=record.stars;best=records[stageIndex];saved=record.saved;}
     const next=progress.stages[stageIndex+1];
-    return {won,stars,best,saved,waves:won?game.waves.length:Math.max(0,game.wave-1),kills:game.kills,lives:game.lives,towers:game.towersBuilt||0,nextHref:won&&progress.unlocked(records,stageIndex+1)?next?.href:null,wallReward:won&&stageIndex===1&&progress.wallsUnlocked(records)?hadWalls?'owned':'unlocked':null};
+    return {won,stars,best,saved,waves:won?game.waves.length:Math.max(0,game.wave-1),kills:game.kills,lives:game.lives,towers:game.towersBuilt||0,nextHref:won&&progress.unlocked(records,stageIndex+1)?next?.href:null,wallReward:won&&stageIndex===1&&progress.wallsUnlocked(records)?hadWalls?'owned':'unlocked':null,bombTowerReward:won&&stageIndex===3&&progress.bombTowersUnlocked(records)?hadBombTowers?'owned':'unlocked':null};
   }
   function mount(dialog,{onRestart,stageIndex=0}={}){
     dialog.innerHTML=`<div class="battle-result">
@@ -26,6 +26,7 @@
       </section>
       <div class="result-best"><span>最佳紀錄</span><div id="result-best-stars" class="result-stars" role="img"></div></div>
       <div id="result-wall-reward" class="result-wall-reward" hidden><span class="result-wall-icon" aria-hidden="true"></span><div><b id="result-wall-title"></b><p>第三關起可使用 · 每場 3 個 · 每個 100 金幣</p></div></div>
+      <div id="result-bomb-reward" class="result-wall-reward" hidden><span class="result-bomb-icon" aria-hidden="true"></span><div><b id="result-bomb-title"></b><p>第五關起開放建造</p></div></div>
       <p id="save-note" role="status" hidden></p>
       <div class="result-buttons"><button id="restart" type="button"><img class="result-action-icon" src="assets/ui/result-restart-icon.png" alt="" draggable="false">再玩一次</button><button id="result-next" type="button"><img class="result-action-icon" src="assets/ui/result-next-icon.png" alt="" draggable="false"><span>下一關</span></button></div>
       <p id="result-next-note" hidden>下一關準備中</p>
@@ -54,6 +55,7 @@
       for(const key of ['waves','kills','lives','towers'])$('result-'+key).textContent=data[key];
       $('save-note').hidden=data.saved;$('save-note').textContent=data.saved?'':'無法儲存本次紀錄，離開後可能遺失進度。';
       $('result-wall-reward').hidden=!data.wallReward;$('result-wall-title').textContent=data.wallReward==='owned'?'通關獎勵 · 城牆已解鎖':'通關獎勵 · 解鎖城牆';
+      $('result-bomb-reward').hidden=!data.bombTowerReward;$('result-bomb-title').textContent=data.bombTowerReward==='owned'?'通關獎勵 · 炸彈塔已解鎖':'通關獎勵 · 解鎖炸彈塔';
       nextHref=data.nextHref;$('result-next').disabled=!nextHref;
       $('result-next').title=nextHref?'前往下一關':data.won?'下一關準備中':'通關後開放';
       $('result-next-note').hidden=!data.won||!!nextHref;

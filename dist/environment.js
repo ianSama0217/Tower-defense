@@ -22,8 +22,8 @@
     return flags;
   }
   function placements(level,images,displayScale=1){
-    const flowering=level.environment==='flower-forest',dense=flowering||level.environment==='deep-forest';
-    const random=rng(flowering?31005:dense?20406:48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
+    const rocky=level.environment==='cave-approach',flowering=level.environment==='flower-forest',dense=flowering||level.environment==='deep-forest';
+    const random=rng(rocky?41023:flowering?31005:dense?20406:48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
     // Reserve the full tower silhouette above every build pad as well as its click area.
     const reserved=level.slots.map(s=>({x:s.x-24*displayScale,y:s.y-56*displayScale,w:48*displayScale,h:78*displayScale}));
     if(images.enemyEntranceFlag)reserved.push(...entranceFlags(level,displayScale).map(p=>({x:p.x-4*displayScale,y:p.y-4*displayScale,w:p.w+8*displayScale,h:p.h+8*displayScale})));
@@ -33,10 +33,36 @@
       {count:45,names:['mossRock','rock','lowRock','rockCluster','stump','fallenLog'],scale:.55},
       {count:95,names:['bush','flowers','orangeBush','berryBush'],scale:.55},
       {count:380,names:['fern','tuft','whiteFlowers','pinkFlowers','pebble','flowers'],scale:.42});
+    if(rocky)groups.splice(0,groups.length,
+      {count:12,names:['oak','pine','smallOak','youngTree'],scale:.75,region:[0,.62]},
+      {count:36,names:['boulders','standingRock','rockCluster','mossRock'],scale:.85,region:[2/3,1],clustered:true},
+      {count:34,names:['rock','lowRock','pebble'],scale:.6,region:[2/3,1],clustered:true},
+      {count:24,names:['mossRock','rock','lowRock','rockCluster'],scale:.65,region:[0,2/3]},
+      {count:22,names:['bush','fern','tuft'],scale:.55,region:[0,2/3]},
+      {count:100,names:['pebble','tuft'],scale:.35});
+    const rocks=new Set(['boulders','standingRock','rockCluster','mossRock','rock','lowRock','pebble']);
+    const clusterRandom=rng(41029),clusters=rocky?Array.from({length:8},()=>({
+      x:map.width*(.7+clusterRandom()*.28),y:map.height*(.04+clusterRandom()*.92),
+      rx:(28+clusterRandom()*34)*displayScale,ry:(20+clusterRandom()*38)*displayScale
+    })):[];
     for(const group of groups){let count=0;for(let attempt=0;attempt<(dense?9000:1600)&&count<group.count;attempt++){
-      const name=group.names[Math.floor(random()*group.names.length)],img=images[name],scale=group.scale*(.85+random()*.3),w=Math.round(img.naturalWidth*scale)*displayScale,h=Math.round(img.naturalHeight*scale)*displayScale;
-      const box={x:Math.floor(3+random()*(map.width-w-6)),y:Math.floor(4+random()*(map.height-h-8)),w,h};
+      const name=group.names[Math.floor(random()*group.names.length)],img=images[name],scale=group.scale*(group.clustered?.55+random()*1.05:.85+random()*.3),w=Math.round(img.naturalWidth*scale)*displayScale,h=Math.round(img.naturalHeight*scale)*displayScale;
+      const [left,right]=group.region||[0,1];
+      const box={x:Math.floor(map.width*left+3+random()*(map.width*(right-left)-w-6)),y:Math.floor(4+random()*(map.height-h-8)),w,h};
+      // Loose satellites surround uneven outcrops, with open ground between groups.
+      if(group.clustered&&random()<.88){
+        const cluster=clusters[Math.floor(random()*clusters.length)],angle=random()*Math.PI*2,radius=Math.sqrt(random());
+        box.x=Math.round(cluster.x+Math.cos(angle)*cluster.rx*radius-w/2);
+        box.y=Math.round(cluster.y+Math.sin(angle)*cluster.ry*radius-h/2);
+        if(box.x<map.width*left+3||box.x+w>map.width*right-3||box.y<4||box.y+h>map.height-4)continue;
+      }
       if(roads.some(r=>overlaps(box,r))||reserved.some(r=>overlaps(box,r)))continue;
+      if(group.clustered){
+        // Let silhouettes overlap, but retain distinct rock cores and clear non-rock scenery.
+        const core=b=>({x:b.x+b.w*.2,y:b.y+b.h*.2,w:b.w*.6,h:b.h*.6});
+        if(placed.some(p=>rocks.has(p.name)?overlaps(core(box),core(p)):overlaps(box,p)))continue;
+        placed.push({...box,name});count++;continue;
+      }
       const inset=dense?.23:0;
       const occupied=dense?{x:box.x+box.w*inset,y:box.y+box.h*inset,w:box.w*(1-inset*2),h:box.h*(1-inset*2)}:box;
       if(placed.some(p=>overlaps(occupied,{x:p.x+(dense?p.w*inset:3),y:p.y+(dense?p.h*inset:3),w:p.w-(dense?p.w*inset*2:6),h:p.h-(dense?p.h*inset*2:6)})))continue;
@@ -57,6 +83,17 @@
     };
     const stamps=textures.map(name=>makeStamp(name));
     for(let i=0;i<Math.ceil(430*textureDensity);i++){ctx.globalAlpha=.45+random()*.4;ctx.drawImage(stamps[Math.floor(random()*stamps.length)],Math.floor(random()*(width+60*displayScale)-60*displayScale),Math.floor(random()*(height+60*displayScale)-60*displayScale),64*displayScale,64*displayScale);}ctx.globalAlpha=1;
+    if(level.environment==='cave-approach'){
+      // Exposed soil gradually replaces meadow near the enemy's rocky approach.
+      const stoneRandom=rng(41024),soil=makeStamp('dirt',10);
+      for(let i=0;i<520*textureDensity;i++){
+        const x=stoneRandom()*width;if(stoneRandom()>Math.max(0,(x/width-.48)/.52))continue;
+        const size=(28+stoneRandom()*36)*displayScale;
+        ctx.globalAlpha=.35+stoneRandom()*.35;
+        ctx.drawImage(soil,Math.floor(x-size/2),Math.floor(stoneRandom()*height-size/2),size,size);
+      }
+      ctx.globalAlpha=1;
+    }
     const grassUnderlay=document.createElement('canvas');grassUnderlay.width=width;grassUnderlay.height=height;grassUnderlay.getContext('2d').drawImage(c,0,0);
     // Pixel-stepped shoulders vary only the artwork; movement still uses the original routes.
     const road=new Path2D(),shoulders=[],rects=roadRects(level),edgeRandom=rng(86219);
@@ -98,7 +135,8 @@
       }
       const flowering=level.environment==='flower-forest';
       if(detailRandom()>(flowering?.55:.3))continue;
-      const isStone=detailRandom()<.25,name=isStone?'pebble':flowering&&detailRandom()<.45?(detailRandom()<.5?'whiteFlowers':'pinkFlowers'):detailRandom()<.2?'fern':'tuft';
+      const stoneChance=level.environment==='cave-approach'?(edge.x>width*2/3?.9:.5):.25;
+      const isStone=detailRandom()<stoneChance,name=isStone?'pebble':flowering&&detailRandom()<.45?(detailRandom()<.5?'whiteFlowers':'pinkFlowers'):detailRandom()<.2?'fern':'tuft';
       const scale=(isStone?.22+detailRandom()*.14:.38+detailRandom()*.27)*displayScale,img=images[name];
       const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);
       const inward=(isStone?-1:1)*(1+detailRandom()*3)*displayScale;

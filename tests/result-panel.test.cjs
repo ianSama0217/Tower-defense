@@ -4,7 +4,7 @@ const {TutorialGame}=require('../dist/tutorial-level.js');
 const store=()=>{const values=new Map();return {getItem:key=>values.get(key)||null,setItem:(key,value)=>values.set(key,value)};};
 test('result stars use remaining lives and preserve the best record across loss and weaker wins',()=>{
  const s=store(),g={phase:'won',lives:3,wave:4,waves:[1,2,3,4],kills:26,towersBuilt:3};
- assert.deepEqual(summarize(g,s),{won:true,stars:3,best:3,saved:true,waves:4,kills:26,lives:3,towers:3,nextHref:'level-two.html',wallReward:null});
+ assert.deepEqual(summarize(g,s),{won:true,stars:3,best:3,saved:true,waves:4,kills:26,lives:3,towers:3,nextHref:'level-two.html',wallReward:null,bombTowerReward:null});
  assert.equal(summarize({...g,lives:1},s).best,3);
  const lost=summarize({...g,phase:'lost',wave:3,lives:0,kills:18},s);
  assert.equal(lost.waves,2);assert.equal(lost.stars,0);assert.equal(lost.best,3);assert.equal(lost.nextHref,null);
@@ -24,4 +24,17 @@ test('tower count records completed new buildings only, survives destruction, an
  g.money=1000;g.wave=2;g.awaitingWave=true;g.build(0);g.update(5);assert.equal(g.towersBuilt,1);
  g.damageTower(g.slots[0],100);assert.equal(g.towersBuilt,1);g.upgradeLearned=true;g.build(1);g.damageTower(g.slots[1],100);g.update(5);assert.equal(g.towersBuilt,1);
  g.start();assert.equal(g.towersBuilt,0);
+});
+
+test('fourth-stage victory unlocks bomb towers from saved stars and retains them on replay or loss',()=>{
+ const P=require('../dist/level-progress.js'),s=store();s.setItem(P.KEY,'[3,3,3,0,0]');
+ const g={level:{stageIndex:3},phase:'lost',lives:0,wave:6,waves:[1,2,3,4,5,6],kills:100};
+ assert.equal(summarize(g,s).bombTowerReward,null);assert.equal(P.bombTowersUnlocked(P.read(s)),false);
+ g.phase='won';g.lives=1;assert.equal(summarize(g,s).bombTowerReward,'unlocked');assert.equal(P.bombTowersUnlocked(P.read(s)),true);
+ assert.equal(summarize(g,s).bombTowerReward,'owned');g.phase='lost';assert.equal(summarize(g,s).bombTowerReward,null);
+ assert.equal(P.bombTowersUnlocked(P.read(s)),true);assert.equal(P.bombTowersUnlocked([3,3,3,1,0]),true);
+ assert.equal(P.bombTowersUnlocked([3,3,3,0,0]),false);assert.equal(P.bombTowersUnlocked(null),false);
+ g.phase='won';const failed=store();failed.setItem(P.KEY,'[3,3,3,0,0]');failed.setItem=()=>{throw Error('Storage blocked');};
+ const result=summarize(g,failed);assert.equal(result.saved,false);assert.equal(result.bombTowerReward,'unlocked');
+ assert.equal(P.bombTowersUnlocked(P.read(failed)),false);
 });
