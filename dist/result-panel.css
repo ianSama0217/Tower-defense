@@ -18,11 +18,12 @@
 .result-grid dt{font-size:19px;white-space:nowrap}.result-grid dd{margin:0;font-size:20px;line-height:1}.result-grid b{font:700 38px var(--font-ui);vertical-align:baseline;margin-right:4px}
 .result-best{display:flex;justify-content:center;align-items:center;gap:24px;width:65%;min-height:48px;margin:12px auto 14px;background:#315c30;border:3px solid #554022;box-shadow:inset 0 2px #79944c,inset 0 -3px #1e361e;color:#fff0c5;font-size:24px;text-shadow:2px 2px #243b1c;border-radius:6px}
 .result-best .result-stars span{width:32px;height:32px}
-.result-wall-reward{display:flex;align-items:center;justify-content:center;gap:12px;width:92%;margin:10px auto;padding:10px;background:#ead4a6;border:2px solid #9a7843;text-align:left;color:#4d331a}
+.result-wall-reward{display:flex;align-items:center;justify-content:center;gap:12px;width:92%;margin:10px auto;padding:14px 24px;background:none;border:10px solid transparent;border-image:url('assets/ui/stage-kit/heading.png') 20 fill / 10px / 0 stretch;text-align:left;color:#fff0cb;text-shadow:2px 2px #39200f}
 .result-wall-reward b{font-size:20px}.result-wall-reward p{margin:4px 0 0;font-size:14px;line-height:1.4}
-.result-wall-icon{flex:none;width:49px;height:30px;background:url('assets/walls/wall-horizontal-100.png') -7px -46px no-repeat;image-rendering:pixelated}
+.result-wall-reward p span{display:inline-block;white-space:nowrap}
+.result-wall-icon{flex:none;width:72px;height:36px;background:url('assets/fences/fence-100.png') center/contain no-repeat;image-rendering:pixelated}
 .result-bomb-icon{flex:none;width:64px;height:64px;background:url('assets/bomb-towers/tower_lv1.png') center/contain no-repeat;image-rendering:pixelated}
-@media(max-width:600px){.result-wall-reward{width:100%;gap:8px;padding:8px}.result-wall-reward b{font-size:16px}.result-wall-reward p{font-size:12px}}
+@media(max-width:600px){.result-wall-reward{width:100%;gap:8px;padding:8px}.result-wall-icon{width:48px;height:30px}.result-wall-reward b{font-size:16px}.result-wall-reward p{font-size:12px}}
 .result-buttons{display:flex;justify-content:center;gap:10px;margin:0 auto;width:100%}
 #result .result-buttons button{display:flex;align-items:center;justify-content:center;gap:12px;width:50%;height:84px;border:0;padding:12px 8%;background:url('assets/ui/stage-kit/title.png') center/100% 100% no-repeat;box-shadow:none;border-radius:0;color:#fff1cc;font-size:28px;white-space:nowrap;text-shadow:2px 2px #3d220f,-1px -1px #3d220f}
 .result-action-icon{display:block;flex:0 0 48px;width:48px;height:48px;object-fit:contain;image-rendering:pixelated}

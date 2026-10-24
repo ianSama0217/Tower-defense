@@ -68,11 +68,11 @@ test('a single 40+ hit only interrupts charge; a later lethal hit resolves death
     assert.equal(e.hp,80);assert.equal(g.kills,0);g.damageEnemy(e,999);g.damageEnemy(e,999);assert.equal(g.corpses.length,1);assert.equal(g.kills,1);
   }
 });
-test('bomber explosion damage also interrupts a nearby orc charge',()=>{
+test('bomber explosion leaves allied orc health and charge intact',()=>{
   const g=setup(),e=orc(g),b={...e,id:g.nextId++,level:4,hp:60,maxHp:60,x:10};g.enemies.push(b);
   g.moveEnemy(e,.01);g.damageEnemy(b,60);
-  assert.equal(e.hp,80);assert.equal(e.chargeDamageTaken,40);assert.equal(e.charging,false);
-  assert.equal(e.chargeConsumed,true);assert.equal(g.corpses.length,1);
+  assert.equal(e.hp,80);assert.equal(e.chargeHp,40);assert.equal(e.charging,true);
+  assert.notEqual(e.chargeConsumed,true);assert.equal(g.corpses.length,1);
 });
 test('arrows can interrupt charge on the contact update before collision damage is applied',()=>{
   const g=setup(),t=tower(g,300),e=orc(g,367);

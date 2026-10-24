@@ -34,6 +34,11 @@
 #pads.road-hover{cursor:pointer}
 @media(max-width:600px){#wall-preview{width:60px;height:60px;object-fit:contain}.road-build-info{font-size:12px;line-height:1.7}}
 #build.is-built #tower-preview{width:82px;height:100px}
+#bomb-card-preview,#bomb-selected-preview{display:block;width:68px;height:68px;object-fit:contain;image-rendering:pixelated}
+#build.is-built #bomb-selected-preview{width:82px;height:100px}
+#build-bomb:disabled #bomb-card-preview{filter:grayscale(.65) brightness(.65)}
+#stat-range b{font-size:18px}
+@media(max-width:720px){.has-tower #build.is-built #bomb-selected-preview{width:66px;height:84px}.has-tower #stat-range b{font-size:14px}}
 .tower-stats{display:flex;align-self:center;gap:18px;flex:none;min-width:204px;height:126px;padding:3px 0}
 .stat-column{display:flex;flex-direction:column;gap:4px}
 .tower-stat{display:flex;align-items:center;gap:6px;height:36px;white-space:nowrap;color:#342312;text-shadow:0 1px #ffe5b5;cursor:help;border-radius:3px}

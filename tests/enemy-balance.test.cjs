@@ -73,7 +73,8 @@ test('even a 200 or 999 damage hit only removes the gray shield and never grants
   const {game,enemy}=setup(2);
   const bomber={id:99,level:4,hp:60,maxHp:60,x:enemy.x,y:enemy.y};game.enemies.push(bomber);
   game.damageEnemy(bomber,60);
-  assert.equal(enemy.hp,80);assert.equal(enemy.chargeHp,0);assert.equal(enemy.maxHp,80);assert.equal(enemy.charging,false);
+  assert.equal(enemy.hp,80);assert.equal(enemy.chargeHp,40);assert.equal(enemy.maxHp,80);assert.equal(enemy.charging,true);
+  game.damageEnemy(enemy,80);assert.equal(game.kills,1);
   game.damageEnemy(enemy,80);assert.equal(game.kills,2);
 });
 
@@ -87,7 +88,7 @@ test('the actual 200 damage arrow rain changes charge form once while leaving th
   assert.equal(game.effects.at(-1).amount,28);assert.equal(game.fireArrowRain(),false);assert.equal(enemy.hp,80);
 });
 
-test('bomb tower explosions and bomber chain reactions use the same non-spilling shield rule',()=>{
+test('bomb tower explosions respect shields while allied bomber blasts spare them',()=>{
   const {BombTowerGame}=require('../dist/bomb-towers.js');
   const {game,enemy}=setup(2,1,BombTowerGame);
   game.detonate({toX:enemy.x,toY:enemy.y,radius:64,damage:200});
@@ -95,8 +96,8 @@ test('bomb tower explosions and bomber chain reactions use the same non-spilling
   game.detonate({toX:enemy.x,toY:enemy.y,radius:64,damage:20});assert.equal(enemy.hp,60);
   const chain=setup(2),a={id:99,level:4,hp:40,x:chain.enemy.x,y:100},b={...a,id:100};
   chain.game.enemies.push(a,b);chain.game.damageEnemy(a,60);
-  assert.equal(chain.enemy.hp,30);assert.equal(chain.enemy.chargeHp,0);
-  assert.equal(chain.game.kills,2);assert.equal(chain.game.corpses.length,2);
+  assert.equal(chain.enemy.hp,80);assert.equal(chain.enemy.chargeHp,40);assert.equal(b.hp,40);
+  assert.equal(chain.game.kills,1);assert.equal(chain.game.corpses.length,1);
 });
 
 test('gray health is visible immediately, shrinks independently and disappears after charge ends',()=>{

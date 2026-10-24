@@ -11,6 +11,8 @@
     return rects;
   }
   function entranceFlags(level,displayScale=1){
+    // The cave already carries its own red entrance banners.
+    if(level.environment==='cave-mouth')return [];
     const {width,roadWidth}=level.mapConfig,seen=new Set(),flags=[];
     const w=24*displayScale,h=40*displayScale,margin=4*displayScale;
     for(const route of level.routes){
@@ -21,11 +23,15 @@
     }
     return flags;
   }
+  function landmarks(level){
+    return level.environment==='cave-mouth'?[{name:'skullCave',x:1056,y:192,w:368,h:245}]:[];
+  }
   function placements(level,images,displayScale=1){
-    const rocky=level.environment==='cave-approach',flowering=level.environment==='flower-forest',dense=flowering||level.environment==='deep-forest';
-    const random=rng(rocky?41023:flowering?31005:dense?20406:48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
+    const cave=level.environment==='cave-mouth',rocky=level.environment==='cave-approach',flowering=level.environment==='flower-forest',dense=flowering||level.environment==='deep-forest';
+    const random=rng(cave?51023:rocky?41023:flowering?31005:dense?20406:48315),map=level.mapConfig,placed=[],roads=roadRects(level,4);
     // Reserve the full tower silhouette above every build pad as well as its click area.
     const reserved=level.slots.map(s=>({x:s.x-24*displayScale,y:s.y-56*displayScale,w:48*displayScale,h:78*displayScale}));
+    reserved.push(...landmarks(level));
     if(images.enemyEntranceFlag)reserved.push(...entranceFlags(level,displayScale).map(p=>({x:p.x-4*displayScale,y:p.y-4*displayScale,w:p.w+8*displayScale,h:p.h+8*displayScale})));
     const groups=dense?[{count:78,names:names.slice(0,7),scale:.9},{count:35,names:['boulders','mossRock','rock','lowRock','stump','fallenLog','log'],scale:.65},{count:85,names:['bush','flowers','orangeBush','berryBush'],scale:.65},{count:220,names:['fern','tuft','whiteFlowers','pinkFlowers','pebble'],scale:.6}]:[{count:19,names:names.slice(0,11),scale:.85},{count:15,names:['boulders','standingRock','rockCluster','mossRock','rock','lowRock','stump','fallenLog','log'],scale:.8},{count:28,names:['bush','flowers','orangeBush','berryBush'],scale:.75},{count:45,names:['fern','tuft','reeds','whiteFlowers','pinkFlowers','pebble'],scale:.75}];
     if(flowering)groups.splice(0,groups.length,
@@ -40,9 +46,16 @@
       {count:24,names:['mossRock','rock','lowRock','rockCluster'],scale:.65,region:[0,2/3]},
       {count:22,names:['bush','fern','tuft'],scale:.55,region:[0,2/3]},
       {count:100,names:['pebble','tuft'],scale:.35});
+    if(cave)groups.splice(0,groups.length,
+      {count:4,names:['pine','smallOak','youngTree'],scale:.7,region:[0,.45]},
+      {count:18,names:['fallenLog','log'],scale:.95},
+      {count:48,names:['boulders','standingRock','rockCluster','mossRock'],scale:.85,clustered:true},
+      {count:38,names:['rock','lowRock'],scale:.65},
+      {count:12,names:['stump','fern','tuft'],scale:.55},
+      {count:100,names:['pebble','tuft'],scale:.35});
     const rocks=new Set(['boulders','standingRock','rockCluster','mossRock','rock','lowRock','pebble']);
-    const clusterRandom=rng(41029),clusters=rocky?Array.from({length:8},()=>({
-      x:map.width*(.7+clusterRandom()*.28),y:map.height*(.04+clusterRandom()*.92),
+    const clusterRandom=rng(cave?51029:41029),clusters=rocky||cave?Array.from({length:cave?14:8},()=>({
+      x:map.width*(cave?.04+clusterRandom()*.92:.7+clusterRandom()*.28),y:map.height*(.04+clusterRandom()*.92),
       rx:(28+clusterRandom()*34)*displayScale,ry:(20+clusterRandom()*38)*displayScale
     })):[];
     for(const group of groups){let count=0;for(let attempt=0;attempt<(dense?9000:1600)&&count<group.count;attempt++){
@@ -83,11 +96,11 @@
     };
     const stamps=textures.map(name=>makeStamp(name));
     for(let i=0;i<Math.ceil(430*textureDensity);i++){ctx.globalAlpha=.45+random()*.4;ctx.drawImage(stamps[Math.floor(random()*stamps.length)],Math.floor(random()*(width+60*displayScale)-60*displayScale),Math.floor(random()*(height+60*displayScale)-60*displayScale),64*displayScale,64*displayScale);}ctx.globalAlpha=1;
-    if(level.environment==='cave-approach'){
+    if(level.environment==='cave-approach'||level.environment==='cave-mouth'){
       // Exposed soil gradually replaces meadow near the enemy's rocky approach.
       const stoneRandom=rng(41024),soil=makeStamp('dirt',10);
       for(let i=0;i<520*textureDensity;i++){
-        const x=stoneRandom()*width;if(stoneRandom()>Math.max(0,(x/width-.48)/.52))continue;
+        const x=stoneRandom()*width;if(stoneRandom()>(level.environment==='cave-mouth'?.35+.65*x/width:Math.max(0,(x/width-.48)/.52)))continue;
         const size=(28+stoneRandom()*36)*displayScale;
         ctx.globalAlpha=.35+stoneRandom()*.35;
         ctx.drawImage(soil,Math.floor(x-size/2),Math.floor(stoneRandom()*height-size/2),size,size);
@@ -135,7 +148,7 @@
       }
       const flowering=level.environment==='flower-forest';
       if(detailRandom()>(flowering?.55:.3))continue;
-      const stoneChance=level.environment==='cave-approach'?(edge.x>width*2/3?.9:.5):.25;
+      const stoneChance=level.environment==='cave-mouth'?.85:level.environment==='cave-approach'?(edge.x>width*2/3?.9:.5):.25;
       const isStone=detailRandom()<stoneChance,name=isStone?'pebble':flowering&&detailRandom()<.45?(detailRandom()<.5?'whiteFlowers':'pinkFlowers'):detailRandom()<.2?'fern':'tuft';
       const scale=(isStone?.22+detailRandom()*.14:.38+detailRandom()*.27)*displayScale,img=images[name];
       const w=Math.round(img.naturalWidth*scale),h=Math.round(img.naturalHeight*scale);
@@ -149,9 +162,10 @@
     }
     const scenery=decorate?placements(level,images,displayScale):[];
     for(const p of scenery)ctx.drawImage(images[p.name],p.x,p.y,p.w,p.h);
+    if(decorate)for(const p of landmarks(level))ctx.drawImage(images[p.name],p.x,p.y,p.w,p.h);
     if(images.enemyEntranceFlag)for(const p of entranceFlags(level,displayScale))ctx.drawImage(images.enemyEntranceFlag,p.x,p.y,p.w,p.h);
     return {canvas:c,scenery};
   }
-  const api={names,roadRects,entranceFlags,placements,makeBackground};
+  const api={names,roadRects,entranceFlags,landmarks,placements,makeBackground};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.Environment=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

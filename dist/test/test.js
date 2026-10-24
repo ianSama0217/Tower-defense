@@ -13,7 +13,7 @@
   let time = 0, previous = 0, paused = false, pointer = null, dragging = null, nextId = 1;
   let shieldPreview=null;
   let simulation=null,rainDemoLoaded=false,rainDemoActive=false;
-  const description={1:'哥布林 · 50 HP · 速度 50，每 1.2 秒攻擊 12 傷害，擊殺獲得 10 金幣。',2:'獸人 · 本體 80 HP、衝鋒灰條 40 HP · 衝鋒速度 60，首次撞塔或城牆造成 50 傷害。灰條耗盡或撞擊後取消衝鋒，恢復速度 40、每秒普攻 20 傷害；破盾的單次傷害不溢出到本體。擊殺獲得 20 金幣。',3:'獨眼巨人 · 200 HP · 速度 30，每 1.5 秒攻擊 30 傷害，擊殺獲得 40 金幣。',4:'炸彈哥布林 · 40 HP · 速度 60，不普攻，追塔或死亡時爆炸，半徑 48、傷害 50，擊殺獲得 15 金幣。',5:'史萊姆 · 30 HP · 速度 45，沿路前進，不攻擊塔；對阻路建築每 1.2 秒造成 6 傷害，擊殺獲得 6 金幣。',6:'哥布林弓箭手 · 36 HP · 速度 50，射程內停下拉弓，每 1.4 秒射一箭，命中塔時造成 15 傷害。擊殺獲得 10 金幣。'};
+  const description={1:'哥布林 · 50 HP · 速度 50，每 1.2 秒攻擊 12 傷害，擊殺獲得 10 金幣。',2:'獸人 · 本體 80 HP、衝鋒灰條 40 HP · 衝鋒速度 60，首次撞塔或城牆造成 50 傷害。灰條耗盡或撞擊後取消衝鋒，恢復速度 40、每秒普攻 20 傷害；破盾的單次傷害不溢出到本體。擊殺獲得 20 金幣。',3:'獨眼巨人 · 200 HP · 速度 30，每 1.5 秒攻擊 30 傷害，擊殺獲得 40 金幣。',4:'炸彈哥布林 · 40 HP · 速度 60，不普攻，沿道路前進，偵測距離 64 內追近建築自爆，死亡時也會爆炸，半徑 48、傷害 50，只傷害玩家建築，不傷害其他怪物，擊殺獲得 15 金幣。',5:'史萊姆 · 30 HP · 速度 45，沿路前進，不攻擊塔；對阻路建築每 1.2 秒造成 6 傷害，擊殺獲得 6 金幣。',6:'哥布林弓箭手 · 36 HP · 速度 50，射程內停下拉弓，每 1.4 秒射一箭，命中塔時造成 15 傷害。擊殺獲得 10 金幣。'};
   const arrowImage=new Image();arrowImage.src='assets/projectiles/arrow.png';
   const wallImages={};
   const bombImages={};
@@ -46,13 +46,14 @@
     if(active?.category==='boss'&&active.level==='warcryAura')$('enemy-description').textContent='戰吼光環 · 獨立 48×48／格 · 4 格循環，播放於受增益單位腳下。';
     if(active?.category==='wall')$('enemy-description').textContent='城牆 · 300 HP · 高角度俯視，橫／直向獨立繪製。耐久選單可查看五階段受損外觀；敵人優先攻擊，無法修復。';
     if(active?.category==='fence')$('enemy-description').textContent=`柵欄 · ${TD.FENCE.hp} HP · 僅能放在道路，使用正式關卡 ${MAP.roadWidth} px 道路設定。敵人優先攻擊，可受爆炸傷害；耐久選單可預覽五階段外觀。`;
-    if(active?.category==='bomb-tower'){const s=BombTowers.specs[active.level],r=BombTowers.ranges(active.level,WORLD_SCALE);$('enemy-description').textContent=`炸彈塔 Lv.${active.level} · ${s.hp} HP · 攻擊距離 ${r.min}～${r.max} px · 爆炸半徑 ${r.blast} px · 傷害 ${s.damage} · 每 ${s.interval} 秒投彈。會傷害友軍與自己；過近不投彈。勾選「塔可射擊」開始測試。`;}
-    if(active?.category==='enemy')$('enemy-description').textContent+=' 附近城牆優先；史萊姆也會攻擊城牆。';
-    if(active?.category==='enemy'){
+    if(active?.category==='bomb-tower'){const s=BombTowers.specs[active.level],r=BombTowers.ranges(active.level,WORLD_SCALE);$('enemy-description').textContent=`炸彈塔 Lv.${active.level} · ${s.hp} HP · 攻擊距離 ${r.min}～${r.max} px · 爆炸半徑 ${r.blast} px · 傷害 ${s.damage} · 每 ${s.interval} 秒投彈。只傷害敵人，不傷害友軍或自己；過近不投彈。勾選「塔可射擊」開始測試。`;}
+    if(active?.previewOnly)$('enemy-description').textContent='洞窟蝙蝠 · 24×24／格 · 待機 4／飛行 4／攻擊 4／受傷 3／死亡 4 格。可翻轉左右朝向；目前為動畫素材預覽，尚未設定戰鬥數值。';
+    if(active?.category==='enemy'&&!active.previewOnly)$('enemy-description').textContent+=' 附近城牆優先；史萊姆也會攻擊城牆。';
+    if(active?.category==='enemy'&&!active.previewOnly){
       const r=TD.enemyRanges(active.level,WORLD_SCALE);
       $('enemy-description').textContent+=r.attack?` 判定半徑 ${r.detection} px；攻擊半徑 ${r.attack} px。`:r.blast?` 引爆距離 ${r.trigger} px；爆炸半徑 ${r.blast} px。`:' 攻擊半徑 0 px。';
     }
-    $('simulate').disabled=!!shieldPreview||!ready||(!simulation&&!objects.some(o=>o.asset.category==='enemy'));
+    $('simulate').disabled=!!shieldPreview||!ready||(!simulation&&!objects.some(o=>o.asset.category==='enemy'&&!o.asset.previewOnly));
     $('simulate').textContent=simulation?'結束行為測試':'開始行為測試';$('simulate').setAttribute('aria-pressed',String(!!simulation));
     $('kill-enemy').disabled=!simulation||!simulation.enemies.some(e=>e.id===selected&&e.hp>0);
     for(const id of ['flip-object','tool-place','bomber-demo','bomb-tower-demo','arrow-rain-demo','fence-demo','wall-demo'])$(id).disabled=!ready||(!!simulation||!!shieldPreview);
@@ -107,7 +108,7 @@
   }
   function visibleObjects(){
     if(!simulation)return shieldPreview?objects.map(o=>shieldPreview.find(p=>p.id===o.id)||o):objects;
-    const scene=objects.filter(o=>['environment','boss','friendly'].includes(o.asset.category));
+    const scene=objects.filter(o=>o.asset.previewOnly||['environment','boss','friendly'].includes(o.asset.category));
     for(const s of simulation.slots)if(s.level){const o=objects.find(o=>o.id===s.objectId);scene.push({...o,unit:s});}
     for(const w of simulation.walls){const o=objects.find(o=>o.id===w.objectId);if(o.asset.category==='fence'&&TestFences.opacity(w,simulation.time)<=0)continue;scene.push({...o,unit:w});}
     for(const e of [...simulation.enemies.filter(e=>e.hp>0),...simulation.corpses]){const o=objects.find(o=>o.id===e.id);scene.push({...o,x:e.x,y:e.y,facing:e.facing??1,unit:e});}
@@ -133,7 +134,7 @@
     label.textContent=active?`戰吼生效 · ${affected.size} 名哥布林顯示增益光環 · 剩餘 ${next.remaining.toFixed(1)} 秒 · 僅動畫，不改攻速／移速`:`下次戰吼 ${next.remaining.toFixed(1)} 秒 · 每 15 秒觸發／持續 5 秒 · 示意半徑 ${radius} px`;
   }
   function paintRanges(o,labels=false,alpha=1){
-    if(o.asset.category!=='enemy'||o.animation==='death'&&!o.unit||o.unit&&(o.unit.hp<=0||o.unit.deathAt!=null))return;
+    if(o.asset.previewOnly||o.asset.category!=='enemy'||o.animation==='death'&&!o.unit||o.unit&&(o.unit.hp<=0||o.unit.deathAt!=null))return;
     // Match combat distances in world coordinates, independent of sprite display scale.
     const r=TD.enemyRanges(o.asset.level,WORLD_SCALE);
     ctx.save();ctx.globalAlpha=alpha;ctx.lineWidth=2;
@@ -235,7 +236,7 @@
     status('戰吼範例：15 秒後自動發動，光環維持 5 秒。獸人、史萊姆與範圍外哥布林不顯示增益。');
   });
   $('warcry-now').addEventListener('click',()=>{
-    for(const o of objects)if(o.asset.level==='goblinCaptain')o.warcryStart=time-GoblinCaptain.INTERVAL;
+    for(const o of objects)if(o.asset.level==='goblinCaptain')o.warcryStart=time-GoblinCaptain.FIRST_DELAY;
     status('立即預覽戰吼：光環持續 5 秒，之後每 15 秒再次發動；不更動戰鬥數值。');
   });
   $('shield-preview').addEventListener('click',()=>{
@@ -251,12 +252,12 @@
   $('simulate').addEventListener('click',()=>{
     window.gameSound.stopAll();
     if(simulation){simulation=null;rainDemoActive=false;objects.forEach(o=>o.started=time);status('已結束測試並還原原始擺放。');$('simulation-status').textContent='放置塔與怪物後，可測試追塔、自爆與範圍傷害。';update();return;}
-    if(!objects.some(o=>o.asset.category==='enemy'))return;
+    if(!objects.some(o=>o.asset.category==='enemy'&&!o.asset.previewOnly))return;
     const sim=new BombTowers.BombTowerGame(Math.random,TestFences.createScenario());sim.start();sim.lives=150;sim.time=time;
     sim.sound=window.gameSound;
     sim.slots=objects.filter(o=>['tower','bomb-tower'].includes(o.asset.category)).map((o,id)=>{const kind=o.asset.category==='bomb-tower'?'bomb':'arrow',hp=sim.towerSpecs({kind})[o.asset.level].hp;return {id,objectId:o.id,x:o.x,y:o.y,level:o.asset.level,kind,visualScale:o.scale,towerId:sim.nextTowerId++,kills:0,hp,maxHp:hp,cooldown:0,action:null,destroyedAt:null};});
     sim.walls=objects.filter(o=>['wall','fence'].includes(o.asset.category)).map((o,id)=>{const w=o.asset.category==='fence'?TestFences.unit(o):labWall(o);return {...w,id:-id-1,objectId:o.id,kind:'wall',material:o.asset.category==='fence'?'wood':'stone',level:w.hp>0?1:0,towerId:sim.nextTowerId++};});
-    sim.enemies=objects.filter(o=>o.asset.category==='enemy').map(o=>{
+    sim.enemies=objects.filter(o=>o.asset.category==='enemy'&&!o.asset.previewOnly).map(o=>{
       const spec=TD.ENEMIES[o.asset.level],routeIndex=sim.level.routes.length;
       sim.level.routes.push({path:[{x:0,y:o.y},{x:W,y:o.y}],segments:[W],length:W});
       const enemy={id:o.id,level:o.asset.level,x:o.x,y:o.y,hp:spec.hp,maxHp:spec.hp,distance:o.x,remaining:W-o.x,routeIndex,facing:1,moving:true};
@@ -281,14 +282,14 @@
       objects.push({id:nextId++,asset:catalog.find(a=>a.category===type&&a.level===level),x,y,scale:WORLD_SCALE,facing:1,animation:'walk',started:time});
     }
     selected=objects.find(o=>o.asset.level===4&&o.asset.category==='enemy').id;mode='move';$('tower-fire').checked=false;update();
-    status('範例已載入。開始行為測試可看追塔自爆；立即擊殺炸彈哥布林可看波及旁邊怪物。');
+    status('範例已載入。開始行為測試可看追塔自爆；立即擊殺炸彈哥布林可確認旁邊怪物不受爆炸傷害。');
   });
   $('bomb-tower-demo').addEventListener('click',()=>{
     if(simulation||!ready)return;record();objects.length=0;rainDemoLoaded=false;
     const add=(type,level,x,y)=>objects.push({id:nextId++,asset:catalog.find(a=>a.category===type&&(level==null||a.level===level)),x,y,scale:WORLD_SCALE,facing:1,animation:'walk',started:time});
     for(const [level,x] of [[1,280],[2,600],[3,920]]){add('bomb-tower',level,x,380);for(const [dx,dy] of level===1?[[-172,-32],[-148,0],[-172,32]]:[[176,-32],[200,0],[176,32]])add('enemy',5,x+dx,380+dy);}
     add('wall',null,700,430);selected=null;mode='move';pointer=null;$('tower-fire').checked=true;$('show-bomb-ranges').checked=true;$('show-enemy-ranges').checked=false;update();
-    status('已載入三級炸彈塔。開始測試：左側查看近距離自傷，中間查看友方城牆受傷，右側查看範圍爆炸。');
+    status('已載入三級炸彈塔。開始測試：左側查看投彈與最短射程，中間確認友方城牆不受爆炸傷害，右側查看範圍爆炸。');
   });
   $('arrow-rain-demo').addEventListener('click',()=>{
     if(simulation||!ready)return;record();objects.length=0;rainDemoLoaded=true;
@@ -394,6 +395,7 @@
   syncSceneView();
   function load(category,name,file,spec,level){return new Promise((resolve,reject)=>{const image=new Image();image.onload=()=>{const width=spec?.size||image.naturalWidth,height=spec?.size||image.naturalHeight;resolve({category,name,image,width,height,level,animations:spec?.animations,anchor:spec?.anchor||{x:width/2,y:height-2}});};image.onerror=()=>reject(new Error(`無法載入 ${file}`));image.src=file;});}
   const loads=[];
+  loads.push(load('enemy',BatSprites.bat.name,`assets/enemies/${BatSprites.bat.file}`,BatSprites.bat,'bat').then(item=>({...item,previewOnly:true})));
   loads.push(load('boss',GoblinCaptain.captain.name,`assets/boss/${GoblinCaptain.captain.file}`,GoblinCaptain.captain,'goblinCaptain'));
   loads.push(load('boss',GoblinCaptain.aura.name,`assets/boss/${GoblinCaptain.aura.file}`,GoblinCaptain.aura,'warcryAura'));
   loads.push(load('friendly',FriendlySprites.shield.name,`assets/friendly/${FriendlySprites.shield.file}`,FriendlySprites.shield,'shield'));

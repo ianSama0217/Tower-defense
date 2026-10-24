@@ -27,7 +27,7 @@
     for(let i=0;i<16;i++){
       const x=((i*137+37)%870)+Math.sin(now/3200+i)*5;
       const y=240+((i*73)%200)+Math.cos(now/4100+i)*5;
-      // Keep the title and both wooden buttons clear.
+      // Keep the title and all three wooden buttons clear.
       if(x>280&&x<590)continue;
       ctx.globalAlpha=.12+(Math.sin(now/1600+i*7)+1)*.15;
       ctx.fillStyle='#ffeda1';ctx.fillRect(Math.round(x),Math.round(y),1,1);

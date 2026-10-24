@@ -2,17 +2,23 @@
   'use strict';
   const ARROW_PITCH=Object.freeze({1:1000,2:900,3:800});
   const MAX_GAIN=2; // 50% = the original full volume; 100% = double gain.
+  const RESULT_SOUNDS=Object.freeze({victory:'assets/tunoron_sfx_pack_8bit/victory_01_8bit.wav',gameOver:'assets/tunoron_sfx_pack_8bit/gameover_01_8bit.wav'});
   class SoundManager {
-    constructor({volume=.5,muted=false,contextFactory}={}){
+    constructor({volume=.5,muted=false,contextFactory,createAudio}={}){
       this.volume=Number.isFinite(volume)?Math.max(0,Math.min(1,volume)):.5;
       this.muted=!!muted;this.context=null;this.master=null;this.noise=null;
       this.voices=new Set();this.lastPlayed=new Map();this.resuming=null;
+      this.resultPlayers=new Map();this.playbackVersion=0;
+      this.createAudio=createAudio||(root.Audio?()=>new root.Audio():null);
       this.contextFactory=contextFactory||(()=>{const Audio=root.AudioContext||root.webkitAudioContext;return Audio?new Audio():null;});
     }
     // Call from a pointer/keyboard gesture. Never queue sounds before audio is unlocked.
     async unlock(){
       try{
         if(!this.context||this.context.state==='closed'){
+          this.stopAll();
+          for(const player of this.resultPlayers.values())player.node.disconnect();
+          this.resultPlayers.clear();
           this.context=this.contextFactory();if(!this.context)return false;
           this.master=this.context.createGain();this.master.gain.value=this.muted?0:this.volume*MAX_GAIN;
           const limiter=this.context.createDynamicsCompressor();
@@ -26,7 +32,9 @@
           if(!this.resuming)this.resuming=this.context.resume().finally(()=>{this.resuming=null;});
           await this.resuming;
         }
-        return this.context.state==='running';
+        const ready=this.context.state==='running';
+        if(ready)for(const kind of Object.keys(RESULT_SOUNDS))this._resultPlayer(kind);
+        return ready;
       }catch{return false;}
     }
     setVolume(value){
@@ -37,9 +45,30 @@
     setMuted(value){this.muted=!!value;this._gain();if(this.muted)this.stopAll();}
     _gain(){if(this.master)this.master.gain.setTargetAtTime(this.muted?0:this.volume*MAX_GAIN,this.context.currentTime,.01);}
     stopAll(){
+      this.playbackVersion++;
+      for(const {media} of this.resultPlayers.values()){media.pause();media.currentTime=0;}
       for(const voice of this.voices){for(const source of voice.sources){try{source.stop();}catch{}}for(const node of voice.nodes)node.disconnect();}
       this.voices.clear();this.lastPlayed.clear();
     }
+    _resultPlayer(kind){
+      if(this.resultPlayers.has(kind))return this.resultPlayers.get(kind);
+      if(!this.createAudio||!this.context||!RESULT_SOUNDS[kind])return null;
+      try{
+        const media=this.createAudio();media.preload='auto';media.loop=false;media.src=RESULT_SOUNDS[kind];
+        // File audio shares the synthesized effects' gain, mute and compression, including 2x gain.
+        const node=this.context.createMediaElementSource(media);node.connect(this.master);
+        const player={media,node};this.resultPlayers.set(kind,player);return player;
+      }catch{return null;}
+    }
+    async _playResult(kind){
+      if(this.context?.state!=='running'||this.muted||this.volume===0||root.document?.hidden)return false;
+      this.stopAll();
+      const player=this._resultPlayer(kind),version=this.playbackVersion;
+      if(!player)return false;
+      try{await player.media.play();return version===this.playbackVersion;}catch{return false;}
+    }
+    playVictory(){return this._playResult('victory');}
+    playGameOver(){return this._playResult('gameOver');}
     _play(key,interval,compose){
       const ctx=this.context;
       if(!ctx||ctx.state!=='running'||this.muted||this.volume===0||root.document?.hidden)return false;

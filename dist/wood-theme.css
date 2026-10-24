@@ -41,3 +41,8 @@ button:focus-visible,a:focus-visible{outline-color:#fff0b7}
 #pause-shade img{display:block;width:min(72%,760px);height:auto;max-height:55%;object-fit:contain;image-rendering:pixelated;filter:drop-shadow(0 6px 0 #160c0855)}
 @media(max-width:900px){#speed-play{width:28px;height:28px}}
 @media(max-width:600px),(max-height:440px) and (orientation:landscape){#speed-play{width:22px;height:22px}}
+/* The cursor fingertip points toward the play sign without intercepting input. */
+#pause-resume-hint{position:absolute;top:calc(100% + 12px);left:calc(50% - 6px);width:40px;height:48px;pointer-events:none;user-select:none;image-rendering:pixelated;transform-origin:6px 2px;animation:pause-resume-nudge 1.2s ease-in-out infinite}
+@keyframes pause-resume-nudge{0%,100%{transform:translateY(0) rotate(-4deg)}50%{transform:translateY(-4px) rotate(4deg)}}
+@media(max-width:600px),(max-height:440px) and (orientation:landscape){#pause-resume-hint{top:calc(100% + 8px);left:calc(50% - 4.8px);width:32px;height:38.4px;transform-origin:4.8px 1.6px}}
+@media(prefers-reduced-motion:reduce){#pause-resume-hint{animation:none}}

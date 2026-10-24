@@ -16,6 +16,43 @@ function audioContext(){
     createOscillator:source,createBufferSource:source,createBiquadFilter(){return {...node(),Q:param(),frequency:param()};}
   };
 }
+function resultAudio(){
+  const ctx=audioContext(),media=[],links=[];
+  ctx.createMediaElementSource=element=>({connect(target){links.push({element,target});},disconnect(){}});
+  const sound=new SoundManager({contextFactory:()=>ctx,createAudio:()=>{
+    const element={currentTime:0,paused:true,plays:0,async play(){this.paused=false;this.plays++;},pause(){this.paused=true;}};
+    media.push(element);return element;
+  }});
+  return {ctx,media,links,sound};
+}
+test('result WAVs preload once, use the effects gain, and switch without overlap',async()=>{
+  const {sound,media,links}=resultAudio();
+  assert.equal(await sound.playVictory(),false);assert.equal(media.length,0);
+  await sound.unlock();await sound.unlock();assert.equal(media.length,2);
+  assert.match(media[0].src,/victory_01_8bit\.wav$/);assert.match(media[1].src,/gameover_01_8bit\.wav$/);
+  for(const link of links){assert.equal(link.target,sound.master);assert.equal(link.element.loop,false);}
+  assert.equal(sound.master.gain.value,1);sound.setVolume(1);assert.equal(sound.master.gain.events.at(-1)[0],2);
+  assert.equal(await sound.playVictory(),true);assert.equal(media[0].plays,1);
+  media[0].currentTime=1;
+  assert.equal(await sound.playGameOver(),true);assert.equal(media[0].paused,true);assert.equal(media[0].currentTime,0);assert.equal(media[1].plays,1);
+  sound.stopAll();assert.equal(media[1].paused,true);assert.equal(media[1].currentTime,0);
+});
+test('result sounds respect mute/zero volume and safely handle interruption or playback failure',async()=>{
+  const {sound,media}=resultAudio();await sound.unlock();
+  sound.setMuted(true);assert.equal(await sound.playVictory(),false);
+  sound.setMuted(false);sound.setVolume(0);assert.equal(await sound.playGameOver(),false);
+  assert.equal(media.reduce((sum,m)=>sum+m.plays,0),0);sound.setVolume(.5);
+  let finish;media[0].play=()=>new Promise(resolve=>{finish=resolve;});
+  const pending=sound.playVictory();sound.stopAll();finish();assert.equal(await pending,false);assert.equal(media[0].paused,true);
+  media[1].play=async()=>{throw Error('Unavailable audio');};assert.equal(await sound.playGameOver(),false);
+});
+test('bundled result files are RIFF/WAVE audio and retain their license',()=>{
+  const fs=require('node:fs'),path=require('node:path'),dir=path.join(__dirname,'../dist/assets/tunoron_sfx_pack_8bit');
+  for(const name of ['victory_01_8bit.wav','gameover_01_8bit.wav']){
+    const wav=fs.readFileSync(path.join(dir,name));assert.equal(wav.toString('ascii',0,4),'RIFF');assert.equal(wav.toString('ascii',8,12),'WAVE');assert.ok(wav.length>44);
+  }
+  assert.match(fs.readFileSync(path.join(dir,'LICENSE.txt'),'utf8'),/including in commercial games/);
+});
 test('audio is lazy; unavailable and rejected audio never throw or queue effects',async()=>{
   let created=0;const ctx=audioContext(),sound=new SoundManager({contextFactory:()=>{created++;return ctx;}});
   assert.equal(sound.playArrow(),false);assert.equal(created,0);
@@ -67,7 +104,7 @@ test('actual tower level reaches arrow audio; misses do not play hit sounds',()=
     events.length=0;g.bullets=[{target:e,x:0,y:0,damage:12}];e.hp=0;g.update(.01);assert.ok(!events.some(([name])=>name==='Hit'));
   }
 });
-test('chain explosions, rewards and death cues happen once; self-detonation grants no coin',()=>{
+test('separate bomber deaths play explosions, rewards and death cues once; self-detonation grants no coin',()=>{
   const g=arena(),events=attach(g),a=enemy(g,4),b=enemy(g,4,10);g.killEnemy(a);g.killEnemy(a);g.killEnemy(b);
   for(const name of ['Explosion','EnemyDeath','Coin'])assert.equal(events.filter(([event])=>event===name).length,2);
   const other=arena(),otherEvents=attach(other);other.killEnemy(enemy(other,4),false);

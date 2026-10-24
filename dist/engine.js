@@ -23,18 +23,19 @@
   }
   function targetDistance(target,from){const p=targetPoint(target,from);return Math.hypot(p.x-from.x,p.y-from.y);}
   const TOWER_ACTIONS = {build:{duration:5},upgrade:{duration:5},repair:{duration:3,cost:40},demolish:{duration:3}};
-  const ENEMY_TYPES = {goblin:1,orc:2,cyclops:3,bomber:4,slime:5,archer:6};
+  const ENEMY_TYPES = {goblin:1,orc:2,cyclops:3,bomber:4,slime:5,archer:6,captain:7};
   // Compact ground footprints leave room for crowds to reach a building's attack perimeter.
-  const ENEMY_RADII = [0,5,7,10,6,5,5];
+  const ENEMY_RADII = [0,5,7,10,6,5,5,5];
   const enemyRadius=(type,worldScale=1)=>(ENEMY_RADII[type]??8)*worldScale;
   const ENEMIES = [null,
     {name:'哥布林',behavior:'attacker',detectionRange:64,hp:50,speed:50,reward:10,attackDamage:12,attackRange:32,attackInterval:1.2},
     {name:'獸人',behavior:'attacker',detectionRange:64,hp:80,speed:40,reward:20,attackDamage:20,attackRange:32,attackInterval:1,chargeHealthBonus:40,chargeDamage:50,chargeSpeedMultiplier:1.5,chargeBreakDamage:40},
     {name:'獨眼巨人',behavior:'attacker',detectionRange:96,hp:200,speed:30,reward:40,attackDamage:30,attackRange:40,attackInterval:1.5},
-    {name:'炸彈哥布林',behavior:'bomber',detectionRange:Infinity,hp:40,speed:60,reward:15,attackDamage:0,attackRange:0,attackInterval:0,triggerRange:22,blastRadius:48,blastDamage:50},
+    {name:'炸彈哥布林',behavior:'bomber',detectionRange:64,hp:40,speed:60,reward:15,attackDamage:0,attackRange:0,attackInterval:0,triggerRange:22,blastRadius:48,blastDamage:50},
     {name:'史萊姆',behavior:'passive',detectionRange:0,hp:30,speed:45,reward:6,attackDamage:0,attackRange:0,attackInterval:0},
     {name:'哥布林弓箭手',behavior:'archer',detectionRange:90,hp:36,speed:50,reward:10,attackDamage:15,attackRange:112,attackInterval:1.4,attackWindup:.2,projectileSpeed:220}
   ];
+  ENEMIES.push({...ENEMIES[1],name:'哥布林隊長',hp:500});
   function makeRoute(points) {
     const path = points.map(([x,y]) => ({x,y}));
     const segments = path.slice(1).map((p,i) => Math.hypot(p.x-path[i].x,p.y-path[i].y));
@@ -282,32 +283,23 @@
       if(enemy.hp===0)this.killEnemy(enemy,true,sourceTowerId);
     }
     killEnemy(enemy,reward=true,sourceTowerId=null) {
-      // Queue chain reactions: each death, blast, reward and corpse is resolved exactly once.
-      const pending=[{enemy,reward}];
-      for(let i=0;i<pending.length;i++){
-        const {enemy:e,reward:grant}=pending[i];
-        if(e.deathAt!=null||e.escaped)continue;
-        e.hp=0;e.deathAt=this.time;e.moving=false;e.targetId=null;
-        this.corpses.push({...e});
-        this.sound?.playEnemyDeath();
-        const spec=ENEMIES[e.level];
-        if(grant){
-          this.money+=spec.reward;this.kills++;this.sound?.playCoin();
-          // The projectile remembers the building instance, never just a reusable pad.
-          const tower=sourceTowerId==null?null:this.slots.find(s=>s.towerId===sourceTowerId&&s.level>0&&s.hp>0);
-          if(tower)tower.kills=(tower.kills||0)+1;
-        }
-        if(spec.behavior!=='bomber')continue;
-        const radius=enemyRanges(e.level,this.worldScale).blast;
-        this.effects.push({kind:'bomb-explosion',x:e.x,y:e.y,radius,life:sprites.deathDuration});
-        this.sound?.playExplosion();
-        for(const s of [...this.slots,...this.walls])if(targetDistance(s,e)<=radius)this.damageTower(s,spec.blastDamage);
-        for(const other of this.enemies){
-          if(other.hp<=0||other.deathAt!=null||other.escaped||Math.hypot(other.x-e.x,other.y-e.y)>radius)continue;
-          this.applyEnemyDamage(other,spec.blastDamage);
-          if(other.hp===0)pending.push({enemy:other,reward:true});
-        }
+      const e=enemy,grant=reward;
+      if(e.deathAt!=null||e.escaped)return;
+      e.hp=0;e.deathAt=this.time;e.moving=false;e.targetId=null;
+      this.corpses.push({...e});
+      this.sound?.playEnemyDeath();
+      const spec=ENEMIES[e.level];
+      if(grant){
+        this.money+=spec.reward;this.kills++;this.sound?.playCoin();
+        // The projectile remembers the building instance, never just a reusable pad.
+        const tower=sourceTowerId==null?null:this.slots.find(s=>s.towerId===sourceTowerId&&s.level>0&&s.hp>0);
+        if(tower)tower.kills=(tower.kills||0)+1;
       }
+      if(spec.behavior!=='bomber')return;
+      const radius=enemyRanges(e.level,this.worldScale).blast;
+      this.effects.push({kind:'bomb-explosion',x:e.x,y:e.y,radius,life:sprites.deathDuration});
+      this.sound?.playExplosion();
+      for(const s of [...this.slots,...this.walls])if(targetDistance(s,e)<=radius)this.damageTower(s,spec.blastDamage);
     }
     attackTarget(e) {
       const wall=this.wallTarget(e);if(wall){e.targetId=wall.id;return wall;}
@@ -344,7 +336,7 @@
           const ux=(b.x-a.x)/length,uy=(b.y-a.y)/length;
           for(const s of [...this.slots,...this.walls]){
             if(!s.level||s.hp<=0)continue;
-            if(s.kind!=='wall'&&!ENEMIES[e.level].attackDamage)continue;
+            if(s.kind!=='wall'&&!ENEMIES[e.level].attackDamage&&ENEMIES[e.level].behavior!=='bomber')continue;
             const detection=s.kind==='wall'?Math.max(range,WALL.detectionRange*this.worldScale)+Math.hypot(s.width,s.height)/2:range;
             const dx=s.x-a.x,dy=s.y-a.y,along=dx*ux+dy*uy;
             const perpendicular=dx*uy-dy*ux,disc=detection*detection-perpendicular*perpendicular;
@@ -468,10 +460,11 @@
       }
       return nearest;
     }
+    enemyHaste(enemy){return 1;}
     moveEnemy(e,dt) {
       this.prepareChargeHealth(e);
       e.charging=this.isCharging(e);
-      const spec=ENEMIES[e.level],route=this.level.routes[e.routeIndex],speed=spec.speed*this.worldScale*(e.charging?spec.chargeSpeedMultiplier:1),oldX=e.x,oldY=e.y;
+      const spec=ENEMIES[e.level],route=this.level.routes[e.routeIndex],speed=spec.speed*this.worldScale*(e.charging?spec.chargeSpeedMultiplier:1)*this.enemyHaste(e),oldX=e.x,oldY=e.y;
       let travel=speed*dt;
       const approach=(point,stop=0)=>{
         const dx=point.x-e.x,dy=point.y-e.y,distance=Math.hypot(dx,dy),step=Math.min(travel,Math.max(0,distance-stop));
@@ -517,18 +510,20 @@
         if(target)pursue(target);
         else if(e.offRoute)returnToRoute();
       }
-      if(spec.behavior==='bomber'){
+      const pursueBomberTarget=()=>{
         let target=this.wallTarget(e),nearest=Infinity;
-        if(!target)for(const s of this.slots){if(!s.level||s.hp<=0)continue;const distance=Math.hypot(s.x-e.x,s.y-e.y);if(distance<=enemyRanges(e.level,this.worldScale).detection&&distance<nearest){nearest=distance;target=s;}}
+        if(!target)for(const s of this.slots){if(!s.level||s.hp<=0)continue;const distance=Math.hypot(s.x-e.x,s.y-e.y);if(distance<=enemyRanges(e.level,this.worldScale).detection+1e-7&&distance<nearest){nearest=distance;target=s;}}
         e.targetId=target?.id??null;
         if(target){
           chasing=true;e.offRoute=true;
           const trigger=enemyRanges(e.level,this.worldScale).trigger;
           if(approach(targetPoint(target,e),trigger)<=trigger+1e-9){this.killEnemy(e,false);return;}
-        }else if(e.offRoute){
-          // Rejoin the nearest part of the assigned route if every tower was removed.
-          returnToRoute();
         }
+      };
+      if(spec.behavior==='bomber'){
+        pursueBomberTarget();
+        if(e.hp<=0)return;
+        if(!chasing&&e.offRoute)returnToRoute();
       }
       if(!chasing&&!e.offRoute){
         // Move each segment continuously so bends, merges and lateral avoidance share the same sweep.
@@ -541,7 +536,7 @@
           if(index<route.segments.length-1&&Math.hypot(e.x-b.x,e.y-b.y)<=Math.min(this.level.mapConfig.roadWidth/2,enemyRadius(e.level,this.worldScale)*2)){
             e.distance=offset+length;continue;
           }
-          const stop=spec.attackDamage||this.walls.some(w=>w.hp>0)?this.detectionStopDistance(e,travel):e.distance+travel;
+          const stop=spec.attackDamage||spec.behavior==='bomber'||this.walls.some(w=>w.hp>0)?this.detectionStopDistance(e,travel):e.distance+travel;
           const lookAhead=Math.abs(stop-e.distance-travel)<1e-7?e.distance+Math.max(travel,enemyRadius(e.level,this.worldScale)*3):stop;
           const next=Math.min(lookAhead,offset+length),point=position(next,route),dx=point.x-e.x,dy=point.y-e.y,d=Math.hypot(dx,dy);
           if(d<1e-9)break;
@@ -557,7 +552,8 @@
           e.distance=next;
           if(next===stop)break;
         }
-        if(spec.behavior!=='bomber'){const target=this.attackTarget(e);if(target)pursue(target);}
+        if(spec.behavior==='bomber'){pursueBomberTarget();if(e.hp<=0)return;}
+        else{const target=this.attackTarget(e);if(target)pursue(target);}
         const exit=route.path.at(-1);
         if(e.distance>=route.length-1e-7&&Math.hypot(e.x-exit.x,e.y-exit.y)<1e-7)e.distance=route.length;
         if(!chasing&&e.distance>=route.length)this.resolveEnemyExit(e);
@@ -582,7 +578,7 @@
         this.prepareChargeHealth(e);
         const spec=ENEMIES[e.level];
         if(spec.behavior==='bomber')continue;
-        e.attackCooldown=Math.max(0,(e.attackCooldown??0)-dt);
+        e.attackCooldown=Math.max(0,(e.attackCooldown??0)-dt*this.enemyHaste(e));
         if(e.pendingShot){
           const shot=e.pendingShot;
           if(this.time+1e-9<shot.releaseAt)continue;
@@ -656,17 +652,22 @@
       }
       const blockedRoutes=new Set();
       this.pendingSpawns=this.pendingSpawns.filter(({level,routeIndex})=>{
+        if(this.phase!=='playing')return false;
         const s=ENEMIES[level],route=this.level.routes[routeIndex],e={level,hp:s.hp,maxHp:s.hp,charging:!!s.chargeDamage,chargeConsumed:false,distance:0,routeIndex,remaining:route.length,...position(0,route)};
         this.prepareChargeHealth(e);
         if(blockedRoutes.has(routeIndex)||!this.enemySpaceFree(e,e.x,e.y)){blockedRoutes.add(routeIndex);return true;}
-        e.id=this.nextId++;this.enemies.push(e);this.lastEnemySpawnAt=this.time;this.onEnemySpawn?.(level);return false;
+        e.id=this.nextId++;e.spawnedAt=this.time;this.enemies.push(e);this.lastEnemySpawnAt=this.time;this.onEnemySpawn?.(level);return false;
       });
+      if(this.phase!=='playing')return;
       this.separateEnemyOverlaps();
-      for(const e of this.enemies)if(e.hp>0)this.moveEnemy(e,dt);
+      for(const e of this.enemies){if(this.phase!=='playing')return;if(e.hp>0)this.moveEnemy(e,dt);}
+      if(this.phase!=='playing')return;
       this.updateWallBlockedTime(dt);
       if(this.lives===0){this.phase='lost';return;}
       this.fireTowers(dt);
+      if(this.phase!=='playing')return;
       this.bullets=this.bullets.filter(b=>{const e=b.target;if(e.hp<=0)return false;const d=Math.hypot(e.x-b.x,e.y-b.y);if(d<640*this.worldScale*dt){this.sound?.playHit();this.damageEnemy(e,b.damage,b.sourceTowerId);return false;}b.x+=(e.x-b.x)/d*640*this.worldScale*dt;b.y+=(e.y-b.y)/d*640*this.worldScale*dt;return true;});
+      if(this.phase!=='playing')return;
       this.enemies=this.enemies.filter(e=>e.hp>0);
       this.updateEnemyArrows(dt);
       // Resolve only surviving enemies, keeping their target locked while approaching or attacking.

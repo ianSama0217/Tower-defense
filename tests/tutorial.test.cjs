@@ -5,6 +5,34 @@ function runUntil(g,predicate,max=15000){for(let i=0;i<max&&!predicate();i++)g.u
 function setup(){const g=new TutorialGame(()=>0);g.start();g.build(0);g.build(1);return g;}
 function clearCurrent(g){runUntil(g,()=>g.awaitingWave||g.phase!=='playing');}
 
+test('first-level construction and upgrades are independent of wave and lesson progress',()=>{
+  const {state}=require('../dist/tower-menu.js');
+  for(const [wave,awaitingWave] of [[0,true],[1,false],[2,false],[2,true],[3,false]]){
+    const g=new TutorialGame(()=>0);g.start();g.money=1000;
+    g.wave=wave;g.awaitingWave=awaitingWave;
+    assert.equal(g.build(0).ok,true);g.updateTowerActions(5);
+    assert.equal(state(g,0).upgrade.disabled,false);
+    assert.equal(state(g,0).demolish.disabled,false);
+    assert.equal(g.build(0).ok,true);
+    // Starting an upgrade must not reserve the other pads for a lesson.
+    assert.equal(state(g,1).build.disabled,false);
+    assert.equal(g.build(1).ok,true);g.updateTowerActions(5);
+    assert.equal(g.slots[0].level,2);assert.equal(g.slots[1].level,1);
+    assert.equal(g.demolish(1).ok,true);g.updateTowerActions(3);
+    assert.equal(g.slots[1].level,0);
+  }
+});
+
+test('first-level demolition and rebuilding do not require a prior upgrade, even after restart',()=>{
+  const {state}=require('../dist/tower-menu.js'),g=new TutorialGame(()=>0);
+  for(let attempt=0;attempt<2;attempt++){
+    g.start();assert.equal(g.build(0).ok,true);g.updateTowerActions(5);
+    assert.equal(state(g,0).demolish.disabled,false);
+    assert.equal(g.demolish(0).ok,true);g.updateTowerActions(3);
+    assert.equal(g.money,90);assert.equal(g.build(0).ok,true);
+  }
+});
+
 test('preparation waits indefinitely for swords; first wave starts exactly once',()=>{
   const g=new TutorialGame(()=>0);g.start();g.update(120);
   assert.equal(g.money,120);assert.equal(g.wave,0);assert.equal(g.enemies.length,0);assert.equal(sample(g).mode,'ready');

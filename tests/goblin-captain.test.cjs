@@ -1,12 +1,12 @@
 const {test}=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),path=require('node:path');
 const C=require('../dist/goblin-captain.js'),TD=require('../dist/engine.js');
-test('first warcry starts at 15s, ends at 20s and repeats every 15s for exactly 5s',()=>{
+test('first warcry starts at 5s, ends at 10s and repeats at 20s and 35s',()=>{
   for(const start of [0,37.5]){
-    for(const t of [0,14.999,20,29.999,35,44.999])assert.equal(C.cycle(start+t,start).active,false,`inactive at ${t}`);
-    for(const t of [15,19.999,30,34.999,45,49.999])assert.equal(C.cycle(start+t,start).active,true,`active at ${t}`);
-    assert.equal(C.cycle(start+15,start).remaining,5);assert.equal(C.cycle(start+20,start).remaining,10);
-    assert.equal(C.cycle(start+15.749,start).casting,true);assert.equal(C.cycle(start+15.75,start).casting,false);
-    assert.equal(C.cycle(start+301,start).count,20);assert.equal(C.cycle(start+301,start).active,true);
+    for(const t of [0,4.999,10,19.999,25,34.999])assert.equal(C.cycle(start+t,start).active,false,`inactive at ${t}`);
+    for(const t of [5,9.999,20,24.999,35,39.999])assert.equal(C.cycle(start+t,start).active,true,`active at ${t}`);
+    assert.equal(C.cycle(start,start).remaining,5);assert.equal(C.cycle(start+5,start).remaining,5);assert.equal(C.cycle(start+10,start).remaining,10);
+    assert.equal(C.cycle(start+5.749,start).casting,true);assert.equal(C.cycle(start+5.75,start).casting,false);
+    assert.equal(C.cycle(start+306,start).count,21);assert.equal(C.cycle(start+306,start).active,true);
   }
 });
 test('visual aura only selects living goblin variants within radius without modifying any stats',()=>{

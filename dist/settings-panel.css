@@ -1,4 +1,4 @@
-:is(#world-settings,#game-settings,#settings-dialog).forest-settings{box-sizing:border-box;width:min(680px,calc(100vw - 24px));max-width:none;max-height:none;padding:0;border:0;border-radius:0;overflow:hidden;background:transparent;color:#46230f;box-shadow:0 16px 60px #101409a6;font-family:var(--font-ui);image-rendering:pixelated}
+:is(#world-settings,#game-settings,#settings-dialog,#restart-dialog).forest-settings{box-sizing:border-box;width:min(680px,calc(100vw - 24px));max-width:none;max-height:none;padding:0;border:0;border-radius:0;overflow:hidden;background:transparent;color:#46230f;box-shadow:0 16px 60px #101409a6;font-family:var(--font-ui);image-rendering:pixelated}
 .forest-settings::backdrop{background:#081b13b8;backdrop-filter:blur(3px)}
 .forest-settings-panel{position:relative;padding:30px 48px 40px;background:url('assets/ui/settings-kit/parchment.png') center/100% 100% no-repeat}
 .forest-settings-panel::before{content:'';position:absolute;inset:0;pointer-events:none;border:20px solid transparent;border-image:url('assets/ui/settings-kit/frame.png') 24 stretch}
@@ -18,7 +18,10 @@
 .forest-display-options input{appearance:none;-webkit-appearance:none;flex-shrink:0;width:48px;height:48px;margin:0;border:0;background:url('assets/ui/settings-kit/unchecked.png') center/contain no-repeat;cursor:pointer}
 .forest-display-options input:checked{background-image:url('assets/ui/settings-kit/checked.png')}
 .forest-settings-actions{display:grid;grid-template-columns:1fr 1fr;gap:16px}
+.forest-settings-resume{grid-column:1 / -1}
 .forest-settings .forest-settings-actions :is(button,a){display:grid;place-items:center;min-width:0;min-height:78px;margin:0;padding:10px 15px;border:0;border-radius:0;box-shadow:none;background:url('assets/ui/settings-kit/button.png') center/100% 100% no-repeat;color:#fff0cb;text-decoration:none;text-align:center;font:30px/1.2 var(--font-ui);text-shadow:2px 2px #442613,-1px -1px #442613,1px -1px #442613,-1px 1px #442613;white-space:nowrap;cursor:pointer}
+/* Preserve the same pixel borders on full-width and half-width battle buttons. */
+#game-settings .forest-settings-actions :is(button,a){background:none;border-image:url('assets/ui/settings-kit/button.png') 12 20 fill / 10px 18px / 0 stretch}
 .forest-settings button:hover,.forest-settings a:hover{filter:brightness(1.12)}
 .forest-settings :is(button,a,input):focus-visible{outline:3px solid #527327;outline-offset:3px}
 @media(max-width:600px){
@@ -28,5 +31,6 @@
  .forest-volume-control input[type=range],.forest-volume-control input::-webkit-slider-runnable-track{height:20px}.forest-volume-control input::-webkit-slider-thumb{width:25px;height:38px;margin-top:-9px}.forest-volume-control input::-moz-range-track{height:20px}.forest-volume-control input::-moz-range-thumb{width:25px;height:38px}
  .forest-settings-divider{margin:18px 0 10px;height:17px}.forest-display-options{gap:8px}.forest-display-options label{font-size:16px;gap:5px}.forest-display-options input{width:34px;height:34px}
  .forest-settings-actions{gap:8px}.forest-settings .forest-settings-actions :is(button,a){min-height:60px;font-size:20px;padding:8px}
+ #game-settings .forest-settings-actions :is(button,a){border-image-width:8px 10px}
 }
 @media(max-width:360px){.forest-settings-panel{padding:22px 18px}.forest-settings-title{font-size:24px}.forest-display-options label{font-size:14px}.forest-display-options input{width:29px;height:29px}.forest-settings .forest-settings-actions :is(button,a){font-size:17px}}

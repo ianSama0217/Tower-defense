@@ -33,7 +33,8 @@
         <label><input type="checkbox" data-display-option="enemyHealth">顯示敵人血條</label>
       </div>
       <div class="forest-settings-actions">
-        <button id="${battle?'resume':home?'home-settings-play':'world-resume'}">${home?'開始遊戲':'繼續遊戲'}</button>
+        ${battle?'<button id="resume" class="forest-settings-resume">繼續遊戲</button>':''}
+        <button id="${battle?'restart-level':home?'home-settings-play':'world-resume'}">${battle?'重新開始':home?'開始遊戲':'繼續遊戲'}</button>
         ${battle?'<a href="index.html#levels">返回關卡選單</a>':`<button id="${home?'home-settings-back':'world-back'}">返回首頁</button>`}
       </div>
     </div>`;

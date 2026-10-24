@@ -2,18 +2,18 @@ const fs=require('node:fs'),path=require('node:path');
 const TD=require('../dist/engine.js'),Bomb=require('../dist/bomb-towers.js'),Fence=require('../dist/fence-sprites.js');
 const rows=(headers,data)=>[headers.map(v=>`| ${v} `).join('')+'|',headers.map(()=>'| --- ').join('')+'|',...data.map(r=>r.map(v=>`| ${v} `).join('')+'|')].join('\n');
 const towerRows=(name,specs)=>{let investment=0;return specs.slice(1).map((s,i)=>{investment+=s.cost;return [name+' Lv.'+(i+1),s.hp,s.damage,s.interval,(s.damage/s.interval).toFixed(2),s.minRange?`${s.minRange}～${s.range}`:s.range,s.blastRadius||'—',s.cost,investment,TD.refundFor(i+1,specs)];});};
-const role={1:'基準近戰兵',6:'脆皮遠程兵',2:'一次衝鋒突擊兵',3:'慢速重裝兵',4:'快速爆破兵',5:'低威脅跑線兵'};
+const role={1:'基準近戰兵',6:'脆皮遠程兵',2:'一次衝鋒突擊兵',3:'慢速重裝兵',4:'快速爆破兵',5:'低威脅跑線兵',7:'高血量戰吼支援兵'};
 const text=[
 '# 哥布林基準平衡表',
 '此表由 `node tools/export-balance.cjs` 直接讀取遊戲設定產生。金幣與 HP 不縮放；移速、偵測距離、射程與爆炸半徑使用邏輯單位，正式關卡的 worldScale=2。已納入箭塔削弱與第二、三關台座支援配置，仍需玩家實測評估難度。',
 '## 敵方單位',
-rows(['單位','定位','本體 HP','普通攻擊','間隔（秒）','普通 DPS','速度','偵測距離','攻擊距離','擊殺金幣'],[5,1,6,2,4,3].map(type=>{const s=TD.ENEMIES[type];return [s.name,role[type],s.hp,s.attackDamage||'—',s.attackInterval||'—',s.attackInterval?(s.attackDamage/s.attackInterval).toFixed(2):'—',s.speed,s.detectionRange===Infinity?'全場':s.detectionRange,s.attackRange||'—',s.reward];})),
+rows(['單位','定位','本體 HP','普通攻擊','間隔（秒）','普通 DPS','速度','偵測距離','攻擊距離','擊殺金幣'],[5,1,6,2,4,3,7].map(type=>{const s=TD.ENEMIES[type];return [s.name,role[type],s.hp,s.attackDamage||'—',s.attackInterval||'—',s.attackInterval?(s.attackDamage/s.attackInterval).toFixed(2):'—',s.speed,s.detectionRange===Infinity?'全場':s.detectionRange,s.attackRange||'—',s.reward];})),
 `獸人：開場有 ${TD.ENEMIES[2].chargeHealthBonus} HP 獨立灰條，衝鋒速度 ${TD.ENEMIES[2].speed*TD.ENEMIES[2].chargeSpeedMultiplier}，衝撞傷害 ${TD.ENEMIES[2].chargeDamage}。累積受傷 ${TD.ENEMIES[2].chargeBreakDamage} 或撞擊建築後灰條消失；破盾的單次傷害不溢出，200 傷害箭雨仍只破盾，本體保留 80 HP。`,
-`炸彈哥布林：引爆距離 ${TD.ENEMIES[4].triggerRange}、爆炸半徑 ${TD.ENEMIES[4].blastRadius}、傷害 ${TD.ENEMIES[4].blastDamage}，同時影響敵人和建築。追塔自爆本身不給金幣，被擊殺才給 ${TD.ENEMIES[4].reward}。`,
+`炸彈哥布林：沿道路前進，偵測距離 ${TD.ENEMIES[4].detectionRange} 內才追近建築；引爆距離 ${TD.ENEMIES[4].triggerRange}、爆炸半徑 ${TD.ENEMIES[4].blastRadius}、傷害 ${TD.ENEMIES[4].blastDamage}，只傷害玩家建築，不傷害其他怪物。追塔自爆本身不給金幣，被擊殺才給 ${TD.ENEMIES[4].reward}。`,
 `史萊姆不攻擊箭塔；被城牆或柵欄阻擋時，每 ${TD.WALL.attackInterval} 秒造成 ${TD.WALL.attackDamage} 傷害，攻擊距離 ${TD.WALL.attackRange}。弓箭手準備射擊 ${TD.ENEMIES[6].attackWindup} 秒，箭速 ${TD.ENEMIES[6].projectileSpeed}。`,
 '## 攻擊建築',
 rows(['建築','HP','傷害','間隔（秒）','單目標 DPS','射程','爆炸半徑','建造／本次升級費','累計投資','拆除退款'],[...towerRows('箭塔',TD.TOWERS),...towerRows('炸彈塔',Bomb.specs)]),
-'炸彈塔目前只在測試場使用，以上價格與耐久已接入共用建造／升級／修復／拆除邏輯，正式關卡尚未開放其建造選單。炸彈固定落點且全額傷害友軍；最短射程 65 大於半徑 45，正常投彈可避開自傷。準備 0.3 秒、飛行 0.65 秒，DPS 為名義持續命中值，實際受落點、移動與友軍傷害影響。',
+'炸彈塔於第五關及測試場使用，以上價格與耐久已接入共用建造／升級／修復／拆除邏輯。炸彈固定落點，只傷害敵人，不傷害友方建築或發射塔自身。準備 0.3 秒、飛行 0.65 秒，DPS 為名義持續命中值，實際受落點與目標移動影響。',
 '## 箭塔與台座調整',
 `箭塔每箭傷害由 20／30／40 改為 ${TD.TOWERS.slice(1).map(s=>s.damage).join('／')}，三級塔持續 DPS 由 80 降至 ${(TD.TOWERS[3].damage/TD.TOWERS[3].interval).toFixed(2)}（降低 ${(100*(1-TD.TOWERS[3].damage/TD.TOWERS[3].interval/80)).toFixed(1)}%）。弓箭手 36 HP 與獸人灰條 40 HP 都不再被三級塔一箭清除。`,
 '一級射程保留 95，讓弓箭手在偵測距離 90 停下時，箭塔仍能回擊；二、三級射程由 115／135 縮至 110／125。第一關台座保留，使用共用的新箭塔數值。',
@@ -27,8 +27,9 @@ rows(['建築','價格','HP','單隻哥布林摧毀所需普攻','每場上限',
 '正式關卡木柵外觀靠建築選取格右側顯示，直立木柵貼齊右緣；建造預覽、血條與殘骸使用同一個美術位置，碰撞、阻擋及攻擊判定維持原本座標。',
 rows(['工程','花費／退款','遊戲時間','結果'],[['建造','依建築表',TD.TOWER_ACTIONS.build.duration+' 秒','完成前不攻擊'],['升級','依建築表',TD.TOWER_ACTIONS.upgrade.duration+' 秒','提升最大 HP 並回滿；期間停火'],['滿級修復',TD.TOWER_ACTIONS.repair.cost+' 金幣',TD.TOWER_ACTIONS.repair.duration+' 秒','回滿該塔最大 HP；期間停火'],['拆除','累計投資 50%',TD.TOWER_ACTIONS.demolish.duration+' 秒','完成才退款；期間停火']]),
 '## 對哥布林的攻擊基準',
+'第五關 Boss 哥布林隊長死亡立即通關，尚未出場增援取消；Boss 越過防衛線立即戰敗，剩餘生命歸零且不受盾兵保護期豁免。其他敵人沿用原有生命規則。',
 rows(['箭塔','擊殺 50 HP 哥布林所需箭數','第一箭至致命箭的理論時間','單隻哥布林摧毀滿血塔所需普攻'],TD.TOWERS.slice(1).map((s,i)=>{const n=Math.ceil(50/s.damage);return ['Lv.'+(i+1),n,((n-1)*s.interval).toFixed(2)+' 秒',Math.ceil(s.hp/12)];})),
 '首箭可立即發射；上述時間不含彈道、轉移目標、施工或溢出傷害。高級箭塔另有射程與耐久優勢，炸彈塔要同時命中多個敵人才具成本優勢。',
-'現有波次、初始 120 金幣、波次獎勵與 200 傷害箭雨保留。哥布林隊長、Boss 獨眼巨人與盾兵目前是動畫／救援素材，沒有獨立戰鬥 HP、攻擊或購買機制，未虛設戰鬥數值。'
+'第五關起始 150 金幣、六波共 147 隻敵人，第 3、6 波出怪間隔為 0.8 秒，其餘為 1.35 秒；前五波各給 30 金幣，沿用 200 傷害箭雨。哥布林隊長 500 HP，其餘基礎數值沿用一般哥布林。入場 5 秒後首次發動戰吼，之後每 15 秒一次、持續 5 秒，半徑 160 邏輯單位內其他哥布林、弓箭手、炸彈哥布林的移速與攻速各增加 20%，單次傷害不變。增益不疊加，離開範圍或隊長死亡即解除。Boss 獨眼巨人與盾兵仍是動畫／救援素材。'
 ].join('\n\n')+'\n';
 fs.writeFileSync(path.join(__dirname,'../BALANCE.md'),text);console.log('Generated BALANCE.md from live settings.');

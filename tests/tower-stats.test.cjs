@@ -16,9 +16,9 @@ test('upgrade preserves kills while demolition, destruction and restart cannot c
  const originalId=s.towerId;g.demolish(0);g.updateTowerActions(3);g.build(0);assert.notEqual(s.towerId,originalId);assert.equal(s.kills,0);g.damageEnemy(enemy(g),100,originalId);assert.equal(s.kills,0);
  const rebuiltId=s.towerId;g.damageTower(s,100);g.build(0);g.damageEnemy(enemy(g),100,rebuiltId);assert.equal(s.kills,0);g.start();assert.ok(g.slots.every(t=>t.kills===0));
 });
-test('chain kills credit the triggering tower; enemy self-destruction grants no tower kills',()=>{
- const g=setup(),s=g.slots[0];const bomb=enemy(g,4,110);enemy(g,5,115);g.damageEnemy(bomb,100,s.towerId);assert.equal(s.kills,2);
- const self=enemy(g,4,500);enemy(g,5,510);g.killEnemy(self,false);assert.equal(s.kills,2);
+test('only the shot-down bomber credits the tower; self-destruction grants no tower kills',()=>{
+ const g=setup(),s=g.slots[0];const bomb=enemy(g,4,110);enemy(g,5,115);g.damageEnemy(bomb,100,s.towerId);assert.equal(s.kills,1);
+ const self=enemy(g,4,500);enemy(g,5,510);g.killEnemy(self,false);assert.equal(s.kills,1);
 });
 test('tower statistics follow live level, configured interval, unscaled range and kill count',()=>{
  const g=setup(),s=g.slots[0];let stats=state(g,0).stats;assert.equal(stats.damage,TOWERS[1].damage);assert.equal(stats.range,TOWERS[1].range);assert.equal(stats.interval,TOWERS[1].interval);assert.deepEqual(stats.targets,['ground','air']);

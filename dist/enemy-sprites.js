@@ -8,7 +8,11 @@
     {file:'enemy_lv3_cyclops.png',size:48,anchor:{x:24,y:45}},
     {file:'enemy_bomber_goblin.png',name:'炸彈哥布林',size:32,frames:24,anchor:{x:16,y:29},animations:passiveAnimations},
     {file:'enemy_slime.png',name:'史萊姆',size:24,frames:24,anchor:{x:12,y:21},animations:passiveAnimations},
-    {file:'enemy_goblin_archer.png',name:'哥布林弓箭手',size:24,frames:20,anchor:{x:12,y:21}}
+    {file:'enemy_goblin_archer.png',name:'哥布林弓箭手',size:24,frames:20,anchor:{x:12,y:21}},
+    {file:'../boss/boss_goblin_captain.png',name:'哥布林隊長',size:48,frames:27,anchor:{x:24,y:44},animations:{
+      idle:{start:0,count:4,fps:5,loop:true},walk:{start:4,count:4,fps:7,loop:true},attack:{start:8,count:4,fps:8,loop:false},
+      warcry:{start:12,count:6,fps:8,loop:false},hurt:{start:18,count:3,fps:10,loop:false},death:{start:21,count:6,fps:7,loop:false}
+    }}
   ];
   const deathDuration=animations.death.count/animations.death.fps;
   function sample(enemy,time){

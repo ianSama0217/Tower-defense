@@ -1,0 +1,68 @@
+{
+  "errors": [],
+  "fit": {
+    "roadWidth": 96,
+    "fences": [
+      {
+        "width": 32,
+        "height": 96,
+        "orientation": "vertical"
+      },
+      {
+        "width": 96,
+        "height": 32,
+        "orientation": "horizontal"
+      }
+    ],
+    "soldierRows": [
+      376,
+      424
+    ]
+  },
+  "pads": 10,
+  "waves": 6,
+  "totalEnemies": 147,
+  "spawnInterval": 1.35,
+  "fastWaveInterval": 0.8,
+  "fastWaves": [
+    3,
+    6
+  ],
+  "initialMoney": 150,
+  "buildings": [
+    "arrow",
+    "fence",
+    "bomb"
+  ],
+  "captain": {
+    "hp": 500,
+    "warcry": {
+      "hp": 500,
+      "maxHp": 500,
+      "affected": 5,
+      "multipliers": [
+        1.2,
+        1.2,
+        1.2,
+        1.2,
+        1.2
+      ]
+    },
+    "firstDelay": 5,
+    "interval": 15,
+    "duration": 5,
+    "haste": 1.2,
+    "damageBonus": 0,
+    "death": "immediate victory",
+    "escape": "immediate defeat"
+  },
+  "combat": true,
+  "desktop": [
+    1440,
+    900
+  ],
+  "mobile": [
+    390,
+    844
+  ]
+}

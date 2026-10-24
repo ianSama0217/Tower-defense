@@ -37,13 +37,13 @@ const {chromium}=require('playwright'),assert=require('node:assert/strict'),fs=r
   await page.setViewportSize({width:1440,height:900});
   await page.evaluate(()=>{testGame.walls=[];testGame.phase='won';testGame.wave=6;testGame.kills=103;testGame.lives=3;});
   await page.locator('#result').waitFor({state:'visible'});await page.locator('#result-wall-reward').waitFor({state:'visible'});
-  assert.equal(await page.locator('#result-wall-title').textContent(),'通關獎勵 · 解鎖城牆');
+  assert.equal(await page.locator('#result-wall-title').textContent(),'通關獎勵 · 解鎖柵欄');
   assert.equal(await page.evaluate(()=>LevelProgress.wallsUnlocked(LevelProgress.read(localStorage))),true);
   await page.screenshot({path:'art/walls/reward-desktop.png'});await page.setViewportSize({width:390,height:844});await page.waitForTimeout(150);await page.screenshot({path:'art/walls/reward-mobile.png'});
   const reward=await page.locator('#result-wall-reward').boundingBox();assert.ok(reward.x>=0&&reward.x+reward.width<=390&&reward.y+reward.height<=844);
   await page.locator('#restart').click();assert.equal(await page.locator('#result-wall-reward').isVisible(),false);
   await page.evaluate(()=>{testGame.phase='won';testGame.wave=6;testGame.lives=3;});await page.locator('#result').waitFor({state:'visible'});
-  assert.equal(await page.locator('#result-wall-title').textContent(),'通關獎勵 · 城牆已解鎖');
+  assert.equal(await page.locator('#result-wall-title').textContent(),'通關獎勵 · 柵欄已解鎖');
   await page.goto('http://127.0.0.1:4173/tutorial.html');await page.waitForFunction(()=>window.testGame?.phase==='playing');
   assert.equal(await page.locator('.wall-tools,#wall-build').count(),0);assert.equal(await page.evaluate(()=>{testGame.money=1000;return testGame.placeWall(600,400).ok;}),false);
   await page.setViewportSize({width:1440,height:900});

@@ -7,8 +7,12 @@
 .home-sr-only { position:absolute; width:1px; height:1px; padding:0; margin:-1px; overflow:hidden; clip-path:inset(50%); white-space:nowrap; border:0; }
 .home-menu { position:absolute; inset:0; }
 .home-button { position:absolute; left:39.1%; width:21.3%; height:10.7%; padding:0; border:0; border-radius:2px; background:transparent; color:transparent; touch-action:manipulation; transition:background-color 100ms,box-shadow 100ms; }
-#start { top:52.7%; }
-#settings-open { top:65.5%; }
+#start { top:47.3%; }
+#home-restart { top:59.6%; }
+#settings-open { top:72%; }
+.restart-description { margin:12px 0 28px;font-size:24px;line-height:1.7; }
+.restart-error { color:#942d1c;font-size:18px;line-height:1.5; }
+@media(max-width:600px) { .restart-description { font-size:20px;margin-bottom:22px; } }
 .home-button:hover:not(:disabled) { background:#ffe5a31c; box-shadow:inset 0 0 0 3px #ffe3a27a,0 0 24px #ffe3a233; }
 .home-button:focus-visible { outline:3px solid #fff2a6; outline-offset:5px; background:#ffe5a326; box-shadow:0 0 0 8px #243719ad; }
 .home-button:active:not(:disabled) { background:#28160640; box-shadow:inset 0 0 0 4px #321b1970; }

@@ -25,6 +25,8 @@
     <button data-sound="playExplosion">爆炸<small>低頻衝擊與碎裂聲</small></button>
     <button data-sound="playEnemyDeath">敵人死亡<small>下滑短音</small></button>
     <button data-sound="playWaveStart">波次開始<small>上行號角</small></button>
+    <button data-sound="playVictory">關卡通過<small>8-bit 勝利音效</small></button>
+    <button data-sound="playGameOver">關卡失敗<small>8-bit 遊戲結束音效</small></button>
   </div>
   <p id="status" role="status">音量與靜音設定會套用至遊戲。</p>
 </main>
@@ -32,7 +34,7 @@
 <script>
   document.querySelectorAll('[data-sound]').forEach(button=>button.addEventListener('click',async()=>{
     const ready=await gameSound.unlock();gameSound.stopAll();
-    const played=ready&&gameSound[button.dataset.sound](Number(button.dataset.level)||1);
+    const played=ready&&await gameSound[button.dataset.sound](Number(button.dataset.level)||1);
     document.getElementById('status').textContent=played?`正在試聽：${button.firstChild.textContent}`:gameSound.muted||gameSound.volume===0?'請取消靜音或提高音量。':'瀏覽器尚未啟用音訊，請再次點選試聽。';
   }));
 </script>

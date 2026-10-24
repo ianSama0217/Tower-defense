@@ -22,7 +22,7 @@ test('second-level victory unlocks walls from stars, persists on reload and repe
 test('tower count records completed new buildings only, survives destruction, and resets',()=>{
  const g=new TutorialGame(()=>0);g.start();g.build(0);assert.equal(g.towersBuilt,0);g.update(5);assert.equal(g.towersBuilt,1);
  g.money=1000;g.wave=2;g.awaitingWave=true;g.build(0);g.update(5);assert.equal(g.towersBuilt,1);
- g.damageTower(g.slots[0],100);assert.equal(g.towersBuilt,1);g.upgradeLearned=true;g.build(1);g.damageTower(g.slots[1],100);g.update(5);assert.equal(g.towersBuilt,1);
+ g.damageTower(g.slots[0],100);assert.equal(g.towersBuilt,1);g.build(1);g.damageTower(g.slots[1],100);g.update(5);assert.equal(g.towersBuilt,1);
  g.start();assert.equal(g.towersBuilt,0);
 });
 

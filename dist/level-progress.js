@@ -6,7 +6,7 @@
     {name:'花徑哨站',enemies:[1,6],href:'level-two.html'},
     {name:'古木岔路',enemies:[1,6,2],href:'level-three.html'},
     {name:'暮色防線',enemies:[1,6,2,4],href:'level-four.html'},
-    {name:'荊棘王座',enemies:[]}
+    {name:'荊棘王座',enemies:[1,6,4,7],href:'level-five.html'}
   ];
   function normalize(value){return Array.from({length:COUNT},(_,i)=>Number.isInteger(value?.[i])&&value[i]>=0&&value[i]<=3?value[i]:0);}
   function read(storage){
@@ -28,7 +28,19 @@
     try{storage.setItem(KEY,JSON.stringify(stars));saved=true;}catch{}
     return {stars,saved};
   }
-  const validEnemy=id=>Number.isInteger(id)&&id>=1&&id<=6;
+  function reset(storage){
+    const keys=[KEY,ENCOUNTER_KEY,'td-tutorial-complete'],removed=[];
+    try{
+      const previous=keys.map(key=>[key,storage.getItem(key)]);
+      for(const entry of previous){storage.removeItem(entry[0]);removed.push(entry);}
+      return true;
+    }catch{
+      // Restore anything already removed if storage rejects the reset midway.
+      for(const [key,value] of removed)if(value!==null){try{storage.setItem(key,value);}catch{}}
+      return false;
+    }
+  }
+  const validEnemy=id=>Number.isInteger(id)&&id>=1&&id<=7;
   function readEncountered(storage){
     let ids=[];
     try{const value=JSON.parse(storage.getItem(ENCOUNTER_KEY));if(Array.isArray(value))ids=value.filter(validEnemy);}catch{}
@@ -49,6 +61,6 @@
       }
     };
   }
-  const api={KEY,ENCOUNTER_KEY,stages,read,unlocked,wallsUnlocked,bombTowersUnlocked,starsForResult,record,readEncountered,createEncounterTracker};
+  const api={KEY,ENCOUNTER_KEY,stages,read,unlocked,wallsUnlocked,bombTowersUnlocked,starsForResult,record,reset,readEncountered,createEncounterTracker};
   if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.LevelProgress=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

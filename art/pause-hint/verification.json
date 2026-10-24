@@ -1,0 +1,12 @@
+{
+  "checks": [
+    "all five stages wait three seconds",
+    "shared cursor image and gentle motion",
+    "resume hides hint and cancels pending display",
+    "settings and hidden tab reset the delay",
+    "desktop/mobile positioning",
+    "reduced motion",
+    "no intercepted input"
+  ],
+  "errors": []
+}

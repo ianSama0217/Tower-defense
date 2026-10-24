@@ -8,9 +8,10 @@ test('unselected pads have no menu, empty pads show the configured build price',
   for(const kind of ['build','upgrade','repair','demolish'])assert.equal(menu[kind].duration,TD.TOWER_ACTIONS[kind].duration);
   g.money=59;assert.equal(state(g,0).build.reason,'金幣不足');
 });
-test('upgrade prices and tutorial locks agree with actual transactions',()=>{
+test('upgrade prices and normal resource limits agree with transactions before the first wave',()=>{
   const g=game();g.build(0);g.update(5);let m=state(g,0);assert.equal(m.upgrade.amount,70);assert.equal(m.upgrade.disabled,true);
-  g.wave=2;g.money=300;m=state(g,0);assert.equal(m.upgrade.disabled,false);
+  assert.equal(m.upgrade.reason,'金幣不足');
+  g.money=300;m=state(g,0);assert.equal(g.wave,0);assert.equal(m.upgrade.disabled,false);
   const before=g.money;g.build(0);assert.equal(before-g.money,m.upgrade.amount);assert.equal(state(g,0).upgrade.reason,'工程進行中');
   g.update(5);m=state(g,0);assert.equal(m.upgrade.amount,110);assert.equal(m.investment,130);
   g.build(0);g.update(5);m=state(g,0);assert.equal(m.upgrade.amount,null);assert.equal(m.upgrade.reason,'已達最高等級');
@@ -22,9 +23,9 @@ test('repair price matches engine and full-health or unfinished towers cannot be
   assert.equal(g.repair(0).ok,true);assert.equal(g.money,0);g.update(3);assert.equal(state(g,0).repair.reason,'生命已滿');
 });
 test('demolition previews positive refunds for each level and credits only on completion',()=>{
-  for(const level of [1,2,3]){const g=game();g.upgradeLearned=true;Object.assign(g.slots[0],{level,hp:100});
+  for(const level of [1,2,3]){const g=game();Object.assign(g.slots[0],{level,hp:100});
     const m=state(g,0),before=g.money;assert.equal(m.demolish.amount,TD.refundFor(level));assert.equal(m.demolish.income,true);
-    g.demolish(0);assert.equal(g.money,before);g.update(3);assert.equal(g.money-before,m.demolish.amount);assert.equal(g.slots[0].level,0);
+    assert.equal(m.demolish.disabled,false);assert.equal(g.demolish(0).ok,true);assert.equal(g.money,before);g.update(3);assert.equal(g.money-before,m.demolish.amount);assert.equal(g.slots[0].level,0);
   }
 });
 test('paused, loading, finished and busy states block every engineering action',()=>{

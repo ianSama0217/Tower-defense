@@ -1,20 +1,18 @@
 (function(root){
  'use strict';
  const TD=typeof module!=='undefined'&&module.exports?require('./engine.js'):root.TD;
- // Experimental: only /test imports this module; no campaign build menu registers it.
- const COMMON={minRange:65,range:125,blastRadius:45,windup:.3,flightTime:.65};
+ // Compose the same projectile rules with either the sandbox or campaign clocks.
+ const COMMON={minRange:45,range:125,blastRadius:45,windup:.3,flightTime:.65};
  const specs=[null,...[[100,25,2.4,80],[150,40,2.2,90],[200,60,2,130]].map(([hp,damage,interval,cost])=>({...COMMON,hp,damage,interval,cost}))];
  function ranges(level,scale=1){const s=specs[level];return {min:s.minRange*scale,max:s.range*scale,blast:s.blastRadius*scale};}
  function canTarget(tower,enemy,scale=1){if(!enemy||enemy.hp<=0||enemy.escaped||enemy.deathAt!=null)return false;const r=ranges(tower.level,scale),distance=Math.hypot(enemy.x-tower.x,enemy.y-tower.y);return distance>=r.min-1e-7&&distance<=r.max+1e-7;}
- class BombTowerGame extends TD.Game{
+ const withBombTowers=Base=>class extends Base{
   towerSpecs(slot){return slot?.kind==='bomb'?specs:super.towerSpecs(slot);}
   reset(scenario=this.level){super.reset(scenario);this.bombs=[];this.bombFireEnabled=true;}
-  hasFriendlyProjectiles(){return this.bombs.length>0;}
+  hasFriendlyProjectiles(){return this.bombs.length>0||super.hasFriendlyProjectiles();}
   detonate(bomb){
    this.effects.push({kind:'tower-bomb-explosion',x:bomb.toX,y:bomb.toY,radius:bomb.radius,life:.65,duration:.65});this.sound?.playExplosion();
    const center={x:bomb.toX,y:bomb.toY};
-   // Full friendly fire, including the firing tower; walls measure from their closest edge.
-   for(const target of [...this.slots,...this.walls])if(TD.targetDistance(target,center)<=bomb.radius+1e-7)this.damageTower(target,bomb.damage);
    for(const enemy of [...this.enemies])if(Math.hypot(enemy.x-center.x,enemy.y-center.y)<=bomb.radius+1e-7)this.damageEnemy(enemy,bomb.damage,bomb.sourceTowerId);
   }
   fireTowers(dt){
@@ -41,6 +39,7 @@
     s.pendingBomb={target,towerId:s.towerId,releaseAt:this.time+spec.windup};
    }
   }
- }
- const api={specs,ranges,canTarget,BombTowerGame};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.BombTowers=api;
+ };
+ const BombTowerGame=withBombTowers(TD.Game);
+ const api={specs,ranges,canTarget,BombTowerGame,withBombTowers};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.BombTowers=api;
 })(typeof globalThis!=='undefined'?globalThis:this);

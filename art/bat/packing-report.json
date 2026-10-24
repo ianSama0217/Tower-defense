@@ -1,0 +1,142 @@
+{
+  "scale": 0.07028753993610223,
+  "anchor": {
+    "x": 12,
+    "y": 21
+  },
+  "frames": [
+    {
+      "frame": 0,
+      "left": 1,
+      "top": 9,
+      "right": 22,
+      "bottom": 20
+    },
+    {
+      "frame": 1,
+      "left": 3,
+      "top": 11,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 2,
+      "left": 3,
+      "top": 12,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 3,
+      "left": 2,
+      "top": 9,
+      "right": 21,
+      "bottom": 20
+    },
+    {
+      "frame": 4,
+      "left": 2,
+      "top": 8,
+      "right": 21,
+      "bottom": 20
+    },
+    {
+      "frame": 5,
+      "left": 3,
+      "top": 11,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 6,
+      "left": 2,
+      "top": 13,
+      "right": 21,
+      "bottom": 20
+    },
+    {
+      "frame": 7,
+      "left": 3,
+      "top": 10,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 8,
+      "left": 4,
+      "top": 10,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 9,
+      "left": 3,
+      "top": 9,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 10,
+      "left": 3,
+      "top": 12,
+      "right": 21,
+      "bottom": 20
+    },
+    {
+      "frame": 11,
+      "left": 2,
+      "top": 10,
+      "right": 21,
+      "bottom": 20
+    },
+    {
+      "frame": 12,
+      "left": 4,
+      "top": 10,
+      "right": 19,
+      "bottom": 20
+    },
+    {
+      "frame": 13,
+      "left": 5,
+      "top": 10,
+      "right": 18,
+      "bottom": 20
+    },
+    {
+      "frame": 14,
+      "left": 2,
+      "top": 9,
+      "right": 21,
+      "bottom": 20
+    },
+    {
+      "frame": 15,
+      "left": 3,
+      "top": 8,
+      "right": 20,
+      "bottom": 20
+    },
+    {
+      "frame": 16,
+      "left": 5,
+      "top": 11,
+      "right": 18,
+      "bottom": 20
+    },
+    {
+      "frame": 17,
+      "left": 2,
+      "top": 15,
+      "right": 22,
+      "bottom": 20
+    },
+    {
+      "frame": 18,
+      "left": 5,
+      "top": 9,
+      "right": 20,
+      "bottom": 20
+    }
+  ]
+}

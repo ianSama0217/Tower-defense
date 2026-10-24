@@ -1,7 +1,28 @@
 const test=require('node:test');
 const assert=require('node:assert/strict');
 const P=require('../dist/level-progress.js');
-function memory(initial={}){const data=new Map(Object.entries(initial));return {getItem:key=>data.get(key)??null,setItem:(key,value)=>data.set(key,value)};}
+function memory(initial={}){const data=new Map(Object.entries(initial));return {getItem:key=>data.get(key)??null,setItem:(key,value)=>data.set(key,value),removeItem:key=>data.delete(key)};}
+
+test('new campaign clears stars, encounters and legacy completion without clearing preferences',()=>{
+  const preferences={'td-sound-settings':'{"volume":0.7}','td-display-settings':'{"enemyHealth":false}','td-menu-settings':'{"speed":2}',unrelated:'keep'};
+  const save=memory({...preferences,[P.KEY]:'[3,3,3,3,3]',[P.ENCOUNTER_KEY]:'[1,2,3,4,5,6,7]','td-tutorial-complete':'true'});
+  assert.equal(P.reset(save),true);
+  assert.deepEqual(P.read(save),[0,0,0,0,0]);assert.deepEqual(P.readEncountered(save),[]);
+  assert.deepEqual(P.stages.map((_,i)=>P.unlocked(P.read(save),i)),[true,false,false,false,false]);
+  assert.equal(P.wallsUnlocked(P.read(save)),false);assert.equal(P.bombTowersUnlocked(P.read(save)),false);
+  for(const key of [P.KEY,P.ENCOUNTER_KEY,'td-tutorial-complete'])assert.equal(save.getItem(key),null);
+  for(const [key,value] of Object.entries(preferences))assert.equal(save.getItem(key),value);
+  assert.equal(P.reset(save),true);
+});
+
+test('failed reset reports failure and restores records removed before a storage error',()=>{
+  const initial={[P.KEY]:'[3,2,0,0,0]',[P.ENCOUNTER_KEY]:'[1,5,6]','td-tutorial-complete':'true'};
+  const save=memory(initial),remove=save.removeItem;
+  save.removeItem=key=>{if(key===P.ENCOUNTER_KEY)throw new Error('storage blocked');remove(key);};
+  assert.equal(P.reset(save),false);
+  for(const [key,value] of Object.entries(initial))assert.equal(save.getItem(key),value);
+  assert.equal(P.reset(null),false);
+});
 test('new players can inspect all stops but only the first is unlocked',()=>{
   const stars=P.read(memory());assert.deepEqual(stars,[0,0,0,0,0]);
   assert.deepEqual(P.stages.map((_,i)=>P.unlocked(stars,i)),[true,false,false,false,false]);
@@ -49,11 +70,11 @@ test('enemy encounters are unknown until spawned, persist without winning, and d
 test('encounter tracking rejects invalid IDs, deduplicates writes, and tolerates blocked storage',()=>{
   const save=memory();let writes=0;const original=save.setItem;save.setItem=(...args)=>{writes++;original(...args);};
   const tracker=P.createEncounterTracker(save);
-  for(const id of [0,7,-1,'1',null,NaN])assert.equal(tracker.encounter(id),false);
+  for(const id of [0,8,-1,'1',null,NaN])assert.equal(tracker.encounter(id),false);
   tracker.encounter(5);tracker.encounter(5);assert.equal(writes,1);
   save.setItem(P.ENCOUNTER_KEY,'[2,5]');tracker.encounter(1);assert.deepEqual(P.readEncountered(save),[1,2,5]);
   const blocked=P.createEncounterTracker(null);assert.doesNotThrow(()=>blocked.encounter(1));assert.equal(blocked.has(1),true);
-  for(const raw of ['bad','{}','null','[0,7,"1"]'])assert.deepEqual(P.readEncountered(memory({[P.ENCOUNTER_KEY]:raw})),[]);
+  for(const raw of ['bad','{}','null','[0,8,"1"]'])assert.deepEqual(P.readEncountered(memory({[P.ENCOUNTER_KEY]:raw})),[]);
 });
 test('goblin archer encounters can be saved without revealing them before they spawn',()=>{
   const save=memory(),tracker=P.createEncounterTracker(save);assert.equal(tracker.has(6),false);assert.equal(tracker.encounter(6),true);assert.deepEqual(P.readEncountered(save),[6]);

@@ -2,7 +2,7 @@
   'use strict';
   const $=id=>document.getElementById(id),screen=$('level-screen'),dialog=$('stage-dialog');
   const nodes=[...document.querySelectorAll('.level-node')],stages=LevelProgress.stages;
-  const enemyNames={1:'哥布林',2:'獸人',3:'獨眼巨人',4:'炸彈哥布林',5:'史萊姆',6:'哥布林弓箭手'};
+  const enemyNames={1:'哥布林',2:'獸人',3:'獨眼巨人',4:'炸彈哥布林',5:'史萊姆',6:'哥布林弓箭手',7:'哥布林隊長'};
   const settings=$('world-settings'),settingsButton=$('world-settings-open');
   let selected=0,stars=[];
   function fitDialog(modal){
@@ -95,7 +95,7 @@
     settings.close();screen.hidden=true;$('start-screen').hidden=false;document.title='林境守衛';
     root.StartScreen.resume();$('start').focus({preventScroll:true});
   });
-  screen.addEventListener('keydown',event=>{if(event.key==='Escape'&&!dialog.open&&!settings.open){event.preventDefault();openSettings();}});
+  screen.addEventListener('keydown',event=>{if(event.key==='Escape'&&!dialog.open&&!settings.open&&!$('encyclopedia-dialog').open){event.preventDefault();openSettings();}});
   root.addEventListener('storage',()=>{if(!screen.hidden){refresh();if(dialog.open)selectStage(selected);}});
   root.addEventListener('pageshow',refresh);
   root.LevelSelect={

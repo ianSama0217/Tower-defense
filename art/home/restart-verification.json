@@ -1,0 +1,14 @@
+{
+  "checks": [
+    "three menu controls aligned",
+    "desktop, mobile, landscape and short viewport",
+    "cancel/close/Escape/backdrop preserve records",
+    "cancel focused by default",
+    "storage failure stays in dialog",
+    "confirm resets campaign and legacy save",
+    "preferences retained",
+    "confirmation opens level selection with only stage one unlocked",
+    "later stages locked after reload"
+  ],
+  "errors": []
+}

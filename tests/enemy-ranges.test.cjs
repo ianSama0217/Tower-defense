@@ -4,7 +4,7 @@ const {Game,ENEMIES,enemyRanges}=require('../dist/engine.js');
 test('debug radii match enemy configuration and world scale',()=>{
   for(const scale of [1,2]){
     for(const type of [1,2,3])assert.deepEqual(enemyRanges(type,scale),{detection:ENEMIES[type].detectionRange*scale,attack:ENEMIES[type].attackRange*scale,trigger:0,blast:0});
-    assert.deepEqual(enemyRanges(4,scale),{detection:Infinity,attack:0,trigger:22*scale,blast:48*scale});
+    assert.deepEqual(enemyRanges(4,scale),{detection:64*scale,attack:0,trigger:22*scale,blast:48*scale});
     assert.deepEqual(enemyRanges(5,scale),{detection:0,attack:0,trigger:0,blast:0});
   }
 });
