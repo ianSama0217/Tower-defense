@@ -19,7 +19,6 @@
     const entries=data[category];selected=Math.min(selected,entries.length-1);
     tabs.forEach(tab=>{const active=tab.dataset.category===category;tab.setAttribute('aria-selected',active);tab.tabIndex=active?0:-1;});
     $('encyclopedia-content').setAttribute('aria-labelledby',`encyclopedia-tab-${category}`);
-    $('encyclopedia-count').textContent=`已發現 ${entries.filter(entry=>entry.known).length} / ${entries.length}`;
     $('encyclopedia-list').replaceChildren(...entries.map((entry,index)=>{
       const button=document.createElement('button'),label=document.createElement('span');
       button.type='button';button.className='encyclopedia-entry';button.setAttribute('aria-current',String(index===selected));

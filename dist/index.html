@@ -34,6 +34,8 @@
     <button id="encyclopedia-open" aria-label="開啟圖鑑" title="圖鑑" aria-haspopup="dialog" aria-controls="encyclopedia-dialog" aria-expanded="false"><img src="assets/ui/encyclopedia-book.png" alt="" draggable="false"></button>
     <button id="world-settings-open" aria-label="選關設定" title="設定" aria-haspopup="dialog" aria-controls="world-settings" aria-expanded="false"><span class="world-settings-icon" aria-hidden="true"></span></button>
     <div class="world-map" id="world-map">
+      <div class="map-track" id="map-track">
+      <div class="world-page" data-map-page="0" aria-label="翡翠森林，第 1 至 5 關">
       <div class="map-surface">
       <nav id="world-levels" aria-label="森林關卡地圖">
         <button class="level-node" data-stage="1" style="left:12.6%;top:68%" aria-haspopup="dialog" aria-controls="stage-dialog" aria-expanded="false">
@@ -58,7 +60,17 @@
         </button>
       </nav>
       </div>
+      </div>
+      <div class="world-page cave-page" data-map-page="1" aria-label="幽暗洞窟，第 6 至 10 關" aria-hidden="true" inert>
+        <div class="map-surface"><nav id="cave-levels" aria-label="洞窟關卡地圖"></nav></div>
+      </div>
+      </div>
     </div>
+    <nav class="map-pagination" aria-label="切換選關地圖">
+      <button id="map-prev" class="map-arrow" type="button" aria-label="上一張地圖：第 1 至 5 關" aria-controls="map-track" disabled><img src="assets/ui/map-prev.png" alt="" draggable="false"></button>
+      <p id="map-page-label" role="status" aria-live="polite">翡翠森林</p>
+      <button id="map-next" class="map-arrow" type="button" aria-label="下一張地圖：第 6 至 10 關" aria-controls="map-track"><img src="assets/ui/map-next.png" alt="" draggable="false"></button>
+    </nav>
 
   </section>
   <dialog id="world-settings" data-settings-panel="map" aria-labelledby="world-settings-title"></dialog>
@@ -71,7 +83,7 @@
         <button id="encyclopedia-tab-defenses" role="tab" data-category="defenses" aria-selected="false" aria-controls="encyclopedia-content" tabindex="-1">防禦建築</button>
       </div>
       <div id="encyclopedia-content" role="tabpanel" aria-labelledby="encyclopedia-tab-enemies">
-        <nav class="encyclopedia-sidebar" aria-label="圖鑑條目"><p id="encyclopedia-count"></p><div id="encyclopedia-list"></div></nav>
+        <nav class="encyclopedia-sidebar" aria-label="圖鑑條目"><div id="encyclopedia-list"></div></nav>
         <section class="encyclopedia-detail" aria-live="polite">
           <div class="encyclopedia-profile"><h3 id="encyclopedia-name"></h3><div class="encyclopedia-scene"><button id="encyclopedia-prev" aria-label="上一個條目">‹</button><div id="encyclopedia-portrait"></div><button id="encyclopedia-next" aria-label="下一個條目">›</button></div><div id="encyclopedia-levels" aria-label="塔防等級" hidden></div><p id="encyclopedia-description"></p></div>
           <div class="encyclopedia-facts"><h4>基礎能力</h4><dl id="encyclopedia-stats"></dl><h4>特性</h4><ul id="encyclopedia-traits"></ul></div>

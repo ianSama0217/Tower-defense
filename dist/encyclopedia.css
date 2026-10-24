@@ -8,21 +8,21 @@
 .encyclopedia-heading{position:relative;display:flex;justify-content:center;flex-shrink:0;height:100px}
 #encyclopedia-title{display:grid;place-items:center;width:390px;max-width:70%;height:100%;padding:8px 60px 18px;margin:0;background:url('assets/ui/stage-kit/title.png') center/100% 100% no-repeat;font-size:48px;font-weight:400;letter-spacing:.16em;color:#ffe4a4;text-shadow:3px 3px #382115,-2px -2px #382115;image-rendering:pixelated}
 #encyclopedia-close{position:absolute;right:-4px;top:4px;width:60px;height:60px;border:0;background:url('assets/ui/stage-kit/close.png') center/contain no-repeat;color:transparent;font-size:0;image-rendering:pixelated}
-.encyclopedia-tabs{display:flex;gap:6px;border-bottom:5px solid #55351f;padding:0 0 6px;flex-shrink:0}
-.encyclopedia-tabs button{flex:0 1 240px;min-height:60px;padding:8px 16px;border:2px solid #543522;border-radius:6px 6px 0 0;background:#8b4d29 var(--wood) center/300px;color:#ffedc6;text-shadow:2px 2px #402615;box-shadow:inset 0 2px #dfac73;font-size:26px}
-.encyclopedia-tabs button[aria-selected=true]{background:linear-gradient(#ffdf93cc,#efb54bcc),var(--wood) center/300px;color:#402712;text-shadow:1px 1px #ffdb9a;border-color:#fff0b1;box-shadow:0 0 0 2px #b57528,inset 0 0 12px #ffe998}
+.encyclopedia-tabs{display:flex;gap:6px;align-items:stretch;border-bottom:5px solid #55351f;padding:0;flex-shrink:0}
+.encyclopedia-tabs button{flex:0 1 240px;min-height:66px;padding:8px 20px;border:0;background:url('assets/ui/stage-kit/nameplate.png') center bottom/100% 100% no-repeat;color:#ffedc6;text-shadow:2px 2px #382115,-1px -1px #382115;font-size:26px;image-rendering:pixelated}
+.encyclopedia-tabs button[aria-selected=true]{color:#ffe087;text-shadow:2px 2px #382115,-1px -1px #382115;filter:brightness(1.12) drop-shadow(0 0 3px #ffdf81)}
 #encyclopedia-content{display:grid;grid-template-columns:26% minmax(0,1fr);gap:14px;min-height:0;flex:1;padding-top:12px}
 .encyclopedia-sidebar{display:flex;flex-direction:column;min-height:0;border-right:3px solid #99653a;padding-right:12px}
-#encyclopedia-count{margin:0 0 10px;padding:0 6px;font-size:16px;color:#75502d}
 #encyclopedia-list{overflow:auto;min-height:0;scrollbar-color:#b77939 #5f3a23;scrollbar-width:thin;padding:3px;display:flex;flex-direction:column;gap:7px}
-.encyclopedia-entry{display:flex;align-items:center;gap:8px;width:100%;min-height:74px;flex-shrink:0;padding:5px 9px;border:2px solid #89562e;border-radius:6px;background:#d3ab70;box-shadow:inset 0 2px #f7d79e,0 2px #694526;color:var(--ink);font-size:20px;text-align:left}
-.encyclopedia-entry[aria-current=true]{background:#ffd277;border-color:#fff0ae;box-shadow:0 0 0 2px #c6812c,inset 0 0 12px #fff0ad}
+.encyclopedia-entry{display:flex;align-items:center;gap:8px;width:100%;min-height:74px;flex-shrink:0;padding:7px 16px;border:0;border-radius:6px;background:url('assets/ui/stage-kit/heading.png') center/100% 100% no-repeat;color:#fff1c9;text-shadow:2px 2px #3d2717;font-size:20px;text-align:left;image-rendering:pixelated}
+.encyclopedia-entry[aria-current=true]{outline:2px solid #ffdc83;outline-offset:0;box-shadow:0 0 6px #ffe49c;color:#ffe49c}
 .encyclopedia-sprite{--size:60px;position:relative;display:block;width:var(--size);height:var(--size);flex-shrink:0;background-position:center;background-size:contain;background-repeat:no-repeat;image-rendering:pixelated}
 .encyclopedia-operator{position:absolute;left:50%;transform:translateX(-50%);background:url('assets/bomb-towers/operator.png') 0 0/800% 100% no-repeat}
 .encyclopedia-sprite.is-sheet{background-position:0 0;background-size:calc(var(--frames)*var(--size)) var(--size)}
 .encyclopedia-sprite.is-unknown{filter:brightness(0)}
 .encyclopedia-detail{display:grid;grid-template-columns:minmax(0,1.2fr) minmax(0,1fr);gap:12px;min-height:0;overflow:auto;scrollbar-color:#b77939 #d8b57c;scrollbar-width:thin;padding:3px}
 .encyclopedia-profile,.encyclopedia-facts{min-width:0;border:5px solid #a27140;border-image:url('assets/ui/stage-kit/panel.png') 30 stretch;background:#ead09a99;padding:10px}
+.encyclopedia-facts{margin-right:16px}
 .encyclopedia-profile{display:flex;flex-direction:column}
 #encyclopedia-name{display:grid;place-items:center;flex-shrink:0;min-height:62px;margin:0;text-align:center;padding:9px 12px;background:url('assets/ui/stage-kit/heading.png') center/100% 100% no-repeat;color:#fff1c9;text-shadow:2px 2px #3d2717;font-size:28px;font-weight:400;image-rendering:pixelated}
 .encyclopedia-scene{position:relative;display:flex;align-items:center;justify-content:space-between;min-height:180px;flex:1;margin:10px 0;background:linear-gradient(#edcf90c9,#dfbc7e66),url('assets/ui/forest-world-map.png') 8% 72%/360%;border-bottom:3px solid #ac7e47}
@@ -34,7 +34,7 @@
 #encyclopedia-levels{display:flex;justify-content:center;gap:8px}
 #encyclopedia-levels button{border:2px solid #86592f;background:#cfaa70;color:#50351e;padding:7px 12px;border-radius:4px;font-size:18px}
 #encyclopedia-levels button[aria-pressed=true]{background:#ffe096;border-color:#a46d26}
-.encyclopedia-facts h4{margin:0 0 10px;padding:8px 12px;background:linear-gradient(90deg,#855030,#a77644);color:#ffebc2;font-size:20px;font-weight:400}
+.encyclopedia-facts h4{display:flex;align-items:center;min-height:48px;margin:0 0 10px;padding:10px 18px;background:url('assets/ui/stage-kit/heading.png') center/100% 100% no-repeat;color:#fff1c9;text-shadow:2px 2px #3d2717;font-size:20px;font-weight:400;image-rendering:pixelated}
 #encyclopedia-stats{display:grid;grid-template-columns:1fr auto;margin:0 0 16px;font-size:18px}
 #encyclopedia-stats dt,#encyclopedia-stats dd{margin:0;padding:6px 5px;border-bottom:2px solid #bd945c66}
 #encyclopedia-stats dd{text-align:right}
@@ -42,18 +42,18 @@
 #encyclopedia-traits li+li{margin-top:6px}
 #encyclopedia-dialog button:hover:not(:disabled){filter:brightness(1.08)}
 #encyclopedia-dialog button:focus-visible{outline:3px solid #3b704c;outline-offset:1px}
-@media(max-width:1000px){.encyclopedia-entry{font-size:17px;gap:3px;padding:4px}.encyclopedia-entry .encyclopedia-sprite{--size:48px}#encyclopedia-portrait .encyclopedia-sprite{--size:144px}.encyclopedia-detail{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}#encyclopedia-name{font-size:24px}#encyclopedia-stats{font-size:17px}#encyclopedia-traits{font-size:16px}}
+@media(max-width:1000px){.encyclopedia-entry{font-size:17px;gap:3px;padding:7px 12px}.encyclopedia-entry .encyclopedia-sprite{--size:48px}#encyclopedia-portrait .encyclopedia-sprite{--size:144px}.encyclopedia-detail{grid-template-columns:minmax(0,1.15fr) minmax(0,1fr)}#encyclopedia-name{font-size:24px}#encyclopedia-stats{font-size:17px}#encyclopedia-traits{font-size:16px}}
 @media(max-width:700px){
  #encyclopedia-open{width:44px;height:44px;right:calc(max(12px,env(safe-area-inset-right)) + 54px)}
  #encyclopedia-dialog{width:calc(100vw - 16px);height:calc(100dvh - 24px)}
  .encyclopedia-panel{padding:6px 10px 12px}.encyclopedia-heading{height:72px}#encyclopedia-title{font-size:32px;width:250px;padding:5px 30px 12px}#encyclopedia-close{width:42px;height:42px;right:0}
- .encyclopedia-tabs{gap:4px;border-bottom-width:3px}.encyclopedia-tabs button{min-height:46px;padding:7px 4px;font-size:20px;flex:1}
- #encyclopedia-content{display:flex;flex-direction:column;gap:8px;padding-top:6px}.encyclopedia-sidebar{border:0;padding:0;flex-shrink:0}#encyclopedia-count{font-size:14px;margin:0 0 4px}
- #encyclopedia-list{flex-direction:row;overflow:auto;gap:7px;padding:3px 3px 7px}.encyclopedia-entry{width:132px;min-height:58px;font-size:15px;gap:3px}.encyclopedia-entry .encyclopedia-sprite{--size:42px}
+ .encyclopedia-tabs{gap:4px;border-bottom-width:3px}.encyclopedia-tabs button{min-width:0;min-height:46px;padding:7px 10px;font-size:clamp(14px,4.6vw,20px);flex:1;white-space:nowrap}
+ #encyclopedia-content{display:flex;flex-direction:column;gap:8px;padding-top:6px}.encyclopedia-sidebar{border:0;padding:0;flex-shrink:0}
+ #encyclopedia-list{flex-direction:row;overflow:auto;gap:7px;padding:3px 3px 7px}.encyclopedia-entry{width:148px;min-height:58px;font-size:15px;gap:3px}.encyclopedia-entry .encyclopedia-sprite{--size:42px}
  .encyclopedia-detail{display:block;flex:1;min-height:0}.encyclopedia-profile,.encyclopedia-facts{padding:8px}.encyclopedia-facts{margin-top:8px}#encyclopedia-name{min-height:45px;font-size:24px}.encyclopedia-scene{min-height:158px;margin:4px 0}#encyclopedia-portrait .encyclopedia-sprite{--size:144px}#encyclopedia-description{min-height:0;font-size:17px;padding:8px 4px}.encyclopedia-facts h4{font-size:21px;margin-bottom:6px}#encyclopedia-stats{font-size:18px;margin-bottom:16px}#encyclopedia-traits{font-size:17px}
 }
 @media(max-height:500px) and (min-width:701px){.encyclopedia-heading{height:64px}#encyclopedia-title{font-size:32px}.encyclopedia-tabs button{min-height:42px;font-size:20px}.encyclopedia-panel{padding:6px 14px 12px}#encyclopedia-content{padding-top:6px}.encyclopedia-scene{min-height:150px}#encyclopedia-portrait .encyclopedia-sprite{--size:128px}}
 @media(max-height:500px) and (min-width:560px) and (max-width:700px){
  .encyclopedia-heading{height:50px}#encyclopedia-title{font-size:28px}.encyclopedia-tabs button{min-height:36px;font-size:18px}
- #encyclopedia-content{display:grid;grid-template-columns:30% minmax(0,1fr)}.encyclopedia-sidebar{min-height:0}#encyclopedia-count{font-size:12px}#encyclopedia-list{flex-direction:column;min-height:0}.encyclopedia-entry{width:100%;min-height:48px}.encyclopedia-detail{min-height:0}
+ #encyclopedia-content{display:grid;grid-template-columns:30% minmax(0,1fr)}.encyclopedia-sidebar{min-height:0}#encyclopedia-list{flex-direction:column;min-height:0}.encyclopedia-entry{width:100%;min-height:48px}.encyclopedia-detail{min-height:0}
 }

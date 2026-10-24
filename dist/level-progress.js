@@ -3,10 +3,10 @@
   const KEY='td-level-stars', ENCOUNTER_KEY='td-encountered-enemies', COUNT=5;
   const stages=[
     {name:'林間入口',enemies:[5,1],href:'tutorial.html'},
-    {name:'花徑哨站',enemies:[1,6],href:'level-two.html'},
-    {name:'古木岔路',enemies:[1,6,2],href:'level-three.html'},
-    {name:'暮色防線',enemies:[1,6,2,4],href:'level-four.html'},
-    {name:'荊棘王座',enemies:[1,6,4,7],href:'level-five.html'}
+    {name:'林間小徑',enemies:[1,6],href:'level-two.html'},
+    {name:'深林',enemies:[1,6,2],href:'level-three.html'},
+    {name:'哥布林營地',enemies:[1,6,2,4],href:'level-four.html'},
+    {name:'哥布林巢穴',enemies:[1,6,4,7],href:'level-five.html'}
   ];
   function normalize(value){return Array.from({length:COUNT},(_,i)=>Number.isInteger(value?.[i])&&value[i]>=0&&value[i]<=3?value[i]:0);}
   function read(storage){
